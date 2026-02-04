@@ -1,0 +1,10 @@
+name: flutter_copilot_tools
+description: Build and development tools for flutter_copilot
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  yaml: ^3.1.0

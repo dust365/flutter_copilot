@@ -1,0 +1,55 @@
+name: Publish packages
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+
+jobs:
+  publish:
+    name: Publish flutter_copilot_mcp and flutter_copilot_claw
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'v')
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install tool dependencies
+        run: dart pub get
+        working-directory: tool
+
+      - name: Validate version.g.dart
+        run: |
+          dart tool/generate_version.dart
+          if ! git diff --exit-code packages/flutter_copilot_mcp/lib/src/version.g.dart; then
+            echo "ERROR: version.g.dart is out of sync. Please run 'dart tool/generate_version.dart' and commit the changes."
+            exit 1
+          fi
+
+      - name: Publish flutter_copilot_claw to pub.dev
+        run: flutter pub publish --force
+        working-directory: packages/flutter_copilot_claw
+
+      - name: Publish flutter_copilot_mcp to pub.dev
+        run: flutter pub publish --force
+        working-directory: packages/flutter_copilot_mcp

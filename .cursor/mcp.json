@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "flutter_copilot": {
+      "type": "stdio",
+      "command": "dart run ${workspaceFolder}/packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST"
+    }
+  }
+}
