@@ -57,6 +57,13 @@ class HomePage extends StatelessWidget {
       icon: Icons.navigation,
       color: Colors.teal,
     ),
+    const DemoPageInfo(
+      title: '调试与监控',
+      description: '测试 get_logs 工具 - 获取应用日志和监控功能',
+      route: '/debug-monitor-demo',
+      icon: Icons.monitor,
+      color: Colors.indigo,
+    ),
   ];
 
   @override

@@ -36,7 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_copilot_claw:
     path: ../packages/flutter_copilot_claw
-  logging: ^1.3.0
 
 dev_dependencies:
   flutter_test:
