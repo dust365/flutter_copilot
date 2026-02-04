@@ -3,65 +3,87 @@
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![flutter_copilot_mcp pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_mcp)](https://pub.dev/packages/flutter_copilot_mcp)
 
-**"Playwright MCP/Cursor Browser, but for Flutter apps"**
+**"Flutter 应用的 Playwright MCP/Cursor Browser"**
 
-Flutter Copilot enables AI agents (like Cursor, Claude Code, etc.) to inspect and interact with running Flutter applications. It connects your agent directly to a running app, so it can see the widget tree, tap elements, enter text, scroll, and capture screenshots for automated smoke testing and interaction.
+Flutter Copilot 是一个 MCP（Model Context Protocol）服务器，让 AI 智能体（如 Cursor、Claude Code 等）能够检查和交互运行中的 Flutter 应用程序。它直接将你的智能体连接到运行中的应用，使其能够查看组件树、点击元素、输入文本、滚动和截图，实现自动化冒烟测试和交互。
 
-Flutter Copilot keeps the surface area intentionally small. It exposes only a handful of high-signal actions and returns the minimum actionable data, which helps keep prompts focused and context sizes under control.
+Flutter Copilot 保持简洁的设计理念，只暴露少量高价值操作，返回最小可操作数据，有助于保持提示词聚焦并控制上下文大小。
 
+---
+
+## 📋 目录
+
+- [Flutter Copilot vs Flutter MCP](#flutter-copilot-vs-flutter-mcp)
+- [快速开始](#快速开始)
+- [安装](#安装)
+- [Flutter 应用集成](#flutter-应用集成)
+- [工具配置](#工具配置)
+- [可用工具](#可用工具)
+- [使用示例](#使用示例)
+- [工作原理](#工作原理)
+- [假设与限制](#假设与限制)
+- [故障排除](#故障排除)
+
+---
 
 ## Flutter Copilot vs Flutter MCP
 
-The official [Dart & Flutter MCP server](https://docs.flutter.dev/ai/mcp-server) focuses on **development-time** tasks: searching pub.dev, managing dependencies, analyzing code, and inspecting runtime errors. It can also drive the UI, but it does so through Flutter Driver, which introduces extra instrumentation in your app. Flutter Copilot focuses solely (and in an opinionated way) on **runtime interaction**: tapping buttons, entering text, scrolling, and taking screenshots, while requiring minimal changes to your app. Use Flutter MCP to build your app, use Flutter Copilot to test and interact with it with minimal code changes.
+官方的 [Dart & Flutter MCP 服务器](https://docs.flutter.dev/ai/mcp-server) 专注于**开发时**任务：搜索 pub.dev、管理依赖、分析代码和检查运行时错误。它也可以通过 Flutter Driver 驱动 UI，但这需要在应用中引入额外的工具。Flutter Copilot 专注于（以更简洁的方式）**运行时交互**：点击按钮、输入文本、滚动和截图，同时只需要对应用进行最小改动。使用 Flutter MCP 来构建你的应用，使用 Flutter Copilot 以最小代码改动来测试和交互。
 
-## Quick Start
+---
 
-**Note: Your Flutter app must be prepared to be compatible with this MCP.**
+## 🚀 快速开始
 
-1. **Prepare your Flutter app** - Add the `flutter_copilot_claw` package and initialize `FlutterCopilotBinding` in your `main.dart`.
-2. **Install the MCP server** - Add `flutter_copilot_mcp` to your projects `dev_dependencies`.
-3. **Configure your AI tool** - Add the MCP server command (`dart run flutter_copilot_mcp`) to your tool's configuration (Cursor, Claude, etc.).
-4. **Run your app in debug mode** - Look for the VM service URI in the console (e.g., `ws://127.0.0.1:12345/ws`).
-5. **Connect and interact** - Ask the AI agent to connect to your app using the URI and start interacting.
+> **注意：** 你的 Flutter 应用必须准备好与此 MCP 兼容。
 
-## Installation
+1. **准备 Flutter 应用** - 添加 `flutter_copilot_claw` 包并在 `main.dart` 中初始化 `FlutterCopilotBinding`。
+2. **安装 MCP 服务器** - 将 `flutter_copilot_mcp` 添加到项目的 `dev_dependencies`。
+3. **配置 AI 工具** - 将 MCP 服务器命令（`dart run flutter_copilot_mcp`）添加到工具的配置中（Cursor、Claude 等）。
+4. **以调试模式运行应用** - 在控制台中查找 VM service URI（例如：`ws://127.0.0.1:12345/ws`）。
+5. **连接并交互** - 让 AI 智能体使用 URI 连接到你的应用并开始交互。
 
-### 1. Add MCP Server Package
+---
 
-Run the following command to activate the `flutter_copilot_mcp` [global tool](https://dart.dev/tools/pub/cmd/pub-global):
+## 📦 安装
+
+### 1. 添加 MCP 服务器包
+
+运行以下命令激活 `flutter_copilot_mcp` [全局工具](https://dart.dev/tools/pub/cmd/pub-global)：
 
 ```bash
 dart pub global activate flutter_copilot_mcp
 ```
 
 > [!NOTE]
-> You can also install the package as a dev-dependency using
+> 你也可以使用 dev-dependency 方式安装：
 >
 > ```bash
 > dart pub add dev:flutter_copilot_mcp
 > ```
 >
-> Then invoke the MCP server as `dart run flutter_copilot_mcp`.
-> It might be necessary to change the working directory, so that `dart run` is able to find `flutter_copilot_mcp`.
-> You can do it like so: `cd ${workspaceFolder}/packages/mypackage && dart run flutter_copilot_mcp` (it will vary between tooling).
+> 然后以 `dart run flutter_copilot_mcp` 方式调用 MCP 服务器。
+> 可能需要更改工作目录，以便 `dart run` 能够找到 `flutter_copilot_mcp`。
+> 可以这样做：`cd ${workspaceFolder}/packages/mypackage && dart run flutter_copilot_mcp`（不同工具可能有所不同）。
 >
-> If it does not work, we suggest using the global tool method.
+> 如果不起作用，我们建议使用全局工具方法。
 
-### 2. Add Flutter Package
+### 2. 添加 Flutter 包
 
-Run the following command in your Flutter app directory:
+在 Flutter 应用目录中运行以下命令：
 
 ```bash
 flutter pub add flutter_copilot_claw
 ```
 
-## Flutter App Integration
+---
 
-You need to initialize the `FlutterCopilotBinding` in your app. This binding registers the necessary VM service extensions that the MCP server communicates with.
+## 🔧 Flutter 应用集成
 
-### Basic Setup
+你需要在应用中初始化 `FlutterCopilotBinding`。这个绑定注册了 MCP 服务器通信所需的 VM service 扩展。
 
-If your app uses standard Flutter widgets (like `ElevatedButton`, `TextField`, `Text`, etc.), the default configuration works out of the box.
+### 基础设置
+
+如果你的应用使用标准的 Flutter 组件（如 `ElevatedButton`、`TextField`、`Text` 等），默认配置即可开箱即用。
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -69,7 +91,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 
 void main() {
-  // Initialize Flutter Copilot only in debug mode
+  // 仅在调试模式下初始化 Flutter Copilot
   if (kDebugMode) {
     FlutterCopilotBinding.ensureInitialized();
   } else {
@@ -80,21 +102,22 @@ void main() {
 }
 ```
 
-### Log Collection (`get_logs`)
+### 日志收集 (`get_logs`)
 
-Flutter Copilot collects application logs via Dart's [`logging`](https://pub.dev/packages/logging) package by listening to `Logger.root.onRecord`.
-This means **`logging` is required for the MCP to be able to scrape logs**.
+Flutter Copilot 通过 Dart 的 [`logging`](https://pub.dev/packages/logging) 包收集应用日志，通过监听 `Logger.root.onRecord`。
 
-If your app doesn't use `logging` (or doesn't emit logs via `Logger(...)`), `get_logs` will likely be empty.
-If you already use another logging solution, you may need to bridge it into `logging` for `get_logs` to work. If you'd like first-class support for another logging solution, please open an issue describing your setup and expectations.
+这意味着 **`logging` 是 MCP 能够抓取日志所必需的**。
 
-### Custom Design System
+如果你的应用不使用 `logging`（或不通过 `Logger(...)` 发出日志），`get_logs` 可能会是空的。
+如果你已经使用其他日志解决方案，可能需要将其桥接到 `logging` 以便 `get_logs` 工作。如果你希望为其他日志解决方案提供一流支持，请提交 issue 描述你的设置和期望。
 
-If you use custom widgets in your design system, you can configure Flutter Copilot to recognize them as interactive elements or extract text from them.
+### 自定义设计系统
 
-**Why `isInteractiveWidget`?** A typical Flutter screen has hundreds of widgets in its tree - `Padding`, `Container`, `Column`, `SizedBox`, etc. When the AI agent calls `get_interactive_elements`, Flutter Copilot filters this down to only actionable targets: buttons, text fields, switches, sliders, etc. This gives the agent a concise, manageable list instead of an overwhelming dump of layout widgets.
+如果你在设计系统中使用自定义组件，可以配置 Flutter Copilot 识别它们为交互元素或从中提取文本。
 
-By default, Flutter Copilot recognizes standard Flutter widgets like `ElevatedButton`, `TextField`, and `Switch`. If your app uses custom widgets (e.g., `MyPrimaryButton` that wraps styling around a `GestureDetector`), Flutter Copilot won't know they're tappable unless you tell it. The `isInteractiveWidget` callback lets you mark your custom widget types as interactive, so they appear in the element list and can be targeted by `tap` and other tools.
+**为什么需要 `isInteractiveWidget`？** 典型的 Flutter 屏幕在其组件树中有数百个组件 - `Padding`、`Container`、`Column`、`SizedBox` 等。当 AI 智能体调用 `get_interactive_elements` 时，Flutter Copilot 会将其过滤为仅可操作的目标：按钮、文本字段、开关、滑块等。这为智能体提供了简洁、可管理的列表，而不是令人不知所措的布局组件转储。
+
+默认情况下，Flutter Copilot 识别标准 Flutter 组件，如 `ElevatedButton`、`TextField` 和 `Switch`。如果你的应用使用自定义组件（例如，围绕 `GestureDetector` 包装样式的 `MyPrimaryButton`），除非你告诉它，否则 Flutter Copilot 不会知道它们是可点击的。`isInteractiveWidget` 回调允许你将自定义组件类型标记为交互式，使它们出现在元素列表中，并可以通过 `tap` 和其他工具定位。
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -105,15 +128,15 @@ import 'package:my_app/design_system/inputs.dart';
 
 void main() {
   if (kDebugMode) {
-    Flutter CopilotBinding.ensureInitialized(
-      Flutter CopilotConfiguration(
-        // Identify your custom interactive widgets
+    FlutterCopilotBinding.ensureInitialized(
+      FlutterCopilotConfiguration(
+        // 识别你的自定义交互组件
         isInteractiveWidget: (type) =>
             type == MyPrimaryButton ||
             type == MyTextField ||
             type == MyCheckbox,
 
-        // Extract text from your custom widgets
+        // 从你的自定义组件中提取文本
         extractText: (widget) {
           if (widget is MyText) return widget.data;
           if (widget is MyTextField) return widget.controller?.text;
@@ -129,21 +152,21 @@ void main() {
 }
 ```
 
-#### Screenshot sizing
+#### 截图尺寸
 
-By default, Flutter Copilot will downscale screenshots to fit within 2000×2000
-physical pixels. You can override this via `maxScreenshotSize` in
-`FlutterCopilotConfiguration` (set it to `null` to disable resizing).
+默认情况下，Flutter Copilot 会将截图缩小以适应 2000×2000 物理像素。你可以通过 `FlutterCopilotConfiguration` 中的 `maxScreenshotSize` 覆盖此设置（设置为 `null` 以禁用调整大小）。
 
-## Tool Configuration
+---
 
-Add the MCP server to your AI coding assistant's configuration.
+## ⚙️ 工具配置
+
+将 MCP 服务器添加到你的 AI 编程助手的配置中。
 
 ### Cursor
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=flutter_copilot&config=eyJlbnYiOnt9LCJjb21tYW5kIjoiZmx1dHRlcl9jb3BpbG90X21jcCJ9)
 
-Or manually add to your project's `.cursor/mcp.json` or your global `~/.cursor/mcp.json`:
+或手动添加到项目的 `.cursor/mcp.json` 或全局 `~/.cursor/mcp.json`：
 
 ```json
 {
@@ -158,7 +181,7 @@ Or manually add to your project's `.cursor/mcp.json` or your global `~/.cursor/m
 
 ### Google Antigravity
 
-Open the MCP store, click “Manage MCP Servers”, then “View raw config” and add to the opened `mcp_config.json`:
+打开 MCP 商店，点击 "Manage MCP Servers"，然后 "View raw config" 并添加到打开的 `mcp_config.json`：
 
 ```json
 {
@@ -173,7 +196,7 @@ Open the MCP store, click “Manage MCP Servers”, then “View raw config” a
 
 ### Gemini CLI
 
-Add to your `~/.gemini/settings.json`:
+添加到 `~/.gemini/settings.json`：
 
 ```json
 {
@@ -188,7 +211,7 @@ Add to your `~/.gemini/settings.json`:
 
 ### Claude Code
 
-You can run the following command to add it:
+你可以运行以下命令添加：
 
 ```bash
 claude mcp add --transport stdio flutter_copilot -- flutter_copilot_mcp
@@ -196,7 +219,7 @@ claude mcp add --transport stdio flutter_copilot -- flutter_copilot_mcp
 
 ### Copilot
 
-Add to your `mcp.json`:
+添加到 `mcp.json`：
 
 ```json
 {
@@ -209,63 +232,227 @@ Add to your `mcp.json`:
 }
 ```
 
-## Available Tools
+---
 
-Once connected, the AI agent has access to these tools:
+## 🛠️ 可用工具
 
-| Tool | Description |
-|------|-------------|
-| `connect` | Connect to a Flutter app via its VM service URI (e.g., `ws://127.0.0.1:54321/ws`). |
-| `disconnect` | Disconnect from the currently connected app. |
-| `get_interactive_elements` | Returns a list of all interactive UI elements (buttons, inputs, etc.) visible on screen. |
-| `tap` | Taps an element matching a specific key or visible text. |
-| `enter_text` | Enters text into a text field matching a key. |
-| `scroll_to` | Scrolls the view until an element matching a key or text becomes visible. |
-| `get_logs` | Retrieves application logs collected since the last check (**scraped from Dart `logging` / `Logger.root.onRecord`**). |
-| `take_screenshots` | Captures screenshots of all active views and returns them as base64 images. |
-| `hot_reload` | Performs a hot reload of the Flutter app, applying code changes without losing state. |
+连接后，AI 智能体可以访问以下工具：
 
-## Example Scenarios
+### 连接管理
 
-Flutter Copilot shines when used by coding agents to verify their work or explore the app. Here are some real-world scenarios:
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `connect` | 通过 VM service URI 连接到 Flutter 应用（例如：`ws://127.0.0.1:54321/ws`）。必须先调用此工具才能使用其他工具。 | `uri` (必需): VM service URI |
+| `disconnect` | 断开当前连接的应用。断开后，必须再次调用 `connect` 才能使用其他工具。 | 无 |
 
-### 1. Verify a New Feature
+### UI 元素检测
 
-**Context:** You just asked the agent to implement a "Forgot Password" flow.
-**Prompt:**
-> "Now that you've implemented the Forgot Password screen, let's verify it. Connect to the app, navigate to the login screen, tap 'Forgot Password', enter a valid email, and submit. Check the logs to ensure the API call was made successfully."
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `get_interactive_elements` | 返回屏幕上所有可交互 UI 元素的列表（按钮、输入框等）。每个元素包括其类型、文本内容（如果有）、key（如果有）和其他识别属性。 | 无 |
 
-### 2. Post-Refactor Smoke Test
+### 用户交互
 
-**Context:** You performed a large refactor on the navigation logic.
-**Prompt:**
-> "I've refactored the routing. Please run a quick smoke test: connect to the app, cycle through all tabs in the bottom navigation bar, and verify that each screen loads without throwing exceptions in the logs."
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `tap` | 点击匹配指定条件的元素。可以通过 key、文本、类型或坐标匹配。优先使用 key，因为它更可靠。 | `key` (可选): 元素的 key<br>`text` (可选): 可见文本内容<br>`type` (可选): 组件类型名称<br>`coordinates` (可选): 屏幕坐标 `{x, y}` |
+| `enter_text` | 在匹配 key 的文本框中输入文本。模拟在字段中键入文本。 | `input` (必需): 要输入的文本<br>`key` (必需): 文本框的 key |
+| `scroll_to` | 滚动视图直到匹配 key 或文本的元素可见。当需要与当前不可见的元素交互时很有用。 | `key` (可选): 元素的 key<br>`text` (可选): 可见文本内容 |
 
-### 3. Debugging UI Issues
+### 手势操作
 
-**Context:** Users reported a button is unresponsive on the Settings page.
-**Prompt:**
-> "Investigate the 'Clear Cache' button on the Settings page. Connect to the app, navigate there, find the button using `get_interactive_elements`, tap it, and analyze the logs to see if an error is occurring or if the tap is being ignored."
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `flutter_copilot_drag` | 在元素上模拟拖拽手势。可以通过 key、文本、类型或坐标匹配。支持相对拖拽（deltaX/deltaY）或绝对拖拽（from/to 坐标）。 | `key/text/type/coordinates` (可选): 匹配元素<br>`deltaX` (可选): 水平拖拽距离<br>`deltaY` (可选): 垂直拖拽距离<br>`from` (可选): 起始坐标 `{x, y}`<br>`to` (可选): 结束坐标 `{x, y}` |
+| `swipe` | 在元素上模拟滑动手势。可以通过 key、文本、类型或坐标匹配。滑动方向可以是 left、right、up 或 down。 | `key/text/type/coordinates` (可选): 匹配元素<br>`direction` (必需): 滑动方向 (left/right/up/down)<br>`distance` (可选): 滑动距离（像素，默认 200） |
+| `long_press` | 在元素上模拟长按手势。可以通过 key、文本、类型或坐标匹配。长按持续时间可自定义。 | `key/text/type/coordinates` (可选): 匹配元素<br>`duration` (可选): 长按持续时间（毫秒，默认 500） |
+| `double_tap` | 在元素上模拟双击手势。可以通过 key、文本、类型或坐标匹配。 | `key/text/type/coordinates` (可选): 匹配元素 |
 
-## How It Works
+### 导航控制
 
-1. **Initialization**: Your Flutter app initializes `FlutterCopilotBinding`, which registers custom VM service extensions (`ext.flutter.flutter_copilot.*`).
-2. **Connection**: The MCP server connects to your app's VM Service URL.
-3. **Interaction**: When an AI agent calls a tool (like `tap`), the MCP server translates this into a call to the corresponding VM service extension in your app.
-4. **Execution**: The Flutter app executes the action (e.g., simulates a tap gesture) and returns the result.
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `navigate` | 控制应用导航。支持 push（导航到新路由）、pop（返回）、replace（替换当前路由）、pushReplacement（推送并替换）和 popUntil（弹出直到特定路由）。 | `action` (必需): 导航操作 (push/pop/replace/pushReplacement/popUntil)<br>`route` (可选): 路由名称<br>`arguments` (可选): 传递给路由的参数 |
 
-## Assumptions & Limitations
+### 调试与监控
 
-- **Prefer pasting the VM Service URI manually**: While some tooling can sometimes discover or infer the VM Service endpoint, the most reliable workflow is to copy the `ws://.../ws` URI from your `flutter run` output (or DevTools link) and paste it to the agent when calling `connect`.
+| 工具 | 描述 | 参数 |
+|------|------|------|
+| `get_logs` | 检索自连接或上次日志检索以来从 Flutter 应用收集的所有应用日志。包括调试消息、错误和运行应用的其他日志输出。**需要应用使用 `logging` 包**。 | 无 |
+| `take_screenshots` | 捕获 Flutter 应用中所有视图的截图。返回 base64 编码的 PNG 图像，可以解码和保存。这捕获应用的当前视觉状态。 | 无 |
+| `hot_reload` | 执行 Flutter 应用的热重载。重新加载 Dart 代码而不重启应用，保留当前状态。在代码更改后很有用，可以在运行的应用中看到更改。 | 无 |
 
-- **The agent may not know your app**: Flutter Copilot can "see" the widget tree and interact with UI elements, but it doesn't automatically understand your product's flows, naming conventions, or edge cases. If you want reliable navigation and assertions, provide extra context in the prompt (what screen to reach, expected labels/keys, preconditions, and the goal of the interaction).
+### 元素匹配优先级
 
-- **"Your mileage may vary" interactions**: Some actions are implemented via best-effort simulation of user behavior (gestures, focus, text entry, scrolling). Depending on platform, custom widgets, overlays, or app-specific gesture handling, results may vary. If a flow is flaky, consider exposing clearer widget keys, simplifying hit targets, or adding custom `FlutterCopilotConfiguration` hooks for your design system. And if you hit something that consistently doesn't behave as expected, a small repro in an issue helps us improve it.
+当使用交互工具（如 `tap`、`enter_text` 等）时，元素匹配的优先级为：
 
-## Troubleshooting
+1. **坐标 (x, y)** - 最高优先级，直接点击指定位置
+2. **key** - 最可靠，通过 `ValueKey<String>` 精确匹配
+3. **text** - 通过可见文本内容匹配
+4. **type** - 通过组件类型名称匹配
 
-- **"Not connected to any app"**: Ensure the AI agent has called `connect` with the valid VM Service URI before using other tools.
-- **Finding the URI**: Run your Flutter app in debug mode (`flutter run`). Look for a line like: `The Flutter DevTools debugger and profiler on iPhone 15 Pro is available at: http://127.0.0.1:9101?uri=ws://127.0.0.1:9101/ws`. Use the `ws://...` part.
-- **Release Mode**: Flutter Copilot only works in debug (and profile) mode because it relies on the VM Service. It will not work in release builds.
-- **Elements not found**: Ensure your widgets are visible. If using custom widgets, make sure they are configured in `FlutterCopilotConfiguration`.
+> **提示：** 优先使用 `key` 进行匹配，因为它最可靠且不受 UI 文本变化影响。如果无法定位组件，可能需要在 Flutter 源代码中为其添加 `ValueKey`。例如：`ElevatedButton(key: ValueKey('submit_button'), ...)`
 
+---
+
+## 💡 使用示例
+
+Flutter Copilot 在用于验证工作或探索应用时表现出色。以下是一些结合代码和功能的实际场景：
+
+### 1. 完整表单填写与提交流程测试
+
+**场景：** 你刚实现了一个用户注册表单，需要验证整个填写和提交流程。
+
+**代码示例：**
+```dart
+// 你的注册表单代码
+TextField(
+  key: const ValueKey('email_field'),
+  controller: _emailController,
+  decoration: const InputDecoration(labelText: '邮箱'),
+),
+TextField(
+  key: const ValueKey('password_field'),
+  controller: _passwordController,
+  obscureText: true,
+  decoration: const InputDecoration(labelText: '密码'),
+),
+ElevatedButton(
+  key: const ValueKey('submit_button'),
+  onPressed: _handleSubmit,
+  child: const Text('注册'),
+)
+```
+
+**AI 提示：**
+> "请测试用户注册表单的完整流程：
+> 1. 连接到应用（VM Service URI: `ws://127.0.0.1:54321/ws`）
+> 2. 使用 `get_interactive_elements` 查看表单元素
+> 3. 在邮箱字段（key: `email_field`）输入 `test@example.com`
+> 4. 在密码字段（key: `password_field`）输入 `SecurePass123!`
+> 5. 点击提交按钮（key: `submit_button`）
+> 6. 使用 `get_logs` 检查是否有错误，并确认提交成功日志
+> 7. 使用 `take_screenshots` 验证提交后的界面状态"
+
+**验证要点：**
+- ✅ 所有字段正确填写
+- ✅ 提交按钮可点击
+- ✅ 日志显示提交成功
+- ✅ 界面状态正确更新
+
+---
+
+### 2. 复杂手势操作与状态验证
+
+**场景：** 你实现了一个可拖拽的滑块和可滑动的列表，需要测试手势交互是否正常工作。
+
+**代码示例：**
+```dart
+// 滑块组件
+Slider(
+  key: const ValueKey('volume_slider'),
+  value: _volume,
+  min: 0.0,
+  max: 100.0,
+  onChanged: (value) {
+    setState(() => _volume = value);
+    _logger.info('Volume changed to: $value');
+  },
+)
+
+// 可滑动列表
+PageView(
+  key: const ValueKey('image_carousel'),
+  children: _images.map((img) => Image.network(img)).toList(),
+)
+```
+
+**AI 提示：**
+> "请测试手势交互功能：
+> 1. 连接到应用并导航到手势演示页面
+> 2. 使用 `get_interactive_elements` 找到滑块（key: `demo_slider`）
+> 3. 使用 `flutter_copilot_drag` 将滑块从当前位置向右拖拽 100 像素（deltaX: 100）
+> 4. 检查日志确认滑块值已更新
+> 5. 找到图片轮播（key: `image_carousel`），使用 `swipe` 向左滑动（direction: left）
+> 6. 使用 `take_screenshots` 验证图片已切换
+> 7. 使用 `get_logs` 确认所有手势操作都记录了日志"
+
+**验证要点：**
+- ✅ 滑块值正确更新
+- ✅ 滑动操作成功执行
+- ✅ 界面状态同步更新
+- ✅ 日志记录完整
+
+---
+
+### 3. 导航流程与页面状态验证
+
+**场景：** 你重构了应用的导航系统，需要验证路由跳转和页面状态管理。
+
+**代码示例：**
+```dart
+// 导航路由配置
+MaterialApp(
+  routes: {
+    '/home': (context) => const HomePage(),
+    '/profile': (context) => const ProfilePage(),
+    '/settings': (context) => const SettingsPage(),
+  },
+)
+
+// 导航按钮
+ElevatedButton(
+  key: const ValueKey('nav_to_profile'),
+  onPressed: () => Navigator.pushNamed(context, '/profile'),
+  child: const Text('查看个人资料'),
+)
+```
+
+**AI 提示：**
+> "请测试应用的导航流程：
+> 1. 连接到应用，使用 `get_interactive_elements` 查看首页元素
+> 2. 使用 `navigate` 工具导航到个人资料页面（action: push, route: `/profile`）
+> 3. 使用 `take_screenshots` 验证页面已切换
+> 4. 在个人资料页面，使用 `get_interactive_elements` 查看该页面的元素
+> 5. 使用 `navigate` 导航到设置页面（action: push, route: `/settings`）
+> 6. 使用 `navigate` 返回上一页（action: pop）
+> 7. 使用 `navigate` 返回到根页面（action: popUntil）
+> 8. 使用 `get_logs` 检查导航过程中是否有错误
+> 9. 最后使用 `take_screenshots` 确认已回到首页"
+
+**验证要点：**
+- ✅ 路由跳转正常
+- ✅ 页面状态正确
+- ✅ 返回功能正常
+- ✅ 导航栈管理正确
+
+---
+
+## 🔍 工作原理
+
+1. **初始化**：你的 Flutter 应用初始化 `FlutterCopilotBinding`，它注册自定义 VM service 扩展（`ext.flutter.flutter_copilot.*`）。
+2. **连接**：MCP 服务器连接到应用的 VM Service URL。
+3. **交互**：当 AI 智能体调用工具（如 `tap`）时，MCP 服务器将其转换为对应用中相应 VM service 扩展的调用。
+4. **执行**：Flutter 应用执行操作（例如，模拟点击手势）并返回结果。
+
+---
+
+## ⚠️ 假设与限制
+
+- **建议手动粘贴 VM Service URI**：虽然某些工具有时可以发现或推断 VM Service 端点，但最可靠的工作流程是从 `flutter run` 输出（或 DevTools 链接）复制 `ws://.../ws` URI，并在调用 `connect` 时将其粘贴给智能体。
+
+- **智能体可能不了解你的应用**：Flutter Copilot 可以"看到"组件树并与 UI 元素交互，但它不会自动理解你的产品流程、命名约定或边缘情况。如果你想要可靠的导航和断言，请在提示中提供额外的上下文（要到达的屏幕、预期的标签/keys、前提条件和交互目标）。
+
+- **"你的体验可能有所不同"的交互**：某些操作是通过尽力模拟用户行为（手势、焦点、文本输入、滚动）实现的。根据平台、自定义组件、覆盖层或应用特定的手势处理，结果可能有所不同。如果流程不稳定，请考虑暴露更清晰的组件 keys、简化点击目标，或为你的设计系统添加自定义 `FlutterCopilotConfiguration` 钩子。如果你遇到持续不符合预期的行为，在 issue 中提供小的复现示例有助于我们改进。
+
+---
+
+## 🔧 故障排除
+
+- **"未连接到任何应用"**：确保 AI 智能体在使用其他工具之前已使用有效的 VM Service URI 调用 `connect`。
+
+- **查找 URI**：以调试模式运行 Flutter 应用（`flutter run`）。查找类似这样的行：`The Flutter DevTools debugger and profiler on iPhone 15 Pro is available at: http://127.0.0.1:9101?uri=ws://127.0.0.1:9101/ws`。使用 `ws://...` 部分。
+
+- **发布模式**：Flutter Copilot 仅在调试（和分析）模式下工作，因为它依赖于 VM Service。它不会在发布构建中工作。
+
+- **找不到元素**：确保你的组件可见。如果使用自定义组件，请确保它们在 `FlutterCopilotConfiguration` 中配置。
