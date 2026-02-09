@@ -65,7 +65,10 @@ class ElementTreeFinder {
     widget.debugFillProperties(properties);
     final data = Map<String, Object>.fromEntries(
       properties.properties
-          .where((p) => p.runtimeType != DiagnosticsProperty && p.name != null && p.value != null)
+          .where((p) =>
+              p.runtimeType != DiagnosticsProperty &&
+              p.name != null &&
+              p.value != null)
           .map(
             (p) => MapEntry(p.name!, p.value.toString()),
           ),
@@ -124,8 +127,10 @@ class ElementTreeFinder {
 
       try {
         final offset = renderObject.localToGlobal(Offset.zero);
-        final screenSize = WidgetsBinding.instance.platformDispatcher.views.first.physicalSize /
-            WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+        final screenSize = WidgetsBinding
+                .instance.platformDispatcher.views.first.physicalSize /
+            WidgetsBinding
+                .instance.platformDispatcher.views.first.devicePixelRatio;
 
         final isOnScreen = offset.dx + size.width >= 0 &&
             offset.dy + size.height >= 0 &&

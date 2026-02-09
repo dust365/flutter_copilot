@@ -18,7 +18,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   ///
   /// Returns the singleton instance of [FlutterCopilotBinding].
   static FlutterCopilotBinding ensureInitialized([
-    FlutterCopilotConfiguration configuration = const FlutterCopilotConfiguration(),
+    FlutterCopilotConfiguration configuration =
+        const FlutterCopilotConfiguration(),
   ]) {
     if (_instance == null) {
       FlutterCopilotBinding._(configuration);
@@ -27,7 +28,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// The singleton instance of [FlutterCopilotBinding].
-  static FlutterCopilotBinding get instance => BindingBase.checkInstance(_instance);
+  static FlutterCopilotBinding get instance =>
+      BindingBase.checkInstance(_instance);
   static FlutterCopilotBinding? _instance;
 
   FlutterCopilotBinding._(this.configuration);
@@ -128,7 +130,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Entered text into element matching: ${matcher.toJson()}',
+            'message':
+                'Entered text into element matching: ${matcher.toJson()}',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -263,7 +266,9 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          final direction = params['direction'] is String ? params['direction'] as String : null;
+          final direction = params['direction'] is String
+              ? params['direction'] as String
+              : null;
           final distance = _parseDouble(params['distance']) ?? 200.0;
 
           if (direction == null) {
@@ -283,7 +288,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Swiped element matching: ${matcher.toJson()} in direction: $direction',
+            'message':
+                'Swiped element matching: ${matcher.toJson()} in direction: $direction',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -313,7 +319,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
+            'message':
+                'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -331,7 +338,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          await _gestureDispatcher.doubleTap(matcher, _widgetFinder, configuration);
+          await _gestureDispatcher.doubleTap(
+              matcher, _widgetFinder, configuration);
 
           return <String, dynamic>{
             'status': 'Success',
@@ -360,7 +368,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             };
           }
 
-          final route = params['route'] is String ? params['route'] as String : null;
+          final route =
+              params['route'] is String ? params['route'] as String : null;
           final arguments = params['arguments'] is Map<String, dynamic>
               ? params['arguments'] as Map<String, dynamic>
               : null;
@@ -385,7 +394,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             default:
               return <String, dynamic>{
                 'status': 'Error',
-                'error': 'Invalid action: $action. Must be push, pop, replace, or popUntil',
+                'error':
+                    'Invalid action: $action. Must be push, pop, replace, or popUntil',
               };
           }
 

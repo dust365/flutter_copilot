@@ -39,7 +39,8 @@ class FlutterCopilotConfiguration {
 
   /// Checks if a widget type is interactive (built-in + custom).
   bool isInteractiveWidgetType(Type type) {
-    return _isBuiltInInteractiveWidget(type) || (isInteractiveWidget?.call(type) ?? false);
+    return _isBuiltInInteractiveWidget(type) ||
+        (isInteractiveWidget?.call(type) ?? false);
   }
 
   /// Returns whether traversal should stop at the given widget type.
