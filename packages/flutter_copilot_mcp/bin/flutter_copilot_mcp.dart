@@ -35,7 +35,8 @@ ArgParser buildParser() {
 
 void printUsage(ArgParser argParser) {
   stderr
-    ..writeln('Flutter Copilot MCP Server - Flutter app interaction for AI agents')
+    ..writeln(
+        'Flutter Copilot MCP Server - Flutter app interaction for AI agents')
     ..writeln()
     ..writeln('Usage: flutter_copilot_mcp [options]')
     ..writeln()
