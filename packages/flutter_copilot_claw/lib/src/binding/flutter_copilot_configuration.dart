@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Configuration for the Flutter Copilot extensions.
+/// Configuration for the Flutter Copilot MCP extensions.
 ///
-/// Provides support for custom app-specific widgets.
-/// Standard Flutter widgets (TextField, Button, Text, etc.) are supported by default.
+/// 用于自定义 MCP 如何识别可交互元素、提取文本和截屏尺寸。标准 Flutter 组件
+///（如 [ElevatedButton]、[TextField]、[Switch] 等）已内置支持，无需配置。
+///
+/// 传入方式：[FlutterCopilotBinding.ensureInitialized] 或
+/// [FlutterCopilotBinding.runAppWithConfig] 的第二参数。
+///
+/// 配置项说明见 README 的「FlutterCopilotConfiguration 配置项」。
 class FlutterCopilotConfiguration {
   const FlutterCopilotConfiguration({
     this.isInteractiveWidget,
@@ -12,35 +17,28 @@ class FlutterCopilotConfiguration {
     this.maxScreenshotSize = const Size(2000, 2000),
   });
 
-  /// Determines if an app-specific widget type is interactive.
+  /// 将自定义组件类型标记为「可交互」。
   ///
-  /// This is called only after checking built-in Flutter widgets.
-  /// Return true for custom widgets that should be included
-  /// in the interactive elements tree (e.g., custom buttons, text fields).
+  /// 返回 true 的类型会出现在 [get_interactive_elements] 中，可被 tap、enter_text 等定位。
+  /// 仅在未命中内置可交互组件时调用。
   final bool Function(Type type)? isInteractiveWidget;
 
-  /// Determines if traversal should stop at an app-specific widget type.
+  /// 遍历组件树时，遇到该类型则不再向下遍历。
   ///
-  /// This is called only after checking built-in Flutter widgets.
-  /// Return true for custom widgets that should stop tree traversal.
+  /// 用于封装型组件（如自定义卡片），避免暴露大量内部子节点。仅在未命中内置停止类型时调用。
   final bool Function(Type type)? shouldStopTraversal;
 
-  /// Extracts text content from an app-specific widget instance.
+  /// 从自定义 Widget 实例中提取显示文本。
   ///
-  /// This is called only after checking built-in Flutter widgets.
-  /// Return the text content of your custom widgets, or null if not applicable.
+  /// 该文本会出现在元素列表的 text 字段中，并用于按 text 匹配。仅在未命中内置文本提取时调用。
   final String? Function(Widget widget)? extractText;
 
-  /// Maximum size for screenshots in physical pixels.
-  ///
-  /// If set, captured screenshots will be downscaled to fit within this size
-  /// while preserving aspect ratio. Set to null to disable resizing.
+  /// 截屏最大物理像素尺寸（宽×高），超出会按比例缩小；null 表示不限制。
   final Size? maxScreenshotSize;
 
   /// Checks if a widget type is interactive (built-in + custom).
   bool isInteractiveWidgetType(Type type) {
-    return _isBuiltInInteractiveWidget(type) ||
-        (isInteractiveWidget?.call(type) ?? false);
+    return _isBuiltInInteractiveWidget(type) || (isInteractiveWidget?.call(type) ?? false);
   }
 
   /// Returns whether traversal should stop at the given widget type.

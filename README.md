@@ -21,6 +21,7 @@ Flutter Copilot 保持简洁的设计理念，只暴露少量高价值操作，�
 - [可用工具](#可用工具)
 - [使用示例](#使用示例)
 - [工作原理](#工作原理)
+- [实际项目：包体积与仅 Debug 使用](#实际项目包体积与仅-debug-使用)
 - [假设与限制](#假设与限制)
 - [故障排除](#故障排除)
 
@@ -91,33 +92,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 
 void main() {
-  // 仅在调试模式下初始化 Flutter Copilot
   if (kDebugMode) {
-    FlutterCopilotBinding.ensureInitialized();
+    // 需要 get_logs 时用 runAppWithConfig（内部在同一 Zone 完成 ensureInitialized + runApp，勿在外部先 ensureInitialized）
+    FlutterCopilotBinding.runAppWithConfig(const MyApp());
   } else {
     WidgetsFlutterBinding.ensureInitialized();
+    runApp(const MyApp());
   }
-
-  runApp(const MyApp());
 }
 ```
 
+- 仅做 UI 交互、不需要日志：`FlutterCopilotBinding.ensureInitialized(); runApp(const MyApp());`
+- 需要 `get_logs` 收集 print/错误：使用 **`FlutterCopilotBinding.runAppWithConfig(const MyApp())`**，且**不要**在外部先调用 `ensureInitialized()`（否则会 Zone 不匹配报错）；需自定义配置时传第二参数：`runAppWithConfig(const MyApp(), FlutterCopilotConfiguration(...))`。
+
+### FlutterCopilotConfiguration 配置项
+
+通过 `FlutterCopilotConfiguration` 可以控制 MCP 如何识别可交互元素、如何从组件提取文本，以及截屏尺寸。传入方式：`ensureInitialized(FlutterCopilotConfiguration(...))` 或 `runAppWithConfig(const MyApp(), FlutterCopilotConfiguration(...))`。
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| **isInteractiveWidget** | `bool Function(Type type)?` | 无 | 将**自定义组件类型**标记为「可交互」。返回 `true` 的类型会出现在 `get_interactive_elements` 中，并可被 `tap`、`enter_text`、`scroll_to` 等工具按类型或文本定位。仅在未命中内置 Flutter 组件（如 `ElevatedButton`、`TextField`）时才会调用。 |
+| **shouldStopTraversal** | `bool Function(Type type)?` | 无 | 遍历组件树时，若遇到该类型则**不再向下遍历**。用于封装型组件（如自定义卡片、弹窗内容）：避免把内部大量子节点都暴露给智能体，只把该组件本身当作一个单元。仅在未命中内置“停止类型”（如 `Text`、`ElevatedButton`）时才会调用。 |
+| **extractText** | `String? Function(Widget widget)?` | 无 | 从**自定义 Widget 实例**中提取用于显示的文本。该文本会出现在 `get_interactive_elements` 的 `text` 字段中，并用于按 `text` 匹配（如 `tap(text: '提交')`）。仅在未命中内置文本提取（如 `Text`、`TextField`）时才会调用。 |
+| **maxScreenshotSize** | `Size?` | `Size(2000, 2000)` | 截屏的**最大物理像素尺寸**（宽×高）。超过时会按比例缩小以适配，保持宽高比。设为 `null` 表示不限制尺寸（原图输出，可能较大）。 |
+
+**内置支持**：未配置上述回调时，Flutter Copilot 已内置识别常见 Flutter 组件（如 `ElevatedButton`、`TextField`、`Switch`、`InkWell`、`GestureDetector` 等）为可交互，并从 `Text`/`TextField` 等提取文本；`shouldStopTraversal` 对上述可交互类型和 `Text` 会默认停止遍历。
+
 ### 日志收集 (`get_logs`)
 
-Flutter Copilot 通过 Dart 的 [`logging`](https://pub.dev/packages/logging) 包收集应用日志，通过监听 `Logger.root.onRecord`。
+**不依赖 `logging` 包。** 日志通过以下方式收集：
 
-这意味着 **`logging` 是 MCP 能够抓取日志所必需的**。
+1. **`runAppWithConfig`**：用 `FlutterCopilotBinding.runAppWithConfig(MyApp())` 替代 `runApp` 时，会收集 **`print()`** 输出以及 **Zone 内未捕获错误**。
+2. **Binding 内建监控**：binding 初始化时注册 **FlutterError.onError** 和 **PlatformDispatcher.instance.onError**，自动收集 Flutter 框架错误和未捕获的异步错误。
+3. **自定义日志**：在应用运行后任意位置调用 **`FlutterCopilotBinding.addLog(message, { isError: false })`**，该条会进入 `get_logs` 的返回结果。
 
-如果你的应用不使用 `logging`（或不通过 `Logger(...)` 发出日志），`get_logs` 可能会是空的。
-如果你已经使用其他日志解决方案，可能需要将其桥接到 `logging` 以便 `get_logs` 工作。如果你希望为其他日志解决方案提供一流支持，请提交 issue 描述你的设置和期望。
+```dart
+// 自定义日志示例（会被 get_logs 拉取）
+FlutterCopilotBinding.addLog('Application ready for VM Service connection');
+FlutterCopilotBinding.addLog('Something went wrong', isError: true);
+```
+
+总结：希望 `get_logs` 有内容时，使用 `runAppWithConfig` 并视需使用 `addLog`；无需引入 `logging` 包。
 
 ### 自定义设计系统
 
-如果你在设计系统中使用自定义组件，可以配置 Flutter Copilot 识别它们为交互元素或从中提取文本。
+如果你在设计系统中使用自定义组件，通过 [FlutterCopilotConfiguration 配置项](#fluttercopilotconfiguration-配置项) 中的 `isInteractiveWidget` 和 `extractText` 让 MCP 识别它们为可交互元素并提取文本。
 
-**为什么需要 `isInteractiveWidget`？** 典型的 Flutter 屏幕在其组件树中有数百个组件 - `Padding`、`Container`、`Column`、`SizedBox` 等。当 AI 智能体调用 `get_interactive_elements` 时，Flutter Copilot 会将其过滤为仅可操作的目标：按钮、文本字段、开关、滑块等。这为智能体提供了简洁、可管理的列表，而不是令人不知所措的布局组件转储。
-
-默认情况下，Flutter Copilot 识别标准 Flutter 组件，如 `ElevatedButton`、`TextField` 和 `Switch`。如果你的应用使用自定义组件（例如，围绕 `GestureDetector` 包装样式的 `MyPrimaryButton`），除非你告诉它，否则 Flutter Copilot 不会知道它们是可点击的。`isInteractiveWidget` 回调允许你将自定义组件类型标记为交互式，使它们出现在元素列表中，并可以通过 `tap` 和其他工具定位。
+**为什么需要 `isInteractiveWidget`？** 典型屏幕的组件树中有大量 `Padding`、`Container`、`Column` 等。`get_interactive_elements` 会过滤为可操作目标（按钮、输入框、开关等），便于智能体操作。默认已识别 `ElevatedButton`、`TextField`、`Switch` 等；若你使用自定义按钮/输入框（如 `MyPrimaryButton`、`MyTextField`），需在配置中把这些类型标记为可交互，它们才会出现在元素列表中并被 `tap`、`enter_text` 等定位。若某些自定义组件内部结构复杂、不希望暴露子节点，可用 `shouldStopTraversal` 在该类型处停止遍历。
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -128,33 +149,35 @@ import 'package:my_app/design_system/inputs.dart';
 
 void main() {
   if (kDebugMode) {
-    FlutterCopilotBinding.ensureInitialized(
+    FlutterCopilotBinding.runAppWithConfig(
+      const MyApp(),
       FlutterCopilotConfiguration(
-        // 识别你的自定义交互组件
+        // 识别自定义交互组件，使其出现在 get_interactive_elements 中
         isInteractiveWidget: (type) =>
             type == MyPrimaryButton ||
             type == MyTextField ||
             type == MyCheckbox,
 
-        // 从你的自定义组件中提取文本
+        // 在封装组件处停止遍历，不暴露内部子节点
+        shouldStopTraversal: (type) => type == MyCard,
+
+        // 从自定义组件中提取文本，供按 text 匹配使用
         extractText: (widget) {
           if (widget is MyText) return widget.data;
           if (widget is MyTextField) return widget.controller?.text;
           return null;
         },
+
+        // 可选：截屏尺寸限制（默认 2000×2000，null 表示不限制）
+        maxScreenshotSize: const Size(2000, 2000),
       ),
     );
   } else {
     WidgetsFlutterBinding.ensureInitialized();
+    runApp(const MyApp());
   }
-
-  runApp(const MyApp());
 }
 ```
-
-#### 截图尺寸
-
-默认情况下，Flutter Copilot 会将截图缩小以适应 2000×2000 物理像素。你可以通过 `FlutterCopilotConfiguration` 中的 `maxScreenshotSize` 覆盖此设置（设置为 `null` 以禁用调整大小）。
 
 ---
 
@@ -278,7 +301,7 @@ claude mcp add --transport stdio flutter_copilot -- flutter_copilot_mcp
 
 | 工具 | 描述 | 参数 |
 |------|------|------|
-| `get_logs` | 检索自连接或上次日志检索以来从 Flutter 应用收集的所有应用日志。包括调试消息、错误和运行应用的其他日志输出。**需要应用使用 `logging` 包**。 | 无 |
+| `get_logs` | 检索自连接或上次日志检索以来从 Flutter 应用收集的日志。需应用使用 `runAppWithConfig` 以收集 `print()` 与未捕获错误，或通过 `FlutterCopilotBinding.addLog` 添加自定义日志；Binding 会自动收集 FlutterError 与异步错误。 | 无 |
 | `take_screenshots` | 捕获 Flutter 应用中所有视图的截图。返回 base64 编码的 PNG 图像，可以解码和保存。这捕获应用的当前视觉状态。 | 无 |
 | `hot_reload` | 执行 Flutter 应用的热重载。重新加载 Dart 代码而不重启应用，保留当前状态。在代码更改后很有用，可以在运行的应用中看到更改。 | 无 |
 
@@ -434,6 +457,25 @@ ElevatedButton(
 2. **连接**：MCP 服务器连接到应用的 VM Service URL。
 3. **交互**：当 AI 智能体调用工具（如 `tap`）时，MCP 服务器将其转换为对应用中相应 VM service 扩展的调用。
 4. **执行**：Flutter 应用执行操作（例如，模拟点击手势）并返回结果。
+
+---
+
+## 📦 实际项目：包体积与仅 Debug 使用
+
+### 会影响发布包体积吗？
+
+- **依赖**：`flutter_copilot_claw` 仅依赖 Flutter SDK（无第三方包），无原生插件，不会引入额外 so/aar 等。
+- **Tree-shaking**：若你**仅在 debug 分支里**引用该包（例如 `if (kDebugMode) { FlutterCopilotBinding.runAppWithConfig(...) } else { runApp(...) }`），`kDebugMode` 在 release 下是编译时常量 `false`，Dart 在 release 构建时会做 tree-shaking，**未走到的分支及其引用可被移除**，因此理论上 **release 包不会包含 Flutter Copilot 的代码**，对发布包体积无影响。
+- **建议**：集成时始终用 `kDebugMode` 包裹初始化与 `runAppWithConfig`，避免在 release 路径里引用 `FlutterCopilotBinding`；若需确认，可用 `flutter build apk --release`（或 ios）对比加/不加该依赖的产物大小。
+
+### 可以只在 Debug 模式下打开吗？
+
+**可以，且推荐。** 使用方式就是「仅在 debug 时初始化」：
+
+- 在 **debug**：执行 `FlutterCopilotBinding.runAppWithConfig(...)` 或 `ensureInitialized()` + `runApp(...)`，MCP 可连接 VM Service 使用。
+- 在 **release**：走 `WidgetsFlutterBinding.ensureInitialized(); runApp(const MyApp());`，不引用 Flutter Copilot，且 VM Service 在 release 下本身也不存在，即使带了相关代码也无法连接。
+
+这样既满足「仅 debug 打开」，又利于 tree-shaking 避免增加发布包体积。
 
 ---
 

@@ -1,7 +1,6 @@
-import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
-import 'package:flutter_copilot_claw/src/services/log_collector.dart';
 import 'pages/basic_interaction_demo_page.dart';
 import 'pages/debug_monitor_demo_page.dart';
 import 'pages/gesture_demo_page.dart';
@@ -11,42 +10,11 @@ import 'pages/scroll_demo_page.dart';
 import 'pages/text_input_demo_page.dart';
 
 void main() {
-  // Use Zone to intercept print() calls and capture them in LogCollector
-  // IMPORTANT: Initialize binding inside the Zone to avoid zone mismatch errors
-  runZonedGuarded(
-    () {
-      // Initialize binding inside the Zone
-      FlutterCopilotBinding.ensureInitialized();
-
-      // Log application startup (captures the equivalent of Flutter toolchain messages)
-      // Note: The actual Flutter toolchain messages are output before main() runs,
-      // so they cannot be captured. This is a manual log for reference.
-      // ignore: avoid_print
-      print('Flutter Copilot: Application started and ready for VM Service connection');
-
-      runApp(const MyApp());
-    },
-    (error, stack) {
-      // Capture errors in console logs
-      //收集错误日志
-      LogCollector.addConsoleLogStatic(
-        'Uncaught error: $error\n$stack',
-        isError: true,
-      );
-      // Also print to console
-      // ignore: avoid_print
-      print('Uncaught error: $error\n$stack');
-    },
-    zoneSpecification: ZoneSpecification(
-      print: (self, parent, zone, line) {
-        // Capture print() calls in LogCollector
-        //收集普通日志
-        LogCollector.addConsoleLogStatic(line);
-        // Also print to original console
-        parent.print(zone, line);
-      },
-    ),
-  );
+  if (kDebugMode) {
+    FlutterCopilotBinding.runAppWithConfig(const MyApp());
+  } else {
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {

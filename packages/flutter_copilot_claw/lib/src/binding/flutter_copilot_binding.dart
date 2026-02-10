@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_copilot_claw/src/binding/flutter_copilot_configuration.dart';
@@ -18,8 +20,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   ///
   /// Returns the singleton instance of [FlutterCopilotBinding].
   static FlutterCopilotBinding ensureInitialized([
-    FlutterCopilotConfiguration configuration =
-        const FlutterCopilotConfiguration(),
+    FlutterCopilotConfiguration configuration = const FlutterCopilotConfiguration(),
   ]) {
     if (_instance == null) {
       FlutterCopilotBinding._(configuration);
@@ -28,8 +29,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// The singleton instance of [FlutterCopilotBinding].
-  static FlutterCopilotBinding get instance =>
-      BindingBase.checkInstance(_instance);
+  static FlutterCopilotBinding get instance => BindingBase.checkInstance(_instance);
   static FlutterCopilotBinding? _instance;
 
   FlutterCopilotBinding._(this.configuration);
@@ -64,8 +64,60 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     _scrollSimulator = ScrollSimulator(_gestureDispatcher, _widgetFinder);
     _textInputSimulator = TextInputSimulator(_widgetFinder);
 
-    // Initialize log collection
+    // Initialize log collection and register log/error monitors inside the binding
     _logCollector.initialize();
+    _registerLogMonitors();
+  }
+
+  /// Registers error monitors (FlutterError, PlatformDispatcher.onError).
+  /// For print() and zone errors use [runAppWithConfig]. For custom logs use [addLog].
+  void _registerLogMonitors() {
+    final previousFlutterError = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails details) {
+      final buffer = StringBuffer()..write(details.exceptionAsString());
+      if (details.stack != null) {
+        buffer.write('\n${details.stack}');
+      }
+      _logCollector.addConsoleLog(buffer.toString(), isError: true);
+      previousFlutterError?.call(details);
+    };
+
+    final previousOnError = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
+      _logCollector.addConsoleLog('Uncaught error: $error\n$stackTrace', isError: true);
+      return previousOnError?.call(error, stackTrace) ?? false;
+    };
+  }
+
+  /// Runs the app with optional [configuration], and Zone-based capture of [print] and zone uncaught errors.
+  /// Prefer this so [getLogs] includes print() and async errors. Add custom logs with [addLog].
+  ///
+  /// **Zone 要求**：binding 与 runApp 必须在同一 Zone。因此使用本方法时请**不要**在
+  /// 外部先调用 [ensureInitialized]；本方法会在同一 Zone 内先执行 [ensureInitialized] 再 runApp。
+  static void runAppWithConfig(Widget app, [FlutterCopilotConfiguration? configuration]) {
+    runZonedGuarded(
+      () {
+        ensureInitialized(configuration ?? const FlutterCopilotConfiguration());
+        runApp(app);
+      },
+      (Object error, StackTrace stack) {
+        LogCollector.addConsoleLogStatic('Uncaught error: $error\n$stack', isError: true);
+        // ignore: avoid_print
+        print('Uncaught error: $error\n$stack');
+      },
+      zoneSpecification: ZoneSpecification(
+        print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
+          LogCollector.addConsoleLogStatic(line);
+          parent.print(zone, line);
+        },
+      ),
+    );
+  }
+
+  /// Adds a custom log entry to the collector (included in [getLogs]).
+  /// Call after [ensureInitialized]. Use for app-specific messages.
+  static void addLog(String message, {bool isError = false}) {
+    LogCollector.addConsoleLogStatic(message, isError: isError);
   }
 
   @override
@@ -130,8 +182,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message':
-                'Entered text into element matching: ${matcher.toJson()}',
+            'message': 'Entered text into element matching: ${matcher.toJson()}',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -266,9 +317,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          final direction = params['direction'] is String
-              ? params['direction'] as String
-              : null;
+          final direction = params['direction'] is String ? params['direction'] as String : null;
           final distance = _parseDouble(params['distance']) ?? 200.0;
 
           if (direction == null) {
@@ -288,8 +337,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message':
-                'Swiped element matching: ${matcher.toJson()} in direction: $direction',
+            'message': 'Swiped element matching: ${matcher.toJson()} in direction: $direction',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -319,8 +367,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message':
-                'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
+            'message': 'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -338,8 +385,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          await _gestureDispatcher.doubleTap(
-              matcher, _widgetFinder, configuration);
+          await _gestureDispatcher.doubleTap(matcher, _widgetFinder, configuration);
 
           return <String, dynamic>{
             'status': 'Success',
@@ -368,8 +414,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             };
           }
 
-          final route =
-              params['route'] is String ? params['route'] as String : null;
+          final route = params['route'] is String ? params['route'] as String : null;
           final arguments = params['arguments'] is Map<String, dynamic>
               ? params['arguments'] as Map<String, dynamic>
               : null;
@@ -394,8 +439,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             default:
               return <String, dynamic>{
                 'status': 'Error',
-                'error':
-                    'Invalid action: $action. Must be push, pop, replace, or popUntil',
+                'error': 'Invalid action: $action. Must be push, pop, replace, or popUntil',
               };
           }
 
