@@ -16,6 +16,7 @@ class FlutterCopilotConfiguration {
     this.extractText,
     this.maxScreenshotSize = const Size(2000, 2000),
     this.enableGlobalRebuildHook = true,
+    this.showTapFeedback = true,
   });
 
   /// 将自定义组件类型标记为「可交互」。
@@ -43,6 +44,13 @@ class FlutterCopilotConfiguration {
   /// 对 Widget 的 build 进行全局统计，供 snapshot/timeline/diff 等扩展使用。
   /// 默认 true；release 下若需节省开销可显式传 false。
   final bool enableGlobalRebuildHook;
+
+  /// 是否在 MCP tap/手势操作时显示点击位置红点反馈。
+  ///
+  /// 为 true 时会创建 [TapFeedbackController]，并在派发 tap 后回调显示红点；
+  /// 应用需在根布局挂载 [TapFeedbackOverlay] 才能看到红点。为 false 时不创建
+  /// controller，保持零开销。默认 true。
+  final bool showTapFeedback;
 
   /// Checks if a widget type is interactive (built-in + custom).
   bool isInteractiveWidgetType(Type type) {

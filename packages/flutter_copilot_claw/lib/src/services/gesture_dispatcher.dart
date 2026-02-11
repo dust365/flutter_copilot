@@ -6,8 +6,14 @@ import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
 /// Dispatches gesture events to simulate user interactions.
 class GestureDispatcher {
+  GestureDispatcher({this.onTapAt});
+
   static const kMaxDelta = 40.0;
   static const kDelay = Duration(milliseconds: 10);
+
+  /// Called after a tap/longPress/doubleTap is dispatched, with the global position.
+  /// Used to show a feedback dot (e.g. [TapFeedbackController.showAt]).
+  final void Function(Offset)? onTapAt;
 
   int _nextPointerId = 1;
 
@@ -53,17 +59,22 @@ class GestureDispatcher {
     await _dispatchTapAtPosition(globalPosition);
   }
 
+  /// Delay between showing tap feedback and dispatching the actual pointer events (ms).
+  static const int kTapFeedbackDelayMs = 300;
+
   Future<void> _dispatchTapAtPosition(Offset globalPosition) async {
     final pointerId = _nextPointerId++;
 
+    // Show feedback first, then wait before executing the tap
+    onTapAt?.call(globalPosition);
+    await Future<void>.delayed(const Duration(milliseconds: kTapFeedbackDelayMs));
+
     // Build the event records
     final records = [
-      // Pointer down immediately
       [
         PointerAddedEvent(position: globalPosition),
         PointerDownEvent(pointer: pointerId, position: globalPosition),
       ],
-      // Pointer up after a short delay
       [PointerUpEvent(pointer: pointerId, position: globalPosition)],
     ];
 
@@ -76,15 +87,13 @@ class GestureDispatcher {
 
     final delta = to - from;
     final distance = delta.distance;
-    final stepCount =
-        (distance / kMaxDelta).ceil().clamp(1, double.infinity).toInt();
+    final stepCount = (distance / kMaxDelta).ceil().clamp(1, double.infinity).toInt();
 
     final moveRecords = <List<PointerEvent>>[];
     for (var i = 1; i <= stepCount; i++) {
       final t = i / stepCount;
       final position = Offset.lerp(from, to, t)!;
-      final previousPosition =
-          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
+      final previousPosition = i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
       final stepDelta = position - previousPosition;
 
       moveRecords.add([
@@ -200,8 +209,7 @@ class GestureDispatcher {
         endPosition = startPosition + Offset(0, distance);
         break;
       default:
-        throw Exception(
-            'Invalid swipe direction: $direction. Must be left, right, up, or down');
+        throw Exception('Invalid swipe direction: $direction. Must be left, right, up, or down');
     }
 
     // Use faster drag for swipe (fewer steps, shorter delay)
@@ -251,6 +259,9 @@ class GestureDispatcher {
     Offset globalPosition,
     Duration duration,
   ) async {
+    onTapAt?.call(globalPosition);
+    await Future<void>.delayed(const Duration(milliseconds: kTapFeedbackDelayMs));
+
     final pointerId = _nextPointerId++;
 
     // Build the event records
@@ -351,8 +362,7 @@ class GestureDispatcher {
     for (var i = 1; i <= stepCount; i++) {
       final t = i / stepCount;
       final position = Offset.lerp(from, to, t)!;
-      final previousPosition =
-          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
+      final previousPosition = i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
       final stepDelta = position - previousPosition;
 
       moveRecords.add([

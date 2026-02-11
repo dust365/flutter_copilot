@@ -11,8 +11,10 @@ import 'package:flutter_copilot_claw/src/services/log_collector.dart';
 import 'package:flutter_copilot_claw/src/services/navigation_service.dart';
 import 'package:flutter_copilot_claw/src/services/screenshot_service.dart';
 import 'package:flutter_copilot_claw/src/services/scroll_simulator.dart';
+import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 import 'package:flutter_copilot_claw/src/services/text_input_simulator.dart';
 import 'package:flutter_copilot_claw/src/services/widget_finder.dart';
+import 'package:flutter_copilot_claw/src/widgets/tap_feedback_overlay.dart';
 import 'package:flutter_copilot_claw/src/services/widget_rebuild_tracker.dart';
 import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
@@ -42,6 +44,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
   BuildOwner? _defaultBuildOwner;
   CopilotBuildOwner? _copilotBuildOwner;
+  TapFeedbackController? _tapFeedbackController;
+  OverlayEntry? _tapFeedbackOverlayEntry;
 
   // Service instances
   late final ElementTreeFinder _elementTreeFinder;
@@ -61,7 +65,14 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     // Initialize services
     _widgetFinder = WidgetFinder();
     _elementTreeFinder = ElementTreeFinder(configuration);
-    _gestureDispatcher = GestureDispatcher();
+    if (configuration.showTapFeedback) {
+      _tapFeedbackController = TapFeedbackController();
+      _gestureDispatcher = GestureDispatcher(
+        onTapAt: (Offset offset) => _tapFeedbackController!.showAt(offset),
+      );
+    } else {
+      _gestureDispatcher = GestureDispatcher();
+    }
     _logCollector = LogCollector();
     _navigationService = NavigationService();
     _screenshotService = ScreenshotService(
@@ -78,6 +89,11 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     if (configuration.enableGlobalRebuildHook) {
       enableGlobalRebuildHook();
     }
+
+    // Auto-inject tap feedback overlay after the first frame
+    if (configuration.showTapFeedback && _tapFeedbackController != null) {
+      _scheduleTapFeedbackInjection();
+    }
   }
 
   @override
@@ -85,6 +101,55 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     if (_copilotBuildOwner != null) return _copilotBuildOwner!;
     if (_defaultBuildOwner != null) return _defaultBuildOwner!;
     return super.buildOwner!;
+  }
+
+  /// The tap feedback controller, if [FlutterCopilotConfiguration.showTapFeedback] was true.
+  /// Used by [TapFeedbackOverlay] to show a red dot at the last MCP tap position.
+  TapFeedbackController? get tapFeedbackController => _tapFeedbackController;
+
+  // ---------- Tap feedback overlay auto-injection ----------
+
+  /// Schedules injection of the tap feedback overlay into the app's [Overlay]
+  /// after the first frame is drawn (when the Navigator/Overlay are available).
+  void _scheduleTapFeedbackInjection() {
+    addPostFrameCallback((_) => _tryInjectTapFeedbackOverlay());
+  }
+
+  /// Finds the root [OverlayState] and inserts a [TapFeedbackOverlay] via
+  /// [OverlayEntry]. Retries on the next frame if the overlay is not yet
+  /// available (e.g. first frame not drawn yet).
+  void _tryInjectTapFeedbackOverlay() {
+    if (_tapFeedbackOverlayEntry != null || _tapFeedbackController == null) {
+      return;
+    }
+
+    final overlayState = _findOverlayState();
+    if (overlayState != null && overlayState.mounted) {
+      _tapFeedbackOverlayEntry = OverlayEntry(
+        builder: (_) => TapFeedbackOverlay(controller: _tapFeedbackController!),
+      );
+      overlayState.insert(_tapFeedbackOverlayEntry!);
+    } else {
+      // Overlay not available yet, retry after the next frame.
+      addPostFrameCallback((_) => _tryInjectTapFeedbackOverlay());
+    }
+  }
+
+  /// Walks the element tree to find the first [OverlayState] (typically the
+  /// root Navigator's overlay).
+  OverlayState? _findOverlayState() {
+    OverlayState? result;
+    void visitor(Element element) {
+      if (result != null) return;
+      if (element is StatefulElement && element.state is OverlayState) {
+        result = element.state as OverlayState;
+        return;
+      }
+      element.visitChildren(visitor);
+    }
+
+    rootElement?.visitChildren(visitor);
+    return result;
   }
 
   /// Enables global rebuild tracking for widget repaint monitoring.
