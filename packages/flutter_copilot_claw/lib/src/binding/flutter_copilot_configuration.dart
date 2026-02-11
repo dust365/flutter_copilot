@@ -15,6 +15,7 @@ class FlutterCopilotConfiguration {
     this.shouldStopTraversal,
     this.extractText,
     this.maxScreenshotSize = const Size(2000, 2000),
+    this.enableGlobalRebuildHook = true,
   });
 
   /// 将自定义组件类型标记为「可交互」。
@@ -35,6 +36,13 @@ class FlutterCopilotConfiguration {
 
   /// 截屏最大物理像素尺寸（宽×高），超出会按比例缩小；null 表示不限制。
   final Size? maxScreenshotSize;
+
+  /// 是否开启全局重建 Hook（用于组件重绘监测）。
+  ///
+  /// 为 true 时，[FlutterCopilotBinding] 初始化会调用 [enableGlobalRebuildHook]，
+  /// 对 Widget 的 build 进行全局统计，供 snapshot/timeline/diff 等扩展使用。
+  /// 默认 true；release 下若需节省开销可显式传 false。
+  final bool enableGlobalRebuildHook;
 
   /// Checks if a widget type is interactive (built-in + custom).
   bool isInteractiveWidgetType(Type type) {

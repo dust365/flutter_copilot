@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_copilot_claw/src/binding/copilot_build_owner.dart';
 import 'package:flutter_copilot_claw/src/binding/flutter_copilot_configuration.dart';
 import 'package:flutter_copilot_claw/src/services/element_tree_finder.dart';
 import 'package:flutter_copilot_claw/src/services/gesture_dispatcher.dart';
@@ -11,6 +13,7 @@ import 'package:flutter_copilot_claw/src/services/screenshot_service.dart';
 import 'package:flutter_copilot_claw/src/services/scroll_simulator.dart';
 import 'package:flutter_copilot_claw/src/services/text_input_simulator.dart';
 import 'package:flutter_copilot_claw/src/services/widget_finder.dart';
+import 'package:flutter_copilot_claw/src/services/widget_rebuild_tracker.dart';
 import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
 /// A custom binding that extends Flutter's default binding to provide
@@ -36,6 +39,9 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
   /// Configuration for the Flutter Copilot extensions.
   final FlutterCopilotConfiguration configuration;
+
+  BuildOwner? _defaultBuildOwner;
+  CopilotBuildOwner? _copilotBuildOwner;
 
   // Service instances
   late final ElementTreeFinder _elementTreeFinder;
@@ -67,6 +73,37 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     // Initialize log collection and register log/error monitors inside the binding
     _logCollector.initialize();
     _registerLogMonitors();
+
+    _defaultBuildOwner = super.buildOwner;
+    if (configuration.enableGlobalRebuildHook) {
+      enableGlobalRebuildHook();
+    }
+  }
+
+  @override
+  BuildOwner get buildOwner {
+    if (_copilotBuildOwner != null) return _copilotBuildOwner!;
+    if (_defaultBuildOwner != null) return _defaultBuildOwner!;
+    return super.buildOwner!;
+  }
+
+  /// Enables global rebuild tracking for widget repaint monitoring.
+  ///
+  /// Called during [initInstances] only when [FlutterCopilotConfiguration.enableGlobalRebuildHook]
+  /// is true. On non-Web platforms, creates [CopilotBuildOwner] that reuses the original
+  /// [BuildOwner]'s [FocusManager] (via getter override) while passing a no-op FocusManager to the
+  /// super constructor to avoid the double-registration assertion. On Web, creating a second
+  /// [BuildOwner] has additional issues, so we only initialize the tracker (snapshot stays empty).
+  @protected
+  void enableGlobalRebuildHook() {
+    WidgetRebuildTracker.ensureInitialized();
+    // super.buildOwner is the default BuildOwner created by WidgetsBinding.initInstances().
+    // Its FocusManager has already registered global handlers. We reuse it.
+    final originalBuildOwner = super.buildOwner!;
+    _copilotBuildOwner = CopilotBuildOwner(
+      onBuildScheduled: SchedulerBinding.instance.ensureVisualUpdate,
+      realFocusManager: originalBuildOwner.focusManager,
+    );
   }
 
   /// Registers error monitors (FlutterError, PlatformDispatcher.onError).
@@ -446,6 +483,41 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
           return <String, dynamic>{
             'status': 'Success',
             'message': 'Navigation action "$action" completed successfully',
+          };
+        } catch (err, st) {
+          return <String, dynamic>{
+            'status': 'Error',
+            'error': err.toString(),
+            'stackTrace': st.toString(),
+          };
+        }
+      },
+    );
+
+    // Extension: Rebuild snapshot (for repaint monitoring)
+    registerServiceExtension(
+      name: 'flutter_copilot.rebuild.snapshot',
+      callback: (params) async {
+        try {
+          final tracker = WidgetRebuildTracker.instance;
+          if (tracker == null) {
+            return <String, dynamic>{
+              'status': 'Success',
+              'enabled': false,
+              'message': 'Rebuild tracking not enabled (enableGlobalRebuildHook is false)',
+            };
+          }
+          final topLimit = params['topLimit'] is int
+              ? params['topLimit'] as int
+              : (params['topLimit'] is String
+                      ? int.tryParse(params['topLimit'] as String)
+                      : null) ??
+                  20;
+          final snapshot = tracker.getSnapshot(topLimit: topLimit);
+          return <String, dynamic>{
+            'status': 'Success',
+            'enabled': true,
+            ...snapshot,
           };
         } catch (err, st) {
           return <String, dynamic>{

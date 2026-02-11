@@ -107,7 +107,7 @@ class _DebugMonitorDemoPageState extends State<DebugMonitorDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('调试与监控演示'),
+        title: const Text('日志获取'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SingleChildScrollView(

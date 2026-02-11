@@ -6,6 +6,7 @@ import 'pages/debug_monitor_demo_page.dart';
 import 'pages/gesture_demo_page.dart';
 import 'pages/home_page.dart';
 import 'pages/navigation_demo_page.dart';
+import 'pages/rebuild_demo_page.dart';
 import 'pages/scroll_demo_page.dart';
 import 'pages/text_input_demo_page.dart';
 
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/gesture-demo': (context) => const GestureDemoPage(),
         '/navigation-demo': (context) => const NavigationDemoPage(),
         '/debug-monitor-demo': (context) => const DebugMonitorDemoPage(),
+        '/rebuild-demo': (context) => const RebuildDemoPage(),
         '/old-home': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
       },
     );

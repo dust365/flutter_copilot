@@ -58,11 +58,18 @@ class HomePage extends StatelessWidget {
       color: Colors.teal,
     ),
     const DemoPageInfo(
-      title: '调试与监控',
-      description: '测试 get_logs 工具 - 获取应用日志和监控功能',
+      title: '日志获取',
+      description: '测试 get_logs 工具 - 获取应用日志',
       route: '/debug-monitor-demo',
       icon: Icons.monitor,
       color: Colors.indigo,
+    ),
+    const DemoPageInfo(
+      title: '重绘监测',
+      description: 'BuildOwner Hook + rebuild.snapshot - 查看重建统计与热点',
+      route: '/rebuild-demo',
+      icon: Icons.auto_awesome_motion,
+      color: Colors.deepPurple,
     ),
   ];
 

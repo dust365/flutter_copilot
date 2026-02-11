@@ -302,6 +302,7 @@ claude mcp add --transport stdio flutter_copilot -- flutter_copilot_mcp
 | 工具 | 描述 | 参数 |
 |------|------|------|
 | `get_logs` | 检索自连接或上次日志检索以来从 Flutter 应用收集的日志。需应用使用 `runAppWithConfig` 以收集 `print()` 与未捕获错误，或通过 `FlutterCopilotBinding.addLog` 添加自定义日志；Binding 会自动收集 FlutterError 与异步错误。 | 无 |
+| `get_rebuild_snapshot` | 获取重绘快照与**重绘热点排行**：帧数、总重建次数、平均每帧重建数、以及按重建次数排序的 Top 组件表格（含排名、组件类型/Key、重建次数、占比），用于定位代码中的重绘热点。需应用启用 `enableGlobalRebuildHook`；Web 平台无 hook，数据为空。 | `topLimit` (可选): 返回的热点组件数量，默认 20 |
 | `take_screenshots` | 捕获 Flutter 应用中所有视图的截图。返回 base64 编码的 PNG 图像，可以解码和保存。这捕获应用的当前视觉状态。 | 无 |
 | `hot_reload` | 执行 Flutter 应用的热重载。重新加载 Dart 代码而不重启应用，保留当前状态。在代码更改后很有用，可以在运行的应用中看到更改。 | 无 |
 
