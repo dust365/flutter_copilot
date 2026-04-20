@@ -20,15 +20,70 @@ import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
 /// A custom binding that extends Flutter's default binding to provide
 /// integration points for the Flutter Copilot MCP.
+///
+/// **Usage**: Call [ensureInitialized] as a **drop-in replacement** for
+/// `WidgetsFlutterBinding.ensureInitialized()` at the very start of `main()`:
+///
+/// ```dart
+/// void main() async {
+///   // Use FlutterCopilotBinding instead of WidgetsFlutterBinding
+///   FlutterCopilotBinding.ensureInitialized();
+///   await setupSystemUI();
+///   await SomeInitializer.init();
+///   runApp(const MyApp());
+/// }
+/// ```
+///
+/// Or use [runAppWithConfig] for automatic log/error zone capture:
+///
+/// ```dart
+/// void main() {
+///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
+/// }
+/// ```
+///
+/// **Important**: Do NOT call `WidgetsFlutterBinding.ensureInitialized()`
+/// before [ensureInitialized] or [runAppWithConfig] — it will cause a
+/// "Binding already initialized" error. [FlutterCopilotBinding] is a
+/// subclass of [WidgetsFlutterBinding] and provides the same functionality.
 class FlutterCopilotBinding extends WidgetsFlutterBinding {
   /// Creates and initializes the binding with the given configuration.
+  ///
+  /// This is a **drop-in replacement** for `WidgetsFlutterBinding.ensureInitialized()`.
+  /// Call this at the very start of `main()` instead of
+  /// `WidgetsFlutterBinding.ensureInitialized()`.
   ///
   /// Returns the singleton instance of [FlutterCopilotBinding].
   static FlutterCopilotBinding ensureInitialized([
     FlutterCopilotConfiguration configuration = const FlutterCopilotConfiguration(),
   ]) {
-    if (_instance == null) {
+    if (_instance != null) return instance;
+
+    try {
       FlutterCopilotBinding._(configuration);
+    } on Object {
+      // If binding creation failed, it's likely because another binding
+      // (e.g. WidgetsFlutterBinding) was already initialized.
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary('FlutterCopilotBinding initialization failed.'),
+        ErrorDescription(
+          'This usually happens because WidgetsFlutterBinding.ensureInitialized() '
+          'was called before FlutterCopilotBinding.ensureInitialized().\n\n'
+          'FlutterCopilotBinding is a drop-in replacement for WidgetsFlutterBinding '
+          'and provides the same functionality.\n',
+        ),
+        ErrorHint(
+          'Fix: Replace WidgetsFlutterBinding.ensureInitialized() with '
+          'FlutterCopilotBinding.ensureInitialized() at the start of main().\n\n'
+          '  // Before (causes error):\n'
+          '  WidgetsFlutterBinding.ensureInitialized();\n'
+          '  FlutterCopilotBinding.ensureInitialized(); // ERROR!\n\n'
+          '  // After (correct):\n'
+          '  FlutterCopilotBinding.ensureInitialized();\n'
+          '  // ... your setup code ...\n'
+          '  runApp(const MyApp());\n',
+        ),
+      ]);
     }
     return instance;
   }
@@ -194,8 +249,25 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   /// Runs the app with optional [configuration], and Zone-based capture of [print] and zone uncaught errors.
   /// Prefer this so [getLogs] includes print() and async errors. Add custom logs with [addLog].
   ///
-  /// **Zone 要求**：binding 与 runApp 必须在同一 Zone。因此使用本方法时请**不要**在
-  /// 外部先调用 [ensureInitialized]；本方法会在同一 Zone 内先执行 [ensureInitialized] 再 runApp。
+  /// **用法一（最简单）**: 不需要在 main() 中做 async 初始化：
+  /// ```dart
+  /// void main() {
+  ///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
+  /// }
+  /// ```
+  ///
+  /// **用法二**: 需要先做 async 初始化（如 setupSystemUI、插件初始化等）：
+  /// ```dart
+  /// void main() async {
+  ///   FlutterCopilotBinding.ensureInitialized();
+  ///   await setupSystemUI();
+  ///   await SomeInitializer.init();
+  ///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
+  /// }
+  /// ```
+  ///
+  /// **注意**: 不要在调用本方法前调用 `WidgetsFlutterBinding.ensureInitialized()`。
+  /// 如需提前初始化 binding，请改用 `FlutterCopilotBinding.ensureInitialized()`。
   static void runAppWithConfig(Widget app, [FlutterCopilotConfiguration? configuration]) {
     runZonedGuarded(
       () {

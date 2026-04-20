@@ -12,10 +12,12 @@ import 'pages/text_input_demo_page.dart';
 
 void main() {
   if (kDebugMode) {
-    FlutterCopilotBinding.runAppWithConfig(const MyApp());
+    FlutterCopilotBinding.ensureInitialized();
   } else {
-    runApp(const MyApp());
+    WidgetsFlutterBinding.ensureInitialized();
   }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
