@@ -2,7 +2,7 @@
 
 **Flutter Copilot 项目实践分享**
 
-![【0-0-1】让 AI 真正上手操作 App](./images/【0-0-1】让AI真正上手操作App.svg)
+![【0-0-1】让 AI 真正上手操作 App](./images/svg/【0-0-1】让AI真正上手操作App.svg)
 
 > 演讲时长：约 25 分钟 | 受众：产品、研发、Flutter、后端、设计
 
@@ -91,7 +91,7 @@ Flutter Copilot 就是这么开始的。
 
 ### 1. 整体架构：三层，各管一件事
 
-![【3-1-1】Flutter Copilot 整体架构](./images/【3-1-1】FlutterCopilot整体架构.svg)
+![【3-1-1】Flutter Copilot 整体架构](./images/svg/【3-1-1】FlutterCopilot整体架构.svg)
 
 
 
@@ -114,7 +114,7 @@ MCP 是 AI 和工具之间的标准协议。
 
 如果你想给自己的技术栈也接一个类似的 AI 能力，MCP 协议也是开放的。
 
-![【3-2-1】MCP 是什么](./images/【3-2-1】MCP是什么.svg)
+![【3-2-1】MCP 是什么](./images/svg/【3-2-1】MCP是什么.svg)
 
 我们这个项目的 Dart MCP Server 源码在：
 - `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart`
@@ -127,7 +127,7 @@ VM Service 是 Dart/Flutter 在 Debug 模式下暴露的运行时调试服务。
 
 我们平时用的热重载、DevTools 调试，底层都是 VM Service。它提供了一个正式的入口，让 App 外部的进程可以和运行中的 App 通信。
 
-![【3-2-2】VM Service 是什么](./images/【3-2-2】VMService是什么.svg)
+![【3-2-2】VM Service 是什么](./images/svg/【3-2-2】VMService是什么.svg)
 
 Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，把点击、输入、截图、日志这些能力挂上去。MCP Server 再通过 VM Service 去调用这些 Extension。
 
@@ -135,7 +135,7 @@ Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，�
 
 **所以整个链路是这样的：AI 说话 → MCP 翻译 → VM Service 传达 → Flutter App 执行。**
 
-![【3-3-1】MCP 协议与 VM Service 调用链路](./images/【3-3-1】MCP协议与VMService调用链路.svg)
+![【3-3-1】MCP 协议与 VM Service 调用链路](./images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
 
 这张图放在这里更合适，因为前面刚讲完 MCP 和 VM Service，这里正好把“协议”和“真正执行”之间的关系连起来。
 
@@ -148,7 +148,7 @@ Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，�
 
 给大家看一张总览图：
 
-![【3-4-1】Flutter Copilot 能力总览](./images/【3-4-1】FlutterCopilot能力总览.svg)
+![【3-4-1】Flutter Copilot 能力总览](./images/svg/【3-4-1】FlutterCopilot能力总览.svg)
 
 你在现场讲这一页时，可以先从“15 个 MCP 工具”总数切进去，再按连接、观察、交互、导航、诊断五类往下拆。
 
@@ -164,7 +164,7 @@ Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，�
 
 我把它总结成三步，核心原则就是：**App 内加能力、App 外起桥接、Agent 侧做配置。**
 
-![【4-1-1】接入路径与提效指标示意图](./images/【4-1-1】接入路径与提效指标示意图.svg)
+![【4-1-1】接入路径与提效指标示意图](./images/svg/【4-1-1】接入路径与提效指标示意图.svg)
 
 这张图建议你在接入指南这里先展示上半部分，讲完三步之后，再顺势切到下半部分讲提效指标。
 
@@ -244,7 +244,7 @@ Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，�
 
 ### 2. 接入前后对比示例
 
-![【5-2-1】接入前后效率提升对比](./images/【5-2-1】接入前后效率提升对比.svg)
+![【5-2-1】接入前后效率提升对比](./images/svg/【5-2-1】接入前后效率提升对比.svg)
 
 > 下面这组数字你后面可以替换成真实数据，我先帮你把表达方式搭好。
 
@@ -267,7 +267,7 @@ Flutter Copilot 在 App 内部注册了 14 个自定义的 Service Extension，�
 
 ### 4. 全链路解决方案，开发闭环
 
-![【5-4-1】全链路开发闭环](./images/【5-4-1】全链路开发闭环.svg)
+![【5-4-1】全链路开发闭环](./images/svg/【5-4-1】全链路开发闭环.svg)
 
 Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码生成 → 运行验证 → 页面观察 → 问题定位 → 结果反馈”第一次变成了一条可以被 AI 串起来的完整闭环。
 
@@ -319,7 +319,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ### 3. 我是怎么利用AI，从探索到落地的
 
-![【6-3-1】我是怎么利用 AI，从探索到落地的](./images/【6-3-1】我是怎么利用AI从探索到落地的.svg)
+![【6-3-1】我是怎么利用 AI，从探索到落地的](./images/svg/【6-3-1】我是怎么利用AI从探索到落地的.svg)
 
 这一节我其实更想讲的，不是“我做了什么功能”，而是**我是怎么被真实痛点一步步推着，把这个东西做出来的。**
 
