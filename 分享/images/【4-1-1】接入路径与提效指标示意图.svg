@@ -1,0 +1,47 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1F284A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #657393; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #203050; }
+      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #31415F; }
+      .small { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #66759A; }
+    </style>
+  </defs>
+  <rect width="1400" height="900" rx="28" fill="#F8FAFF"/>
+  <text x="80" y="90" class="title">接入路径与提效指标示意图</text>
+  <text x="80" y="125" class="subtitle">三步接入 + 接入前后核心效率指标（示意数据，可替换）</text>
+
+  <rect x="80" y="190" width="380" height="180" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="120" y="245" class="h">Step 1 · App 内接入</text>
+  <text x="120" y="285" class="b">引入 flutter_copilot_claw</text>
+  <text x="120" y="318" class="b">初始化 Binding / runAppWithConfig</text>
+  <text x="120" y="350" class="small">通常只需要修改入口初始化</text>
+
+  <rect x="510" y="190" width="380" height="180" rx="24" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="550" y="245" class="h">Step 2 · App 外起桥接</text>
+  <text x="550" y="285" class="b">启动 flutter_copilot_mcp</text>
+  <text x="550" y="318" class="b">连接 VM Service / 暴露 MCP 工具</text>
+  <text x="550" y="350" class="small">把 Flutter 运行时能力带给 Agent</text>
+
+  <rect x="940" y="190" width="380" height="180" rx="24" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="980" y="245" class="h">Step 3 · Agent 侧配置</text>
+  <text x="980" y="285" class="b">Cursor / Claude Code 配置 MCP</text>
+  <text x="980" y="318" class="b">让 Agent 知道有哪些工具可调用</text>
+  <text x="980" y="350" class="small">从代码助手进入运行时助手</text>
+
+  <rect x="80" y="460" width="1240" height="320" rx="28" fill="#FFFFFF" stroke="#D4DCF4" stroke-width="2"/>
+  <text x="120" y="520" class="h">接入前后提效指标（示意）</text>
+
+  <text x="120" y="575" class="b">• 单次表单验证耗时： 2~3 分钟 → 20~40 秒</text>
+  <text x="120" y="615" class="b">• 一次日志排查耗时： 5~10 分钟 → 1~3 分钟</text>
+  <text x="120" y="655" class="b">• 问题复现准备动作：人工手动串流程 → Agent 自动执行并拿截图/日志</text>
+  <text x="120" y="695" class="b">• 产品确认核心流程：依赖开发/测试回放 → Agent 可直接执行并反馈结果</text>
+  <text x="120" y="735" class="b">• 重绘热点定位：手工看 DevTools → 一次快照 + Agent 辅助解释</text>
+
+  <rect x="910" y="545" width="340" height="165" rx="22" fill="#EEF3FF" stroke="#6E86FF"/>
+  <text x="950" y="590" class="h">核心价值</text>
+  <text x="950" y="630" class="b">不是只节省几分钟，</text>
+  <text x="950" y="662" class="b">而是把“验证、观察、定位、反馈”</text>
+  <text x="950" y="694" class="b">串成一条 Agent 可执行的闭环。</text>
+</svg>

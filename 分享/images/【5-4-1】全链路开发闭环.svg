@@ -1,0 +1,62 @@
+<svg width="1400" height="980" viewBox="0 0 1400 980" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF4FF"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#4B5EAA"/>
+    </marker>
+    <style>
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .tag { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="980" rx="28" fill="url(#bg)"/>
+  <text x="80" y="90" class="title">全链路解决方案，开发闭环</text>
+  <text x="80" y="125" class="subtitle">把代码生成、运行验证、页面观察、问题定位、结果反馈串成一条 Agent 可执行的闭环</text>
+
+  <rect x="575" y="330" width="250" height="150" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="645" y="392" class="h">AI Agent</text>
+  <text x="608" y="428" class="b">驱动整条研发闭环</text>
+  <text x="632" y="460" class="tag">自动执行 / 自动反馈</text>
+
+  <rect x="150" y="180" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="215" y="235" class="h">代码生成</text>
+  <text x="192" y="272" class="b">补代码 / 改页面 / 调逻辑</text>
+  <text x="215" y="302" class="small">Claude Code / Cursor</text>
+
+  <rect x="1000" y="180" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="1065" y="235" class="h">运行验证</text>
+  <text x="1036" y="272" class="b">打开 App / 触发流程 / 校验结果</text>
+  <text x="1055" y="302" class="small">tap / input / scroll</text>
+
+  <rect x="1030" y="580" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="1095" y="635" class="h">页面观察</text>
+  <text x="1065" y="672" class="b">截图 / 看节点 / 查页面状态</text>
+  <text x="1093" y="702" class="small">screenshot / inspect</text>
+
+  <rect x="150" y="580" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="215" y="635" class="h">问题定位</text>
+  <text x="188" y="672" class="b">读日志 / 看异常 / 分析重绘</text>
+  <text x="218" y="702" class="small">logs / rebuild / error</text>
+
+  <rect x="575" y="700" width="250" height="120" rx="24" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="640" y="748" class="h">结果反馈</text>
+  <text x="620" y="784" class="b">给开发 / 测试 / 产品</text>
+
+  <path d="M410 250 C500 210, 560 210, 620 320" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M780 320 C840 210, 900 210, 990 250" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M1125 330 C1180 410, 1185 500, 1155 570" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M1030 650 C940 710, 870 735, 825 750" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M575 750 C520 735, 455 710, 400 650" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M275 580 C205 500, 205 400, 275 320" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <rect x="120" y="870" width="1160" height="58" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
+  <text x="180" y="907" class="tag">核心价值：把原本分散在人手里的动作，压缩成一条可观察、可执行、可反馈的开发闭环。</text>
+</svg>

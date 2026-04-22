@@ -1,0 +1,51 @@
+<svg width="1400" height="860" viewBox="0 0 1400 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF4FF"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    </marker>
+    <style>
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .tag { font: 700 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="860" rx="28" fill="url(#bg)"/>
+  <text x="80" y="90" class="title">MCP 是 AI 与工具之间的通用调用协议</text>
+  <text x="80" y="125" class="subtitle">让 Agent 用统一方式发现工具、调用工具、获取结果，而不用关心工具是用什么语言实现的</text>
+
+  <rect x="90" y="180" width="1220" height="200" rx="28" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
+  <text x="130" y="235" class="h">可以把它理解成：AI 世界里的“接口标准 + 调用约定”</text>
+  <text x="130" y="285" class="b">就像前端/后端会约定 RESTful API + OpenAPI 一样，</text>
+  <text x="130" y="320" class="b">MCP 约定的是：AI 怎么发现工具、怎么传参数、怎么拿结果。</text>
+  <text x="130" y="355" class="small">重点不是某个具体工具，而是不同 Agent 和不同工具服务之间可以按同一套规则协作。</text>
+
+  <rect x="110" y="460" width="260" height="150" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="185" y="520" class="h">AI Agent</text>
+  <text x="165" y="555" class="b">Claude Code / Cursor</text>
+  <text x="145" y="585" class="small">提出需求：截图、点按钮、读日志</text>
+
+  <rect x="470" y="460" width="460" height="150" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="635" y="520" class="h">MCP 协议层</text>
+  <text x="520" y="555" class="b">统一工具描述 / 参数格式 / 返回结果格式</text>
+  <text x="560" y="585" class="small">让 Agent 不用为每个工具单独适配一套调用方式</text>
+
+  <rect x="1030" y="460" width="260" height="150" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="1100" y="520" class="h">工具服务</text>
+  <text x="1080" y="555" class="b">本地脚本 / MCP Server</text>
+  <text x="1095" y="585" class="small">TypeScript / Python / Dart ...</text>
+
+  <line x1="370" y1="535" x2="455" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="930" y1="535" x2="1015" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <rect x="110" y="690" width="1180" height="95" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
+  <text x="150" y="732" class="tag">一句话总结</text>
+  <text x="150" y="768" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的开放标准。</text>
+</svg>

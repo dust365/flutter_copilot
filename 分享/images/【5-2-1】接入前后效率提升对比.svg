@@ -1,0 +1,71 @@
+<svg width="1400" height="880" viewBox="0 0 1400 880" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 700 36px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1F284A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #657393; }
+      .axis { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #7A88A8; }
+      .metric { font: 600 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #31415F; }
+      .labelBefore { font: 600 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #C0392B; }
+      .labelAfter { font: 600 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E9E57; }
+      .summary { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1F284A; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #66759A; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="860" rx="28" fill="#F8FAFF"/>
+
+  <text x="80" y="90" class="title">接入前 VS 接入后</text>
+  <text x="80" y="125" class="subtitle">改为双柱状图表达：红色代表接入前，绿色代表接入后；示意数据可按真实结果替换</text>
+
+  <rect x="900" y="78" width="22" height="22" rx="5" fill="#E85B52"/>
+  <text x="934" y="95" class="small">接入前</text>
+  <rect x="1040" y="78" width="22" height="22" rx="5" fill="#2DBE6C"/>
+  <text x="1074" y="95" class="small">接入后</text>
+
+  <rect x="80" y="170" width="1240" height="520" rx="26" fill="#FFFFFF" stroke="#D9E1F5" stroke-width="2"/>
+
+  <line x1="130" y1="620" x2="1270" y2="620" stroke="#BFCBE8" stroke-width="2"/>
+  <line x1="130" y1="520" x2="1270" y2="520" stroke="#E6ECFA" stroke-width="1.5"/>
+  <line x1="130" y1="420" x2="1270" y2="420" stroke="#E6ECFA" stroke-width="1.5"/>
+  <line x1="130" y1="320" x2="1270" y2="320" stroke="#E6ECFA" stroke-width="1.5"/>
+  <line x1="130" y1="220" x2="1270" y2="220" stroke="#E6ECFA" stroke-width="1.5"/>
+
+  <text x="95" y="625" class="axis">0</text>
+  <text x="86" y="525" class="axis">25</text>
+  <text x="86" y="425" class="axis">50</text>
+  <text x="86" y="325" class="axis">75</text>
+  <text x="80" y="225" class="axis">100</text>
+  <text x="120" y="655" class="axis">相对耗时 / 人工投入指数</text>
+
+  <!-- Metric 1 -->
+  <rect x="190" y="220" width="64" height="400" rx="10" fill="#E85B52"/>
+  <rect x="268" y="520" width="64" height="100" rx="10" fill="#2DBE6C"/>
+  <text x="174" y="195" class="labelBefore">2~3 分钟</text>
+  <text x="252" y="495" class="labelAfter">20~40 秒</text>
+  <text x="176" y="718" class="metric">表单验证</text>
+
+  <!-- Metric 2 -->
+  <rect x="450" y="220" width="64" height="400" rx="10" fill="#E85B52"/>
+  <rect x="528" y="480" width="64" height="140" rx="10" fill="#2DBE6C"/>
+  <text x="438" y="195" class="labelBefore">5~10 分钟</text>
+  <text x="517" y="455" class="labelAfter">1~3 分钟</text>
+  <text x="446" y="718" class="metric">日志排查</text>
+
+  <!-- Metric 3 -->
+  <rect x="710" y="220" width="64" height="400" rx="10" fill="#E85B52"/>
+  <rect x="788" y="540" width="64" height="80" rx="10" fill="#2DBE6C"/>
+  <text x="693" y="195" class="labelBefore">5~7 次操作</text>
+  <text x="776" y="515" class="labelAfter">1~2 次指令</text>
+  <text x="706" y="718" class="metric">人工参与</text>
+
+  <!-- Metric 4 -->
+  <rect x="970" y="220" width="64" height="400" rx="10" fill="#E85B52"/>
+  <rect x="1048" y="500" width="64" height="120" rx="10" fill="#2DBE6C"/>
+  <text x="952" y="195" class="labelBefore">10~15 分钟</text>
+  <text x="1035" y="475" class="labelAfter">3~5 分钟</text>
+  <text x="956" y="718" class="metric">反馈闭环</text>
+
+  <rect x="80" y="760" width="1240" height="90" rx="22" fill="#FFF8E8" stroke="#F3D58B" stroke-width="1.5"/>
+  <text x="120" y="798" class="summary">综合结论：多角色协作效率整体提升 30%~40%</text>
+  <text x="120" y="828" class="small">核心价值不是只省几分钟，而是把“验证、观察、定位、反馈”压缩成一条 Agent 可执行的闭环。</text>
+</svg>

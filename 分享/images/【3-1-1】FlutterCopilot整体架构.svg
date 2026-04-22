@@ -1,0 +1,46 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF4FF"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    </marker>
+    <style>
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+    </style>
+  </defs>
+  <rect width="1400" height="900" rx="28" fill="url(#bg)"/>
+  <text x="80" y="90" class="title">Flutter Copilot 整体架构</text>
+  <text x="80" y="125" class="subtitle">AI Client → MCP Server → Flutter Binding → Running App</text>
+
+  <rect x="100" y="190" width="1200" height="140" rx="28" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="140" y="245" class="h">AI Client</text>
+  <text x="140" y="280" class="b">Claude Code / Cursor</text>
+  <text x="140" y="312" class="small">决定要做什么：点击、输入、截图、抓日志、分析问题</text>
+
+  <rect x="100" y="400" width="1200" height="160" rx="28" fill="#F4F7FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="140" y="455" class="h">flutter_copilot_mcp</text>
+  <text x="140" y="490" class="b">MCP Server / Tool Bridge</text>
+  <text x="140" y="522" class="small">把 AI 的意图翻译成工具调用，连接 VM Service，调用 Flutter 的 Service Extension</text>
+  <text x="140" y="548" class="small">对外暴露：connect / tap / enter_text / get_logs / screenshots / hot_reload / rebuild_snapshot ...</text>
+
+  <rect x="100" y="640" width="1200" height="160" rx="28" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="140" y="695" class="h">flutter_copilot_claw + Running Flutter App</text>
+  <text x="140" y="730" class="b">Flutter Binding / Runtime Capability Layer</text>
+  <text x="140" y="762" class="small">注册  Service Extension，在 Widget 树中查找元素，执行点击 / 输入 / 滚动 / 截图 / 日志收集 / 重绘监测</text>
+
+  <line x1="700" y1="330" x2="700" y2="390" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="700" y1="560" x2="700" y2="630" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="735" y="365" class="small">MCP 协议</text>
+  <text x="735" y="605" class="small">VM Service / Service Extension</text>
+
+  <rect x="930" y="440" width="300" height="80" rx="20" fill="#DDE7FF" stroke="#6E86FF"/>
+  <text x="965" y="472" class="b">15 个 MCP 工具</text>
+  <text x="965" y="500" class="small">观察 → 操作 → 诊断</text>
+</svg>

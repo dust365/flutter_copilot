@@ -1,0 +1,60 @@
+<svg width="1400" height="1100" viewBox="0 0 1400 1100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#4B5EAA"/>
+    </marker>
+    <style>
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .tag { font: 700 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="1100" rx="28" fill="#F8FAFF"/>
+  <text x="80" y="90" class="title">我是怎么利用 AI，从探索到落地的</text>
+  <text x="80" y="125" class="subtitle">从真实痛点出发，经历方案不满、技术突破，到工程化落地</text>
+
+  <!-- Step 1 -->
+  <rect x="180" y="180" width="1040" height="140" rx="26" fill="#FFFFFF" stroke="#F1B55C" stroke-width="3"/>
+  <rect x="210" y="205" width="130" height="36" rx="18" fill="#FFF4D9"/>
+  <text x="240" y="230" class="tag">Step 1 · 痛点</text>
+  <text x="210" y="270" class="h">我想让 AI 像操作浏览器一样，直接帮我操作 App</text>
+  <text x="210" y="305" class="b">验收流程、获取报错日志、对比修改前后的 UI，而不是每次都要我手工跑一遍。</text>
+
+  <line x1="700" y1="332" x2="700" y2="366" stroke="#4B5EAA" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Step 2 -->
+  <rect x="180" y="380" width="1040" height="170" rx="26" fill="#FFFFFF" stroke="#E68A8A" stroke-width="3"/>
+  <rect x="210" y="405" width="150" height="36" rx="18" fill="#FFE5E5"/>
+  <text x="240" y="430" class="tag">Step 2 · 不满</text>
+  <text x="210" y="470" class="h">传统流程太痛苦：adb 截图、pull 到电脑、再发给 AI</text>
+  <text x="210" y="505" class="b">我每次都要等待重启、自己操作、截图、拷贝、补上下文，整个过程又慢又割裂。</text>
+  <text x="210" y="535" class="small">这让我越来越确定：问题不是 AI 不够聪明，而是它根本没进到运行时里。</text>
+
+  <line x1="700" y1="562" x2="700" y2="596" stroke="#4B5EAA" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Step 3 -->
+  <rect x="180" y="610" width="1040" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <rect x="210" y="635" width="160" height="36" rx="18" fill="#EAF0FF"/>
+  <text x="240" y="660" class="tag">Step 3 · 探索</text>
+  <text x="210" y="700" class="h">我研究过脚本控制、AutoGLM-For-Android 等路线，但都不满意</text>
+  <text x="210" y="735" class="b">因为它们大多还是“看屏幕、猜位置、点大概”，本质上依赖视觉识别，不够稳定，也不够语义化。</text>
+  <text x="210" y="765" class="small">我真正想要的是：拿到真实节点，理解它是什么，再去操作它。</text>
+
+  <line x1="700" y1="812" x2="700" y2="846" stroke="#4B5EAA" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Step 4 -->
+  <rect x="180" y="860" width="1040" height="180" rx="26" fill="#FFFFFF" stroke="#6E86FF" stroke-width="3"/>
+  <rect x="210" y="885" width="180" height="36" rx="18" fill="#DDE7FF"/>
+  <text x="240" y="910" class="tag">Step 4 · 突破与落地</text>
+  <text x="210" y="950" class="h">从 Flutter 自动化转向 VM Service，再接上 MCP，最后补齐截图、日志、滚动等能力</text>
+  <text x="210" y="985" class="b">我一边啃大模型多轮工具调用，一边理解 VM Service 和 MCP 协议，再让 Cursor 帮我优化结构，最终补出了今天这套可用 API。</text>
+  <text x="210" y="1015" class="small">核心转折点：从“视觉层自动化”切到“运行时语义化操作”。</text>
+
+  <!-- Bottom callout -->
+  <rect x="220" y="1048" width="960" height="42" rx="21" fill="#EEF3FF"/>
+  <text x="285" y="1075" class="tag">关键启发：真正驱动工具诞生的，不是技术热点，而是你对真实痛点的不满足。</text>
+</svg>
