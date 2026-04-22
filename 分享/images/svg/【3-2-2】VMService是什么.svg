@@ -1,11 +1,11 @@
-<svg width="1400" height="860" viewBox="0 0 1400 860" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFF"/>
       <stop offset="100%" stop-color="#EEF4FF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="4" markerHeight="4" refX="3.6" refY="2" orient="auto">
-      <path d="M0,0 L4,2 L0,4 Z" fill="#4B5EAA"/>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
     </marker>
     <style>
       .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
@@ -17,41 +17,51 @@
     </style>
   </defs>
 
-  <rect width="1400" height="860" rx="28" fill="url(#bg)"/>
+  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
   <text x="80" y="90" class="title">VM Service 是 Flutter 运行时对外暴露的 Debug 通信入口</text>
   <text x="80" y="125" class="subtitle">热重载、DevTools、外部调试工具，本质上都在通过 VM Service 和运行中的 Flutter App 通信</text>
 
-  <rect x="90" y="180" width="1220" height="170" rx="28" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
+  <rect x="90" y="180" width="1320" height="170" rx="28" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
   <text x="130" y="235" class="h">一句话理解</text>
-  <text x="130" y="285" class="b">VM Service 就像 Flutter App 在 Debug 模式下打开的“调试接口”。</text>
+  <text x="130" y="285" class="b">VM Service 就像 Flutter App 在 Debug 模式下打开的"调试接口"。</text>
   <text x="130" y="320" class="small">外部进程可以通过它读取运行时信息，也可以发起热重载、调用 Service Extension 等操作。</text>
 
-  <rect x="120" y="450" width="235" height="160" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="168" y="510" class="h">调试工具</text>
-  <text x="176" y="545" class="b">DevTools</text>
-  <text x="148" y="575" class="small">看性能 / 看状态 / 调试页面</text>
+  <!-- 调试工具 -->
+  <rect x="90" y="440" width="260" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="220" y="508" class="h" text-anchor="middle">调试工具</text>
+  <text x="220" y="545" class="b" text-anchor="middle">DevTools</text>
+  <text x="220" y="580" class="small" text-anchor="middle">看性能 / 看状态 / 调试页面</text>
 
-  <rect x="425" y="450" width="235" height="160" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="475" y="510" class="h">开发工具</text>
-  <text x="470" y="545" class="b">Hot Reload</text>
-  <text x="445" y="575" class="small">代码更新后立即同步到运行时</text>
+  <!-- 箭头：调试工具 → 开发工具 -->
+  <line x1="350" y1="535" x2="405" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
 
-  <rect x="715" y="430" width="320" height="200" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="790" y="495" class="h">VM Service</text>
-  <text x="773" y="530" class="b">Dart / Flutter Runtime API</text>
-  <text x="762" y="565" class="small">外部进程和运行中 App 的统一通信入口</text>
-  <text x="785" y="600" class="tag">读取状态 / 调试 / 调用扩展</text>
+  <!-- 开发工具 -->
+  <rect x="420" y="440" width="280" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="560" y="508" class="h" text-anchor="middle">开发工具</text>
+  <text x="560" y="545" class="b" text-anchor="middle">Hot Reload</text>
+  <text x="560" y="580" class="small" text-anchor="middle">代码更新后立即同步到运行时</text>
 
-  <rect x="1090" y="450" width="190" height="160" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1125" y="510" class="h">Flutter App</text>
-  <text x="1120" y="545" class="b">Running App</text>
-  <text x="1105" y="575" class="small">Widget Tree / Logs / State</text>
+  <!-- 箭头：开发工具 → VM Service -->
+  <line x1="700" y1="535" x2="755" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
 
-  <line x1="366" y1="530" x2="386" y2="530" stroke="#4B5EAA" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="664" y1="530" x2="684" y2="530" stroke="#4B5EAA" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="1039" y1="530" x2="1057" y2="530" stroke="#4B5EAA" stroke-width="3" marker-end="url(#arrow)"/>
+  <!-- VM Service -->
+  <rect x="770" y="420" width="380" height="230" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="960" y="498" class="h" text-anchor="middle">VM Service</text>
+  <text x="960" y="535" class="b" text-anchor="middle">Dart / Flutter Runtime API</text>
+  <text x="960" y="572" class="small" text-anchor="middle">外部进程和运行中 App 的统一通信入口</text>
+  <text x="960" y="610" class="tag" text-anchor="middle">读取状态 / 调试 / 调用扩展</text>
 
-  <rect x="110" y="700" width="1180" height="95" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="150" y="742" class="tag">对 Flutter Copilot 的意义</text>
-  <text x="150" y="778" class="b">Flutter Copilot 不是绕过 Flutter 去操作 App，而是通过 VM Service 正式接入运行时能力。</text>
+  <!-- 箭头：VM Service → Flutter App -->
+  <line x1="1150" y1="535" x2="1205" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+
+  <!-- Flutter App -->
+  <rect x="1220" y="440" width="260" height="190" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="1350" y="508" class="h" text-anchor="middle">Flutter App</text>
+  <text x="1350" y="545" class="b" text-anchor="middle">Running App</text>
+  <text x="1350" y="580" class="small" text-anchor="middle">Widget Tree / Logs / State</text>
+
+  <!-- 底部总结 -->
+  <rect x="90" y="720" width="1320" height="110" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
+  <text x="140" y="766" class="tag">对 Flutter Copilot 的意义</text>
+  <text x="140" y="804" class="b">Flutter Copilot 不是绕过 Flutter 去操作 App，而是通过 VM Service 正式接入运行时能力。</text>
 </svg>

@@ -1,0 +1,110 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF4FF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F7FAFF"/>
+    </linearGradient>
+    <linearGradient id="pain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F7FAFF"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 52px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 600 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #60708F; }
+      .section { font: 700 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #223250; }
+      .body { font: 500 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #31415F; }
+      .small { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #66759A; }
+      .tag { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3557C8; }
+      .painTitle { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #7A4A08; }
+      .painText { font: 500 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #7A4A08; }
+      .num { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #FFFFFF; }
+      .crash { font: 800 80px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #D94848; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+
+  <text x="90" y="95" class="title">这也太难了</text>
+  <text x="90" y="140" class="subtitle">我可以找个人帮我干这些吗？AI？脚本？救救我。</text>
+
+  <rect x="80" y="180" width="1000" height="510" rx="30" fill="#FFFFFF" stroke="#D5DDF5" stroke-width="2"/>
+  <text x="125" y="245" class="section">过去一次看似简单的验证，实际上很碎</text>
+  <text x="125" y="282" class="small">从改完代码到 AI 真正理解问题，中间常常要经历一整串手工动作</text>
+
+  <rect x="125" y="330" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="160" cy="405" r="24" fill="#5C7CFA"/>
+  <text x="153" y="413" class="num">1</text>
+  <text x="210" y="392" class="section">手动点页面</text>
+  <text x="210" y="430" class="small">确认结果</text>
+
+  <rect x="420" y="330" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="455" cy="405" r="24" fill="#5C7CFA"/>
+  <text x="448" y="413" class="num">2</text>
+  <text x="505" y="392" class="section">手动复现问题</text>
+  <text x="505" y="430" class="small">重新跑一遍</text>
+
+  <rect x="715" y="330" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="750" cy="405" r="24" fill="#5C7CFA"/>
+  <text x="743" y="413" class="num">3</text>
+  <text x="800" y="392" class="section">截图 / 录屏</text>
+  <text x="800" y="430" class="small">保存界面信息</text>
+
+  <rect x="125" y="515" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="160" cy="590" r="24" fill="#5C7CFA"/>
+  <text x="153" y="598" class="num">4</text>
+  <text x="210" y="577" class="section">手动获取日志</text>
+  <text x="210" y="615" class="small">复制再贴给 AI</text>
+
+  <rect x="420" y="515" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="455" cy="590" r="24" fill="#5C7CFA"/>
+  <text x="448" y="598" class="num">5</text>
+  <text x="505" y="577" class="section">转述上下文</text>
+  <text x="505" y="615" class="small">补充问题背景</text>
+
+  <rect x="715" y="515" width="260" height="150" rx="24" fill="url(#card)" stroke="#8EA3FF" stroke-width="3"/>
+  <circle cx="750" cy="590" r="24" fill="#5C7CFA"/>
+  <text x="743" y="598" class="num">6</text>
+  <text x="800" y="577" class="section">再一点点操作</text>
+  <text x="800" y="615" class="small">反复来回切换</text>
+
+  <line x1="385" y1="405" x2="420" y2="405" stroke="#6E86FF" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="420,405 402,393 402,417" fill="#6E86FF"/>
+  <line x1="680" y1="405" x2="715" y2="405" stroke="#6E86FF" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="715,405 697,393 697,417" fill="#6E86FF"/>
+  <line x1="845" y1="480" x2="845" y2="515" stroke="#6E86FF" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="845,515 833,497 857,497" fill="#6E86FF"/>
+  <line x1="385" y1="590" x2="420" y2="590" stroke="#6E86FF" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="420,590 402,578 402,602" fill="#6E86FF"/>
+  <line x1="680" y1="590" x2="715" y2="590" stroke="#6E86FF" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="715,590 697,578 697,602" fill="#6E86FF"/>
+
+  <rect x="1105" y="180" width="420" height="510" rx="30" fill="url(#pain)" stroke="#D5DDF5" stroke-width="2"/>
+  <text x="1145" y="245" class="section">到底烦在哪？</text>
+
+  <rect x="1145" y="295" width="340" height="90" rx="20" fill="#FFFFFF" opacity="0.72"/>
+  <text x="1175" y="332" class="painTitle">信息是断开的</text>
+  <text x="1175" y="364" class="painText">页面、日志、上下文分散在不同地方</text>
+
+  <rect x="1145" y="410" width="340" height="100" rx="20" fill="#FFFFFF" opacity="0.72"/>
+  <text x="1175" y="447" class="painTitle">动作是手工的</text>
+  <text x="1175" y="477" class="painText">要自己点、自己截、自己复制，</text>
+  <text x="1175" y="505" class="painText">还要自己描述。</text>
+
+  <rect x="1145" y="525" width="340" height="90" rx="20" fill="#FFFFFF" opacity="0.72"/>
+  <text x="1175" y="562" class="painTitle">AI 看不到运行时</text>
+  <text x="1175" y="594" class="painText">它只能看你给它的二手信息</text>
+
+  <polygon points="1436,752 1456,716 1476,752 1518,736 1506,780 1550,792 1506,804 1518,848 1476,832 1456,868 1436,832 1394,848 1406,804 1362,792 1406,780 1394,736" fill="#FFB347" stroke="#F06A3B" stroke-width="3"/>
+  <circle cx="1456" cy="792" r="28" fill="#FF6B6B" stroke="#F04A4A" stroke-width="3"/>
+  <circle cx="1445" cy="785" r="4" fill="#FFFFFF"/>
+  <circle cx="1467" cy="785" r="4" fill="#FFFFFF"/>
+  <path d="M1444 805 Q1456 817 1468 805" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <line x1="1434" y1="770" x2="1422" y2="758" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <line x1="1478" y1="770" x2="1490" y2="758" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+
+  <text x="966" y="835" class="crash">要崩溃了！</text>
+</svg>

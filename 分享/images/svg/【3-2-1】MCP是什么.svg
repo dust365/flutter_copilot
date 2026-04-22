@@ -1,4 +1,4 @@
-<svg width="1400" height="860" viewBox="0 0 1400 860" xmlns="http://www.w3.org/2000/svg">
+<svg width="1400" height="880" viewBox="0 0 1400 880" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFF"/>
@@ -17,7 +17,7 @@
     </style>
   </defs>
 
-  <rect width="1400" height="860" rx="28" fill="url(#bg)"/>
+  <rect width="1400" height="880" rx="28" fill="url(#bg)"/>
   <text x="80" y="90" class="title">MCP 是 AI 与工具之间的通用调用协议</text>
   <text x="80" y="125" class="subtitle">让 Agent 用统一方式发现工具、调用工具、获取结果，而不用关心工具是用什么语言实现的</text>
 
@@ -27,25 +27,25 @@
   <text x="130" y="320" class="b">MCP 约定的是：AI 怎么发现工具、怎么传参数、怎么拿结果。</text>
   <text x="130" y="355" class="small">重点不是某个具体工具，而是不同 Agent 和不同工具服务之间可以按同一套规则协作。</text>
 
-  <rect x="110" y="460" width="260" height="150" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="185" y="520" class="h">AI Agent</text>
-  <text x="165" y="555" class="b">Claude Code / Cursor</text>
-  <text x="145" y="585" class="small">提出需求：截图、点按钮、读日志</text>
+  <rect x="110" y="460" width="280" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="250" y="522" class="h" text-anchor="middle">AI Agent</text>
+  <text x="250" y="560" class="b" text-anchor="middle">Claude Code / Cursor</text>
+  <text x="250" y="596" class="small" text-anchor="middle">提出需求：截图、点按钮、读日志</text>
 
-  <rect x="470" y="460" width="460" height="150" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="635" y="520" class="h">MCP 协议层</text>
-  <text x="520" y="555" class="b">统一工具描述 / 参数格式 / 返回结果格式</text>
-  <text x="560" y="585" class="small">让 Agent 不用为每个工具单独适配一套调用方式</text>
+  <rect x="480" y="460" width="460" height="190" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="710" y="522" class="h" text-anchor="middle">MCP 协议层</text>
+  <text x="710" y="560" class="b" text-anchor="middle">统一工具描述 / 参数格式 / 返回结果格式</text>
+  <text x="710" y="596" class="small" text-anchor="middle">让 Agent 不用为每个工具单独适配一套调用方式</text>
 
-  <rect x="1030" y="460" width="260" height="150" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1100" y="520" class="h">工具服务</text>
-  <text x="1080" y="555" class="b">本地脚本 / MCP Server</text>
-  <text x="1095" y="585" class="small">TypeScript / Python / Dart ...</text>
+  <rect x="1030" y="460" width="340" height="190" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="1200" y="522" class="h" text-anchor="middle">工具服务</text>
+  <text x="1200" y="560" class="b" text-anchor="middle">本地脚本 / MCP Server</text>
+  <text x="1200" y="596" class="small" text-anchor="middle">TypeScript / Python / Dart ...</text>
 
-  <line x1="370" y1="535" x2="455" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
-  <line x1="930" y1="535" x2="1015" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="390" y1="555" x2="465" y2="555" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <line x1="940" y1="555" x2="1015" y2="555" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
 
-  <rect x="110" y="690" width="1180" height="95" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="150" y="732" class="tag">一句话总结</text>
-  <text x="150" y="768" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的开放标准。</text>
+  <rect x="110" y="720" width="1180" height="100" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
+  <text x="150" y="762" class="tag">一句话总结</text>
+  <text x="150" y="798" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的开放标准。</text>
 </svg>
