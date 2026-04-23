@@ -8,13 +8,16 @@
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="100%" stop-color="#F7FAFF"/>
     </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    </marker>
     <style>
       .title { font: 700 64px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
       .subtitle { font: 600 30px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
       .desc { font: 500 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #203050; }
-      .b { font: 500 21px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #31415F; }
-      .small { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #66759A; }
+      .h { font: 700 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 21px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
       .tag { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
       .tag2 { font: 600 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
     </style>
@@ -30,32 +33,31 @@
   <text x="110" y="390" class="tag2">关键词：MCP / VM Service / Flutter Runtime / Agent Workflow</text>
   <text x="110" y="425" class="small">从代码助手走向应用助手，从工具调用走向工作流闭环</text>
 
-  <rect x="110" y="485" width="590" height="250" rx="28" fill="url(#card)" stroke="#D6DFF8" stroke-width="2"/>
-  <text x="150" y="545" class="h">这场分享想讲清楚三件事</text>
-  <text x="150" y="595" class="b">1. AI 为什么要从“写代码”走向“操作 App”</text>
-  <text x="150" y="640" class="b">2. Flutter Copilot 是怎么把 MCP 接进运行时的</text>
-  <text x="150" y="685" class="b">3. 我们怎么为自己的工作流做 skills / MCP / 工具链</text>
+  <rect x="110" y="485" width="590" height="260" rx="28" fill="url(#card)" stroke="#D6DFF8" stroke-width="2"/>
+  <text x="150" y="548" class="h">这场分享想讲清楚三件事</text>
+  <text x="150" y="600" class="b">1. AI 为什么要从"写代码"走向"操作 App"</text>
+  <text x="150" y="648" class="b">2. Flutter Copilot 是怎么把 MCP 接进运行时的</text>
+  <text x="150" y="696" class="b">3. 我们怎么为自己的工作流做 skills / MCP / 工具链</text>
 
   <!-- Right visual -->
-  <rect x="930" y="150" width="520" height="120" rx="28" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="1090" y="200" class="h">AI Agent</text>
-  <text x="1010" y="238" class="b">Claude Code / Cursor</text>
+  <rect x="900" y="150" width="560" height="130" rx="28" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="1180" y="203" class="h" text-anchor="middle">AI Agent</text>
+  <text x="1180" y="243" class="b" text-anchor="middle">Claude Code / Cursor</text>
 
-  <rect x="930" y="340" width="520" height="120" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="1075" y="390" class="h">MCP Server</text>
-  <text x="1022" y="428" class="b">Tool Bridge / Workflow Router</text>
+  <line x1="1180" y1="280" x2="1180" y2="332" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
 
-  <rect x="930" y="530" width="520" height="120" rx="28" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1065" y="580" class="h">Flutter Runtime</text>
-  <text x="1008" y="618" class="b">Widget Tree / Logs / Screenshot / Action</text>
+  <rect x="900" y="345" width="560" height="130" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="1180" y="398" class="h" text-anchor="middle">MCP Server</text>
+  <text x="1180" y="438" class="b" text-anchor="middle">Tool Bridge / Workflow Router</text>
 
-  <line x1="1190" y1="270" x2="1190" y2="332" stroke="#4B5EAA" stroke-width="6" stroke-linecap="round"/>
-  <polygon points="1190,346 1178,326 1202,326" fill="#4B5EAA"/>
-  <line x1="1190" y1="460" x2="1190" y2="522" stroke="#4B5EAA" stroke-width="6" stroke-linecap="round"/>
-  <polygon points="1190,536 1178,516 1202,516" fill="#4B5EAA"/>
+  <line x1="1180" y1="475" x2="1180" y2="527" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
 
-  <rect x="930" y="700" width="520" height="130" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="970" y="744" class="h">核心价值</text>
-  <text x="970" y="784" class="small">让 AI 给自己赋能，把重复劳动交给工具，</text>
-  <text x="970" y="814" class="small">把注意力放回更重要的问题上。</text>
+  <rect x="900" y="540" width="560" height="130" rx="28" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="1180" y="593" class="h" text-anchor="middle">Flutter Runtime</text>
+  <text x="1180" y="633" class="b" text-anchor="middle">Widget Tree / Logs / Screenshot / Action</text>
+
+  <rect x="900" y="720" width="560" height="130" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
+  <text x="940" y="770" class="h">核心价值</text>
+  <text x="940" y="808" class="small">让 AI 给自己赋能，把重复劳动交给工具，</text>
+  <text x="940" y="838" class="small">把注意力放回更重要的问题上。</text>
 </svg>

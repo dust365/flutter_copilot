@@ -1,62 +1,141 @@
 <svg width="1400" height="980" viewBox="0 0 1400 980" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-      <path d="M0,0 L8,4 L0,8 Z" fill="#4B5EAA"/>
+    <radialGradient id="coreGrad" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#7B8DFF"/>
+      <stop offset="60%" stop-color="#4C63E8"/>
+      <stop offset="100%" stop-color="#2E3FB8"/>
+    </radialGradient>
+    <linearGradient id="card1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F2F6FF"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFE9B8"/>
+      <stop offset="100%" stop-color="#FFD98A"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="6" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="coreShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="8" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4C63E8"/>
     </marker>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
-      .tag { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+      .title { font: 700 36px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; letter-spacing: 0.5px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .b { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .small { font: 500 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+      .coreTitle { font: 700 30px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; }
+      .coreSub { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #E7ECFF; letter-spacing: 0.5px; }
+      .num { font: 800 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #FFFFFF; }
+      .ribbonText { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #7A5310; }
     </style>
   </defs>
 
   <rect width="1400" height="980" rx="28" fill="url(#bg)"/>
-  <text x="80" y="90" class="title">全链路解决方案，开发闭环</text>
-  <text x="80" y="125" class="subtitle">把代码生成、运行验证、页面观察、问题定位、结果反馈串成一条 Agent 可执行的闭环</text>
 
-  <rect x="575" y="330" width="250" height="150" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="645" y="392" class="h">AI Agent</text>
-  <text x="608" y="428" class="b">驱动整条研发闭环</text>
-  <text x="632" y="460" class="tag">自动执行 / 自动反馈</text>
+  <!-- decorative dots -->
+  <g opacity="0.4">
+    <circle cx="90" cy="160" r="3" fill="#A8B6FF"/>
+    <circle cx="120" cy="200" r="2" fill="#A8B6FF"/>
+    <circle cx="1310" cy="160" r="3" fill="#A8B6FF"/>
+    <circle cx="1280" cy="200" r="2" fill="#A8B6FF"/>
+  </g>
 
-  <rect x="150" y="180" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="215" y="235" class="h">代码生成</text>
-  <text x="192" y="272" class="b">补代码 / 改页面 / 调逻辑</text>
-  <text x="215" y="302" class="small">Claude Code / Cursor</text>
+  <text x="80" y="88" class="title">全链路解决方案，开发闭环</text>
+  <text x="80" y="122" class="subtitle">把代码生成、运行验证、页面观察、问题定位、结果反馈串成一条 Agent 可执行的闭环</text>
+  <rect x="80" y="138" width="68" height="4" rx="2" fill="#4C63E8"/>
 
-  <rect x="1000" y="180" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="1065" y="235" class="h">运行验证</text>
-  <text x="1036" y="272" class="b">打开 App / 触发流程 / 校验结果</text>
-  <text x="1055" y="302" class="small">tap / input / scroll</text>
+  <!-- Core AI Agent -->
+  <g filter="url(#coreShadow)">
+    <circle cx="700" cy="490" r="128" fill="url(#coreGrad)"/>
+    <circle cx="700" cy="490" r="128" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.5"/>
+  </g>
+  <circle cx="700" cy="490" r="150" fill="none" stroke="#8EA3FF" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.7"/>
+  <text x="700" y="478" class="coreTitle" text-anchor="middle">AI Agent</text>
+  <text x="700" y="508" class="coreSub" text-anchor="middle">驱动整条研发闭环</text>
+  <rect x="622" y="524" width="156" height="26" rx="13" fill="#FFFFFF" opacity="0.22"/>
+  <text x="700" y="542" class="coreSub" text-anchor="middle">自动执行 · 自动反馈</text>
 
-  <rect x="1030" y="580" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="1095" y="635" class="h">页面观察</text>
-  <text x="1065" y="672" class="b">截图 / 看节点 / 查页面状态</text>
-  <text x="1093" y="702" class="small">screenshot / inspect</text>
+  <!-- Card 1 · 代码生成 (top-left) -->
+  <g filter="url(#softShadow)">
+    <rect x="140" y="200" width="260" height="150" rx="22" fill="url(#card1)" stroke="#8EA3FF" stroke-width="2"/>
+  </g>
+  <circle cx="170" cy="230" r="18" fill="#6E86FF"/>
+  <text x="170" y="236" class="num" text-anchor="middle">1</text>
+  <text x="200" y="236" class="h">代码生成</text>
+  <line x1="165" y1="256" x2="375" y2="256" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="165" y="286" class="b">补代码 / 改页面 / 调逻辑</text>
+  <text x="165" y="318" class="small">Claude Code · Cursor</text>
 
-  <rect x="150" y="580" width="250" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="215" y="635" class="h">问题定位</text>
-  <text x="188" y="672" class="b">读日志 / 看异常 / 分析重绘</text>
-  <text x="218" y="702" class="small">logs / rebuild / error</text>
+  <!-- Card 2 · 运行验证 (top-right) -->
+  <g filter="url(#softShadow)">
+    <rect x="1000" y="200" width="260" height="150" rx="22" fill="url(#card1)" stroke="#8EA3FF" stroke-width="2"/>
+  </g>
+  <circle cx="1030" cy="230" r="18" fill="#6E86FF"/>
+  <text x="1030" y="236" class="num" text-anchor="middle">2</text>
+  <text x="1060" y="236" class="h">运行验证</text>
+  <line x1="1025" y1="256" x2="1235" y2="256" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="1025" y="286" class="b">打开 App / 触发流程 / 校验结果</text>
+  <text x="1025" y="318" class="small">tap · input · scroll</text>
 
-  <rect x="575" y="700" width="250" height="120" rx="24" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="640" y="748" class="h">结果反馈</text>
-  <text x="620" y="784" class="b">给开发 / 测试 / 产品</text>
+  <!-- Card 3 · 页面观察 (bottom-right) -->
+  <g filter="url(#softShadow)">
+    <rect x="1000" y="630" width="260" height="150" rx="22" fill="url(#card1)" stroke="#8EA3FF" stroke-width="2"/>
+  </g>
+  <circle cx="1030" cy="660" r="18" fill="#6E86FF"/>
+  <text x="1030" y="666" class="num" text-anchor="middle">3</text>
+  <text x="1060" y="666" class="h">页面观察</text>
+  <line x1="1025" y1="686" x2="1235" y2="686" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="1025" y="716" class="b">截图 / 看节点 / 查页面状态</text>
+  <text x="1025" y="748" class="small">screenshot · inspect</text>
 
-  <path d="M410 250 C500 210, 560 210, 620 320" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M780 320 C840 210, 900 210, 990 250" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M1125 330 C1180 410, 1185 500, 1155 570" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M1030 650 C940 710, 870 735, 825 750" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M575 750 C520 735, 455 710, 400 650" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M275 580 C205 500, 205 400, 275 320" fill="none" stroke="#4B5EAA" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <!-- Card 4 · 问题定位 (bottom-left) -->
+  <g filter="url(#softShadow)">
+    <rect x="140" y="630" width="260" height="150" rx="22" fill="url(#card1)" stroke="#8EA3FF" stroke-width="2"/>
+  </g>
+  <circle cx="170" cy="660" r="18" fill="#6E86FF"/>
+  <text x="170" y="666" class="num" text-anchor="middle">4</text>
+  <text x="200" y="666" class="h">问题定位</text>
+  <line x1="165" y1="686" x2="375" y2="686" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="165" y="716" class="b">读日志 / 看异常 / 分析重绘</text>
+  <text x="165" y="748" class="small">logs · rebuild · error</text>
 
-  <rect x="120" y="870" width="1160" height="58" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="180" y="907" class="tag">核心价值：把原本分散在人手里的动作，压缩成一条可观察、可执行、可反馈的开发闭环。</text>
+  <!-- Card 5 · 结果反馈 (bottom-center) -->
+  <g filter="url(#softShadow)">
+    <rect x="570" y="770" width="260" height="80" rx="22" fill="#FFFFFF" stroke="#4C63E8" stroke-width="2.5"/>
+  </g>
+  <circle cx="600" cy="810" r="18" fill="#4C63E8"/>
+  <text x="600" y="816" class="num" text-anchor="middle">5</text>
+  <text x="630" y="816" class="h">结果反馈</text>
+  <text x="630" y="838" class="small">给开发 · 测试 · 产品</text>
+
+  <!-- Flow arrows around the core -->
+  <path d="M400 280 C500 260, 560 330, 585 400" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+  <path d="M815 400 C840 330, 900 260, 1000 280" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+  <path d="M1130 350 C1200 440, 1200 560, 1130 630" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+  <path d="M1000 705 C910 740, 870 770, 825 790" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+  <path d="M570 790 C520 770, 485 740, 400 705" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+  <path d="M270 630 C200 560, 200 440, 270 350" fill="none" stroke="#4C63E8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.9"/>
+
+  <!-- Bottom ribbon -->
+  <g filter="url(#softShadow)">
+    <rect x="120" y="888" width="1160" height="60" rx="22" fill="url(#ribbon)" stroke="#E8B560" stroke-width="1.5"/>
+  </g>
+  <circle cx="160" cy="918" r="14" fill="#E8B560"/>
+  <text x="160" y="924" class="num" text-anchor="middle">★</text>
+  <text x="188" y="925" class="ribbonText">核心价值：把原本分散在人手里的动作，压缩成一条可观察、可执行、可反馈的开发闭环。</text>
 </svg>

@@ -1,59 +1,58 @@
-<svg width="1400" height="1100" viewBox="0 0 1400 1100" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="1100" viewBox="0 0 1500 1100" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-      <path d="M0,0 L8,4 L0,8 Z" fill="#3657C7"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF4FF"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
     </marker>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1D2850; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #66759A; }
-      .h { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1F2C4D; }
-      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #31415F; }
-      .small { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #62718F; }
-      .tiny { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #62718F; }
+      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
+      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
+      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .label { font: 500 14px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
     </style>
   </defs>
-  <rect width="1400" height="1100" rx="28" fill="#F8FAFF"/>
+  <rect width="1500" height="1100" rx="28" fill="url(#bg)"/>
   <text x="80" y="90" class="title">MCP 协议与 VM Service 调用链路</text>
   <text x="80" y="125" class="subtitle">AI 发起工具调用 → MCP 翻译 → VM Service 传递 → Flutter App 执行</text>
 
   <!-- Layer 1: AI Agent -->
-  <rect x="580" y="180" width="240" height="140" rx="24" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="630" y="235" class="h">AI Agent</text>
-  <text x="610" y="268" class="b">Claude Code / Cursor</text>
-  <text x="605" y="296" class="small">例如：tap(login_button)</text>
+  <rect x="550" y="180" width="400" height="160" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
+  <text x="750" y="238" class="h" text-anchor="middle">AI Agent</text>
+  <text x="750" y="275" class="b" text-anchor="middle">Claude Code / Cursor</text>
+  <text x="750" y="310" class="small" text-anchor="middle">例如：tap(login_button)</text>
 
-  <!-- Arrow 1: AI Agent → MCP Server -->
-  <line x1="700" y1="320" x2="700" y2="392" stroke="#3657C7" stroke-width="4.5" marker-end="url(#arrow)"/>
-  <text x="720" y="358" class="tiny">MCP tool call</text>
+  <!-- Arrow 1 -->
+  <line x1="750" y1="340" x2="750" y2="410" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="775" y="382" class="label">MCP tool call</text>
 
   <!-- Layer 2: MCP Server -->
-  <rect x="570" y="400" width="260" height="140" rx="24" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="615" y="455" class="h">MCP Server</text>
-  <text x="610" y="488" class="b">flutter_copilot_mcp</text>
-  <text x="605" y="516" class="small">工具路由 / 参数校验 / 结果返回</text>
+  <rect x="550" y="420" width="400" height="160" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
+  <text x="750" y="478" class="h" text-anchor="middle">MCP Server</text>
+  <text x="750" y="515" class="b" text-anchor="middle">flutter_copilot_mcp</text>
+  <text x="750" y="550" class="small" text-anchor="middle">工具路由 / 参数校验 / 结果返回</text>
 
-  <!-- Arrow 2: MCP Server → VM Service -->
-  <line x1="700" y1="540" x2="700" y2="612" stroke="#3657C7" stroke-width="4.5" marker-end="url(#arrow)"/>
-  <text x="720" y="578" class="tiny">callServiceExtension</text>
+  <!-- Arrow 2 -->
+  <line x1="750" y1="580" x2="750" y2="650" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="775" y="622" class="label">callServiceExtension</text>
 
   <!-- Layer 3: VM Service -->
-  <rect x="565" y="620" width="270" height="140" rx="24" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="615" y="675" class="h">VM Service</text>
-  <text x="605" y="708" class="b">Dart / Flutter Runtime Debug API</text>
-  <text x="615" y="736" class="small">调用 Service Extension</text>
+  <rect x="550" y="660" width="400" height="160" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="750" y="718" class="h" text-anchor="middle">VM Service</text>
+  <text x="750" y="755" class="b" text-anchor="middle">Dart / Flutter Runtime Debug API</text>
+  <text x="750" y="790" class="small" text-anchor="middle">调用 Service Extension</text>
 
-  <!-- Arrow 3: VM Service → Flutter App -->
-  <line x1="700" y1="760" x2="700" y2="832" stroke="#3657C7" stroke-width="4.5" marker-end="url(#arrow)"/>
-  <text x="720" y="798" class="tiny">runtime execution</text>
+  <!-- Arrow 3 -->
+  <line x1="750" y1="820" x2="750" y2="890" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <text x="775" y="862" class="label">runtime execution</text>
 
   <!-- Layer 4: Flutter App -->
-  <rect x="575" y="840" width="250" height="140" rx="24" fill="#EEF3FF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="620" y="895" class="h">Flutter App</text>
-  <text x="615" y="928" class="b">Binding / Widget Tree</text>
-  <text x="613" y="956" class="small">执行点击 / 输入 / 截图 / 日志</text>
-
-  <!-- Example Box -->
-  <rect x="120" y="1000" width="1160" height="85" rx="28" fill="#FFFFFF" stroke="#D3DCF7" stroke-width="2"/>
-  <text x="160" y="1040" class="h">示例：点击 login_button 的真实路径</text>
-  <text x="160" y="1072" class="small">Agent → MCP → VM Service → FlutterCopilotBinding → GestureDispatcher</text>
+  <rect x="550" y="900" width="400" height="160" rx="26" fill="#EEF3FF" stroke="#4B5EAA" stroke-width="3"/>
+  <text x="750" y="958" class="h" text-anchor="middle">Flutter App</text>
+  <text x="750" y="995" class="b" text-anchor="middle">Binding / Widget Tree</text>
+  <text x="750" y="1030" class="small" text-anchor="middle">执行点击 / 输入 / 截图 / 日志</text>
 </svg>
