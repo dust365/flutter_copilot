@@ -2,7 +2,7 @@
 
 **Flutter Copilot 项目实践分享**
 
-![【0-0-1】让 AI 真正上手操作 App](./images/svg/【0-0-1】让AI真正上手操作App.svg)
+<image token="D7FkbIByDooQ9Yx8gx6c0oJQnhf" width="900" align="center"/>
 
 > 演讲时长：约 25 分钟 | 受众：产品、研发、Flutter、后端、设计
 
@@ -22,7 +22,7 @@
 - 要再把上下文转述给 AI
 - 还要自己一点点把流程重新操作一遍
 
-![【1-1-1】这也太难了](./images/svg/【1-1-1】这也太难了.svg)
+<image token="HgjHbbG2RoSEyGxjFicciY0ynPd" width="900" align="center"/>
 
 问题不是 AI 写代码不够快，而是它**看不到**你的 App。
 
@@ -39,16 +39,15 @@ Flutter Copilot 就是从这里开始的。
 ## 二、效果演示
 *配图建议：这一章尽量放真实演示截图或录屏关键帧，不建议再放原理图。*
 
-### 场景 A：AI 帮你跑一遍 Demo 的核心交互
+### 场景 A：AI 帮你验证一个表单流程
 
-> 以前的做法：改完代码 → 热重载 → 自己挨个点页面、输入文本、滑动列表、触发手势 → 出问题再翻控制台日志 → 手工截图贴给同事。一次完整回归少说 5-10 分钟。
+> 以前的做法：改完代码 → 热重载 → 自己打开页面 → 手动输入 → 手动点提交 → 看结果 → 不对再改 → 再来一遍。一次验证少说 2-3 分钟。
 >
-> 现在的做法：一句话告诉 AI "帮我把 Demo 的点击、输入、滚动、手势、日志走一遍"，它自己连 App、自动定位元素、依次完成操作，最后把每一步的截图和日志都交到你面前。
+> 现在的做法：告诉 AI "帮我试一下登录流程"，它自己连接 App、找到输入框、输入内容、点击按钮、截图告诉你结果。
 
-**[建议插入一段 30~60 秒的录屏：AI 一次性走完 点击 → 文本输入 → 滚动 → 手势 → 日志获取 的全流程]**
+**[建议新增配图：AI 自动执行登录/表单流程的终端对话 + App 页面结果截图]**
 
-
-*预期效果：观众看到的不是一段事先剪好的 demo，而是 AI 真的在和 App 实时对话——每一步点完、输完、划完之后，都有截图和状态变化可以验证。全程人没动鼠标，也没切应用。*
+*预期效果：观众看到 AI 自动连接 App → 识别页面元素 → 输入文本 → 点击按钮 → 返回截图和执行结果。全程无需人工操作。*
 
 ---
 
@@ -90,7 +89,7 @@ Flutter Copilot 就是从这里开始的。
 
 ### 1. 整体架构：三层，各管一件事
 
-![【3-1-1】Flutter Copilot 整体架构](./images/svg/【3-1-1】FlutterCopilot整体架构.svg)
+<image token="Q8D4bnPCCoftGux2J78ceQyynUf" width="900" align="center"/>
 
 
 
@@ -113,7 +112,7 @@ MCP 是 AI 和工具之间的标准协议。
 
 如果你想给自己的技术栈也接一个类似的 AI 能力，MCP 协议也是开放的。
 
-![【3-2-1】MCP 是什么](./images/svg/【3-2-1】MCP是什么.svg)
+<image token="Xb94bUZg3oZofoxarYicNeRYnZb" width="900" align="center"/>
 
 我们这个项目的 Dart MCP Server 源码在：
 - `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart`
@@ -126,7 +125,7 @@ VM Service 是 Dart/Flutter 在 Debug 模式下暴露的运行时调试服务。
 
 我们平时用的热重载、DevTools 调试，底层都是 VM Service。它提供了一个正式的入口，让 App 外部的进程可以和运行中的 App 通信。
 
-![【3-2-2】VM Service 是什么](./images/svg/【3-2-2】VMService是什么.svg)
+<image token="MVlab4EeyoTOZtxF6yzcJ38Rn8c" width="900" align="center"/>
 
 Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖连接、观察、交互、导航、诊断等几个核心方向；底层则通过 App 内部能力和 VM Service 调用链路把这些动作真正执行起来。
 
@@ -134,7 +133,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 **所以整个链路是这样的：AI 说话 → MCP 翻译 → VM Service 传达 → Flutter App 执行。**
 
-![【3-3-1】MCP 协议与 VM Service 调用链路](./images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
+<image token="FmuObAma6o7zbTx6zqYcUS5fnx5" width="900" align="center"/>
 
 这张图放在这里更合适，因为前面刚讲完 MCP 和 VM Service，这里正好把“协议”和“真正执行”之间的关系连起来。
 
@@ -147,7 +146,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 给大家看一张总览图：
 
-![【3-4-1】Flutter Copilot 能力总览](./images/svg/【3-4-1】FlutterCopilot能力总览.svg)
+<image token="NM9mb2lIIoJE1Bx8SqYcpgfYnif" width="900" align="center"/>
 
 你在现场讲这一页时，可以先从“15 个 MCP 工具”总数切进去，再按连接、观察、交互、导航、诊断五类往下拆。
 
@@ -177,7 +176,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 我把它总结成三步，核心原则就是：**App 内加能力、App 外起桥接、Agent 侧做配置。**
 
-![【4-1-1】接入路径与提效指标示意图](./images/svg/【4-1-1】接入路径与提效指标示意图.svg)
+<image token="NEJSbwdtXoimZrxAqO8c4lAsnYd" width="900" align="center"/>
 
 这张图建议你在接入指南这里先展示上半部分，讲完三步之后，再顺势切到下半部分讲提效指标。
 
@@ -314,7 +313,7 @@ void main() {
 
 ### 2. 接入前后对比示例
 
-![【5-2-1】接入前后效率提升对比](./images/svg/【5-2-1】接入前后效率提升对比.svg)
+<image token="HhHbbFilyok9XYxhBf3cv4GBn3c" width="900" align="center"/>
 
 > 下面这组数字你后面可以替换成真实数据，我先帮你把表达方式搭好。
 
@@ -337,7 +336,7 @@ void main() {
 
 ### 4. 全链路解决方案，开发闭环
 
-![【5-4-1】全链路开发闭环](./images/svg/【5-4-1】全链路开发闭环.svg)
+<image token="W6wzbnxbqoCptpx2dsfcmfsQnhe" width="900" align="center"/>
 
 Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码生成 → 运行验证 → 页面观察 → 问题定位 → 结果反馈”第一次变成了一条可以被 AI 串起来的完整闭环。
 
@@ -370,7 +369,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ### 3. 给大家真正的启发：从自己的工作场景出发
 
-![【6-3-1】我是怎么利用AI从探索到落地的](./images/svg/【6-3-1】我是怎么利用AI从探索到落地的.svg)
+<image token="U2apbYi8zoK0dZxU21kc7dUhnte" width="900" align="center"/>
 
 如果回头看这个项目，它并不是从“我要做个平台”开始的，而是从一句很具体的话开始的：
 
