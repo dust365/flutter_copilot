@@ -1,63 +1,219 @@
 <svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+    <radialGradient id="leftGlow" cx="20%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#C8D4FF" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#C8D4FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rightGlow" cx="80%" cy="60%" r="55%">
+      <stop offset="0%" stop-color="#BEE9FF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#BEE9FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#F7FAFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="indigo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1A234A"/>
+      <stop offset="55%" stop-color="#3A4AC8"/>
+      <stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F0A03D"/>
+      <stop offset="100%" stop-color="#E07B3A"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
     </marker>
     <style>
-      .title { font: 700 64px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 600 30px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
-      .desc { font: 500 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .b { font: 500 21px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .small { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
-      .tag { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
-      .tag2 { font: 600 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+      .tag { font: 700 14px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 4px; }
+      .bigTitle { font: 900 68px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; letter-spacing: 2px; }
+      .subBrand { font: 700 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; letter-spacing: 1px; }
+      .lead { font: 500 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .kwLabel { font: 700 15px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .kwText { font: 600 16px 'SF Mono',Menlo,monospace; fill: #3A466B; letter-spacing: 0.5px; }
+      .kwSub { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #7383A8; }
+      .panelH { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .panelB { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .nodeTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .nodeH { font: 800 24px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; }
+      .nodeSub { font: 500 14px 'SF Mono',Menlo,monospace; fill: #FFFFFF; fill-opacity: 0.85; letter-spacing: 0.5px; }
+      .valueH { font: 800 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .valueB { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
     </style>
   </defs>
 
-  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+  <rect width="1600" height="900" rx="28" fill="url(#leftGlow)"/>
+  <rect width="1600" height="900" rx="28" fill="url(#rightGlow)"/>
 
-  <!-- Left content -->
-  <text x="110" y="180" class="title">让 AI 真正上手操作 App</text>
-  <text x="110" y="240" class="subtitle">Flutter Copilot 项目实践分享</text>
-  <text x="110" y="305" class="desc">从代码助手，走向真正进入运行时的应用助手</text>
+  <!-- decorative stars -->
+  <g opacity="0.6">
+    <circle cx="960" cy="110" r="2" fill="#4C63E8"/>
+    <circle cx="1100" cy="80" r="1.5" fill="#6EE7FF"/>
+    <circle cx="1540" cy="820" r="2" fill="#4C63E8"/>
+    <circle cx="1480" cy="780" r="1.5" fill="#8EA7FF"/>
+    <circle cx="80" cy="820" r="2" fill="#4C63E8" opacity="0.5"/>
+    <path d="M1520 830 L1528 838 M1520 838 L1528 830" stroke="#4C63E8" stroke-width="2" stroke-linecap="round"/>
+  </g>
 
-  <text x="110" y="390" class="tag2">关键词：MCP / VM Service / Flutter Runtime / Agent Workflow</text>
-  <text x="110" y="425" class="small">从代码助手走向应用助手，从工具调用走向工作流闭环</text>
+  <!-- LEFT: title block -->
+  <text x="80" y="100" class="tag">KEYNOTE · FLUTTER COPILOT</text>
 
-  <rect x="110" y="485" width="590" height="260" rx="28" fill="url(#card)" stroke="#D6DFF8" stroke-width="2"/>
-  <text x="150" y="548" class="h">这场分享想讲清楚三件事</text>
-  <text x="150" y="600" class="b">1. AI 为什么要从"写代码"走向"操作 App"</text>
-  <text x="150" y="648" class="b">2. Flutter Copilot 是怎么把 MCP 接进运行时的</text>
-  <text x="150" y="696" class="b">3. 我们怎么为自己的工作流做 skills / MCP / 工具链</text>
+  <text x="80" y="190" class="bigTitle" fill="url(#titleGrad)">让 <tspan fill="#4C63E8">AI</tspan> 真正上手操作</text>
+  <text x="80" y="270" class="bigTitle" fill="url(#appGrad)">App</text>
+  <rect x="80" y="290" width="96" height="5" rx="2.5" fill="url(#accent)"/>
 
-  <!-- Right visual -->
-  <rect x="900" y="150" width="560" height="130" rx="28" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="1180" y="203" class="h" text-anchor="middle">AI Agent</text>
-  <text x="1180" y="243" class="b" text-anchor="middle">Claude Code / Cursor</text>
+  <text x="80" y="340" class="subBrand">Flutter Copilot 项目实践分享</text>
+  <text x="80" y="380" class="lead">从代码助手，走向真正进入运行时的应用助手</text>
 
-  <line x1="1180" y1="280" x2="1180" y2="332" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- keywords row -->
+  <g transform="translate(80, 420)">
+    <text y="0" class="kwLabel">KEYWORDS</text>
+    <g transform="translate(0, 28)">
+      <g transform="translate(0,0)">
+        <rect width="94" height="30" rx="15" fill="#FFFFFF" stroke="#B8C6F5" stroke-width="1.2"/>
+        <text x="47" y="20" class="kwText" text-anchor="middle">MCP</text>
+      </g>
+      <g transform="translate(104,0)">
+        <rect width="134" height="30" rx="15" fill="#FFFFFF" stroke="#B8C6F5" stroke-width="1.2"/>
+        <text x="67" y="20" class="kwText" text-anchor="middle">VM Service</text>
+      </g>
+      <g transform="translate(248,0)">
+        <rect width="180" height="30" rx="15" fill="#FFFFFF" stroke="#B8C6F5" stroke-width="1.2"/>
+        <text x="90" y="20" class="kwText" text-anchor="middle">Flutter Runtime</text>
+      </g>
+      <g transform="translate(438,0)">
+        <rect width="200" height="30" rx="15" fill="#FFFFFF" stroke="#B8C6F5" stroke-width="1.2"/>
+        <text x="100" y="20" class="kwText" text-anchor="middle">Agent Workflow</text>
+      </g>
+    </g>
+    <text y="86" class="kwSub">从代码助手走向应用助手，从工具调用走向工作流闭环</text>
+  </g>
 
-  <rect x="900" y="345" width="560" height="130" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="1180" y="398" class="h" text-anchor="middle">MCP Server</text>
-  <text x="1180" y="438" class="b" text-anchor="middle">Tool Bridge / Workflow Router</text>
+  <!-- LEFT panel: 这场分享想讲清楚三件事 -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="560" width="640" height="280" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="560" width="6" height="280" rx="3" fill="url(#accent)"/>
+  <text x="110" y="600" class="tag">THREE THINGS</text>
+  <text x="110" y="636" class="panelH">这场分享想讲清楚三件事</text>
 
-  <line x1="1180" y1="475" x2="1180" y2="527" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- three items -->
+  <g transform="translate(110, 666)">
+    <g transform="translate(0, 0)">
+      <rect width="44" height="44" rx="12" fill="url(#accent)"/>
+      <text x="22" y="28" class="nodeH" text-anchor="middle" style="font-size:18px">01</text>
+      <text x="62" y="20" class="panelH" style="font-size:18px">为什么</text>
+      <text x="62" y="42" class="panelB">AI 要从"写代码"走向"操作 App"</text>
+    </g>
+    <g transform="translate(0, 60)">
+      <rect width="44" height="44" rx="12" fill="url(#indigo)"/>
+      <text x="22" y="28" class="nodeH" text-anchor="middle" style="font-size:18px">02</text>
+      <text x="62" y="20" class="panelH" style="font-size:18px">是什么</text>
+      <text x="62" y="42" class="panelB">Flutter Copilot 如何把 MCP 接进运行时</text>
+    </g>
+    <g transform="translate(0, 120)">
+      <rect width="44" height="44" rx="12" fill="url(#cyan)"/>
+      <text x="22" y="28" class="nodeH" text-anchor="middle" style="font-size:18px">03</text>
+      <text x="62" y="20" class="panelH" style="font-size:18px">怎么用</text>
+      <text x="62" y="42" class="panelB">为自己的工作流做 skills / MCP / 工具链</text>
+    </g>
+  </g>
 
-  <rect x="900" y="540" width="560" height="130" rx="28" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1180" y="593" class="h" text-anchor="middle">Flutter Runtime</text>
-  <text x="1180" y="633" class="b" text-anchor="middle">Widget Tree / Logs / Screenshot / Action</text>
+  <!-- RIGHT: stacked architecture -->
+  <!-- Node 1: AI Agent -->
+  <g transform="translate(900, 100)" filter="url(#softShadow)">
+    <rect width="620" height="130" rx="22" fill="url(#accent)"/>
+    <circle cx="72" cy="65" r="36" fill="#FFFFFF" fill-opacity="0.18"/>
+    <!-- robot icon -->
+    <g transform="translate(72, 65)" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round">
+      <rect x="-18" y="-14" width="36" height="28" rx="6" fill="#FFFFFF" fill-opacity="0.3"/>
+      <circle cx="-7" cy="-2" r="2.5" fill="#FFFFFF" stroke="none"/>
+      <circle cx="7" cy="-2" r="2.5" fill="#FFFFFF" stroke="none"/>
+      <line x1="0" y1="-20" x2="0" y2="-26"/>
+      <circle cx="0" cy="-28" r="2.5" fill="#FFFFFF" stroke="none"/>
+      <line x1="-6" y1="7" x2="6" y2="7"/>
+    </g>
+    <rect x="130" y="30" width="86" height="22" rx="11" fill="#FFFFFF" fill-opacity="0.25"/>
+    <text x="173" y="46" class="nodeTag" text-anchor="middle">LAYER 01</text>
+    <text x="130" y="80" class="nodeH">AI Agent</text>
+    <text x="130" y="106" class="nodeSub">Claude Code / Cursor / Copilot CLI</text>
+  </g>
 
-  <rect x="900" y="720" width="560" height="130" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="940" y="770" class="h">核心价值</text>
-  <text x="940" y="808" class="small">让 AI 给自己赋能，把重复劳动交给工具，</text>
-  <text x="940" y="838" class="small">把注意力放回更重要的问题上。</text>
+  <!-- connector 1→2 -->
+  <path d="M1210 240 L1210 280" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Node 2: MCP Server -->
+  <g transform="translate(900, 290)" filter="url(#softShadow)">
+    <rect width="620" height="130" rx="22" fill="url(#cyan)"/>
+    <circle cx="72" cy="65" r="36" fill="#FFFFFF" fill-opacity="0.25"/>
+    <!-- bridge icon -->
+    <g transform="translate(72, 65)" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round">
+      <path d="M-24 8 L24 8"/>
+      <path d="M-24 8 C-18 -14 18 -14 24 8"/>
+      <line x1="-14" y1="8" x2="-14" y2="-2"/>
+      <line x1="0" y1="8" x2="0" y2="-8"/>
+      <line x1="14" y1="8" x2="14" y2="-2"/>
+    </g>
+    <rect x="130" y="30" width="86" height="22" rx="11" fill="#FFFFFF" fill-opacity="0.3"/>
+    <text x="173" y="46" class="nodeTag" text-anchor="middle">LAYER 02</text>
+    <text x="130" y="80" class="nodeH">MCP Server</text>
+    <text x="130" y="106" class="nodeSub">Tool Bridge · Workflow Router</text>
+  </g>
+
+  <!-- connector 2→3 -->
+  <path d="M1210 430 L1210 470" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+  <!-- Node 3: Flutter Runtime -->
+  <g transform="translate(900, 480)" filter="url(#softShadow)">
+    <rect width="620" height="130" rx="22" fill="url(#amber)"/>
+    <circle cx="72" cy="65" r="36" fill="#FFFFFF" fill-opacity="0.25"/>
+    <!-- flutter-like icon -->
+    <g transform="translate(72, 65)" fill="#FFFFFF">
+      <path d="M-14 -20 L10 -20 L-10 0 L-14 -4 Z" opacity="0.95"/>
+      <path d="M-14 -4 L0 10 L20 10 L-4 -14 Z" opacity="0.8"/>
+      <path d="M-4 16 L8 28 L20 16 L10 6 Z" opacity="0.6"/>
+    </g>
+    <rect x="130" y="30" width="86" height="22" rx="11" fill="#FFFFFF" fill-opacity="0.3"/>
+    <text x="173" y="46" class="nodeTag" text-anchor="middle">LAYER 03</text>
+    <text x="130" y="80" class="nodeH">Flutter Runtime</text>
+    <text x="130" y="106" class="nodeSub">Widget Tree · Logs · Screenshot · Action</text>
+  </g>
+
+  <!-- Core value panel -->
+  <g filter="url(#softShadow)">
+    <rect x="900" y="660" width="620" height="180" rx="22" fill="url(#card)" stroke="#F0A03D" stroke-width="1.5"/>
+  </g>
+  <rect x="900" y="660" width="6" height="180" rx="3" fill="url(#amber)"/>
+  <g transform="translate(930, 696)">
+    <circle r="14" fill="url(#amber)"/>
+    <text y="6" text-anchor="middle" font-family="SF Mono,Menlo,monospace" font-weight="800" font-size="16" fill="#FFFFFF">★</text>
+  </g>
+  <text x="960" y="702" class="tag" style="fill:#E68A3D">CORE VALUE</text>
+  <text x="930" y="740" class="valueH">核心价值</text>
+  <text x="930" y="772" class="valueB">让 AI 给自己赋能，把重复劳动交给工具，</text>
+  <text x="930" y="796" class="valueB">把注意力放回到 <tspan font-weight="800" fill="#4C63E8">更重要的问题</tspan> 上。</text>
+
 </svg>

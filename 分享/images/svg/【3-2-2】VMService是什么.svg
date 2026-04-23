@@ -1,67 +1,145 @@
 <svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="indigo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
     </marker>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
-      .tag { font: 700 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 38px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 0.5px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .quoteTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .h { font: 800 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .hNode { font: 800 24px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .hNodeBig { font: 800 30px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .bLg { font: 600 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .small { font: 500 14px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+      .chip { font: 600 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 0.3px; }
+      .chipCyan { font: 600 12px 'SF Mono',Menlo,monospace; fill: #2E7FAC; letter-spacing: 0.3px; }
+      .protoLabel { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .sumH { font: 800 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
     </style>
   </defs>
 
   <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
-  <text x="80" y="90" class="title">VM Service 是 Flutter 运行时对外暴露的 Debug 通信入口</text>
-  <text x="80" y="125" class="subtitle">热重载、DevTools、外部调试工具，本质上都在通过 VM Service 和运行中的 Flutter App 通信</text>
 
-  <rect x="90" y="180" width="1320" height="170" rx="28" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
-  <text x="130" y="235" class="h">一句话理解</text>
-  <text x="130" y="285" class="b">VM Service 就像 Flutter App 在 Debug 模式下打开的"调试接口"。</text>
-  <text x="130" y="320" class="small">外部进程可以通过它读取运行时信息，也可以发起热重载、调用 Service Extension 等操作。</text>
+  <!-- header -->
+  <text x="80" y="80" class="tag">RUNTIME · WHAT IS VM SERVICE</text>
+  <text x="80" y="130" class="title">VM Service 是 Flutter 对外暴露的 Debug 通信入口</text>
+  <text x="80" y="165" class="subtitle">热重载 · DevTools · 外部调试工具，本质上都在通过它和运行中的 App 通信</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
 
-  <!-- 调试工具 -->
-  <rect x="90" y="440" width="260" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="220" y="508" class="h" text-anchor="middle">调试工具</text>
-  <text x="220" y="545" class="b" text-anchor="middle">DevTools</text>
-  <text x="220" y="580" class="small" text-anchor="middle">看性能 / 看状态 / 调试页面</text>
+  <!-- Concept panel -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="1340" height="150" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="220" width="6" height="150" rx="3" fill="url(#accent)"/>
+  <text x="110" y="253" class="quoteTag">ANALOGY · 一句话理解</text>
+  <text x="110" y="297" class="h">VM Service 就像 Flutter App 在 Debug 模式下打开的"调试接口"</text>
+  <text x="110" y="340" class="bLg">外部进程可以通过它读取运行时信息，也可以发起热重载、调用 Service Extension。</text>
 
-  <!-- 箭头：调试工具 → 开发工具 -->
-  <line x1="350" y1="535" x2="405" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- 4-node flow: 调试工具 → 开发工具 → VM Service → Flutter App -->
+  <!-- Node 1: 调试工具 (DevTools) -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="440" width="280" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="440" width="280" height="6" fill="url(#accent)"/>
+  <rect x="104" y="468" width="80" height="22" rx="11" fill="url(#accent)"/>
+  <text x="144" y="483" class="layerTag" text-anchor="middle">DEBUGGER</text>
+  <text x="220" y="532" class="hNode" text-anchor="middle">调试工具</text>
+  <text x="220" y="563" class="b" text-anchor="middle">DevTools</text>
+  <line x1="110" y1="585" x2="330" y2="585" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="220" y="612" class="small" text-anchor="middle">看性能 · 看状态</text>
+  <text x="220" y="634" class="small" text-anchor="middle">调试页面</text>
 
-  <!-- 开发工具 -->
-  <rect x="420" y="440" width="280" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="560" y="508" class="h" text-anchor="middle">开发工具</text>
-  <text x="560" y="545" class="b" text-anchor="middle">Hot Reload</text>
-  <text x="560" y="580" class="small" text-anchor="middle">代码更新后立即同步到运行时</text>
+  <!-- Node 2: 开发工具 (Hot Reload) -->
+  <g filter="url(#softShadow)">
+    <rect x="385" y="440" width="280" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="385" y="440" width="280" height="6" fill="url(#indigo)"/>
+  <rect x="409" y="468" width="58" height="22" rx="11" fill="url(#indigo)"/>
+  <text x="438" y="483" class="layerTag" text-anchor="middle">DEV</text>
+  <text x="525" y="532" class="hNode" text-anchor="middle">开发工具</text>
+  <text x="525" y="563" class="b" text-anchor="middle">Hot Reload</text>
+  <line x1="415" y1="585" x2="635" y2="585" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="525" y="612" class="small" text-anchor="middle">代码更新</text>
+  <text x="525" y="634" class="small" text-anchor="middle">立即同步到运行时</text>
 
-  <!-- 箭头：开发工具 → VM Service -->
-  <line x1="700" y1="535" x2="755" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- Node 3: VM Service (center, highlighted bigger) -->
+  <g filter="url(#softShadow)">
+    <rect x="690" y="420" width="380" height="260" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+  </g>
+  <rect x="690" y="420" width="380" height="6" fill="url(#accent)"/>
+  <rect x="714" y="448" width="110" height="22" rx="11" fill="url(#accent)"/>
+  <text x="769" y="463" class="layerTag" text-anchor="middle">VM SERVICE</text>
+  <text x="880" y="512" class="hNodeBig" text-anchor="middle">VM Service</text>
+  <text x="880" y="545" class="b" text-anchor="middle">Dart / Flutter Runtime API</text>
+  <line x1="720" y1="565" x2="1040" y2="565" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="880" y="592" class="small" text-anchor="middle">外部进程和运行中 App 的统一通信入口</text>
+  <!-- capability chips -->
+  <g transform="translate(720, 610)">
+    <g><rect width="100" height="28" rx="14" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="50" y="19" class="chip" text-anchor="middle">读取状态</text></g>
+    <g transform="translate(110,0)"><rect width="80" height="28" rx="14" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="40" y="19" class="chip" text-anchor="middle">调试</text></g>
+    <g transform="translate(200,0)"><rect width="140" height="28" rx="14" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="70" y="19" class="chip" text-anchor="middle">调用 Extension</text></g>
+  </g>
 
-  <!-- VM Service -->
-  <rect x="770" y="420" width="380" height="230" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="960" y="498" class="h" text-anchor="middle">VM Service</text>
-  <text x="960" y="535" class="b" text-anchor="middle">Dart / Flutter Runtime API</text>
-  <text x="960" y="572" class="small" text-anchor="middle">外部进程和运行中 App 的统一通信入口</text>
-  <text x="960" y="610" class="tag" text-anchor="middle">读取状态 / 调试 / 调用扩展</text>
+  <!-- Node 4: Flutter App -->
+  <g filter="url(#softShadow)">
+    <rect x="1100" y="440" width="320" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="1100" y="440" width="320" height="6" fill="url(#cyan)"/>
+  <rect x="1124" y="468" width="70" height="22" rx="11" fill="url(#cyan)"/>
+  <text x="1159" y="483" class="layerTag" text-anchor="middle">APP</text>
+  <text x="1260" y="532" class="hNode" text-anchor="middle">Flutter App</text>
+  <text x="1260" y="563" class="b" text-anchor="middle">Running App</text>
+  <line x1="1130" y1="585" x2="1390" y2="585" stroke="#E5EBFF" stroke-width="1.5"/>
+  <g transform="translate(1130, 605)">
+    <g><rect width="96" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="48" y="19" class="chipCyan" text-anchor="middle">Widget Tree</text></g>
+    <g transform="translate(110,0)"><rect width="68" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="34" y="19" class="chipCyan" text-anchor="middle">Logs</text></g>
+    <g transform="translate(55,36)"><rect width="74" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="37" y="19" class="chipCyan" text-anchor="middle">State</text></g>
+  </g>
 
-  <!-- 箭头：VM Service → Flutter App -->
-  <line x1="1150" y1="535" x2="1205" y2="535" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- Arrows -->
+  <path d="M360 550 L385 550" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M665 550 L690 550" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M1070 550 L1100 550" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
 
-  <!-- Flutter App -->
-  <rect x="1220" y="440" width="260" height="190" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1350" y="508" class="h" text-anchor="middle">Flutter App</text>
-  <text x="1350" y="545" class="b" text-anchor="middle">Running App</text>
-  <text x="1350" y="580" class="small" text-anchor="middle">Widget Tree / Logs / State</text>
-
-  <!-- 底部总结 -->
-  <rect x="90" y="720" width="1320" height="110" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="140" y="766" class="tag">对 Flutter Copilot 的意义</text>
-  <text x="140" y="804" class="b">Flutter Copilot 不是绕过 Flutter 去操作 App，而是通过 VM Service 正式接入运行时能力。</text>
+  <!-- Summary ribbon -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="740" width="1340" height="110" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="740" width="6" height="110" rx="3" fill="url(#amber)"/>
+  <g transform="translate(130, 795)">
+    <circle r="22" fill="url(#amber)"/>
+    <text y="7" text-anchor="middle" style="font: 800 20px -apple-system; fill:#FFFFFF">★</text>
+  </g>
+  <text x="170" y="786" class="sumH">对 Flutter Copilot 的意义</text>
+  <text x="170" y="820" class="b">不是绕过 Flutter 去操作 App，而是<tspan font-weight="800" fill="#4C63E8">通过 VM Service 正式接入运行时能力</tspan>。</text>
 </svg>

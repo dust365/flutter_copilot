@@ -1,51 +1,147 @@
-<svg width="1400" height="880" viewBox="0 0 1400 880" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
     </marker>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
-      .tag { font: 700 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #3657C7; }
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .quoteTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .h { font: 800 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .hNode { font: 800 24px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .bLg { font: 600 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .small { font: 500 14px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+      .chip { font: 600 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 0.3px; }
+      .protoLabel { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .analogy { font: 500 15px 'SF Mono',Menlo,monospace; fill: #5D6B8A; letter-spacing: 0.3px; }
+      .sumH { font: 800 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
     </style>
   </defs>
 
-  <rect width="1400" height="880" rx="28" fill="url(#bg)"/>
-  <text x="80" y="90" class="title">MCP 是 AI 与工具之间的通用调用协议</text>
-  <text x="80" y="125" class="subtitle">让 Agent 用统一方式发现工具、调用工具、获取结果，而不用关心工具是用什么语言实现的</text>
+  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
 
-  <rect x="90" y="180" width="1220" height="200" rx="28" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
-  <text x="130" y="235" class="h">可以把它理解成：AI 世界里的“接口标准 + 调用约定”</text>
-  <text x="130" y="285" class="b">就像前端/后端会约定 RESTful API + OpenAPI 一样，</text>
-  <text x="130" y="320" class="b">MCP 约定的是：AI 怎么发现工具、怎么传参数、怎么拿结果。</text>
-  <text x="130" y="355" class="small">重点不是某个具体工具，而是不同 Agent 和不同工具服务之间可以按同一套规则协作。</text>
+  <!-- header -->
+  <text x="80" y="80" class="tag">PROTOCOL · WHAT IS MCP</text>
+  <text x="80" y="130" class="title">MCP 是 AI 与工具之间的通用调用协议</text>
+  <text x="80" y="165" class="subtitle">让 Agent 用统一方式发现工具 · 调用工具 · 获取结果</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
 
-  <rect x="110" y="460" width="280" height="190" rx="26" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="250" y="522" class="h" text-anchor="middle">AI Agent</text>
-  <text x="250" y="560" class="b" text-anchor="middle">Claude Code / Cursor</text>
-  <text x="250" y="596" class="small" text-anchor="middle">提出需求：截图、点按钮、读日志</text>
+  <!-- Concept panel -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="1340" height="170" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="220" width="6" height="170" rx="3" fill="url(#accent)"/>
+  <text x="110" y="254" class="quoteTag">ANALOGY · 一句话理解</text>
+  <text x="110" y="298" class="h">可以把它理解成：AI 世界里的"接口标准 + 调用约定"</text>
+  <text x="110" y="333" class="bLg">就像前后端约定 RESTful + OpenAPI，MCP 约定的是</text>
+  <text x="110" y="363" class="analogy">AI 怎么发现工具  ·  怎么传参数  ·  怎么拿结果</text>
 
-  <rect x="480" y="460" width="460" height="190" rx="26" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="710" y="522" class="h" text-anchor="middle">MCP 协议层</text>
-  <text x="710" y="560" class="b" text-anchor="middle">统一工具描述 / 参数格式 / 返回结果格式</text>
-  <text x="710" y="596" class="small" text-anchor="middle">让 Agent 不用为每个工具单独适配一套调用方式</text>
+  <!-- right side small diagram: REST ↔ MCP -->
+  <g transform="translate(1040, 240)">
+    <rect x="0" y="0" width="360" height="130" rx="16" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/>
+    <text x="20" y="30" class="chip" style="fill:#7383A8">FRONTEND  ↔  BACKEND</text>
+    <text x="20" y="56" class="small" style="fill:#1A234A">RESTful + OpenAPI</text>
+    <line x1="20" y1="74" x2="340" y2="74" stroke="#C8D4F5" stroke-dasharray="3 4"/>
+    <text x="20" y="98" class="chip">AI AGENT  ↔  TOOLS</text>
+    <text x="20" y="120" class="small" style="fill:#4C63E8; font-weight:800">MCP</text>
+  </g>
 
-  <rect x="1030" y="460" width="340" height="190" rx="26" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="1200" y="522" class="h" text-anchor="middle">工具服务</text>
-  <text x="1200" y="560" class="b" text-anchor="middle">本地脚本 / MCP Server</text>
-  <text x="1200" y="596" class="small" text-anchor="middle">TypeScript / Python / Dart ...</text>
+  <!-- 3-node call flow -->
+  <!-- Node 1: AI Agent -->
+  <g filter="url(#softShadow)">
+    <rect x="100" y="460" width="350" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="100" y="460" width="350" height="6" fill="url(#accent)"/>
+  <rect x="126" y="488" width="70" height="22" rx="11" fill="url(#accent)"/>
+  <text x="161" y="503" class="layerTag" text-anchor="middle">AGENT</text>
+  <text x="275" y="555" class="hNode" text-anchor="middle">AI Agent</text>
+  <text x="275" y="588" class="b" text-anchor="middle">Claude Code · Cursor</text>
+  <line x1="150" y1="610" x2="400" y2="610" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="275" y="640" class="small" text-anchor="middle">提出需求：</text>
+  <text x="275" y="662" class="small" text-anchor="middle">截图 · 点按钮 · 读日志</text>
 
-  <line x1="390" y1="555" x2="465" y2="555" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
-  <line x1="940" y1="555" x2="1015" y2="555" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
+  <!-- Node 2: MCP Protocol -->
+  <g filter="url(#softShadow)">
+    <rect x="520" y="430" width="460" height="280" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+  </g>
+  <rect x="520" y="430" width="460" height="6" fill="url(#accent)"/>
+  <rect x="546" y="458" width="90" height="22" rx="11" fill="url(#accent)"/>
+  <text x="591" y="473" class="layerTag" text-anchor="middle">PROTOCOL</text>
+  <text x="750" y="520" class="hNode" text-anchor="middle">MCP 协议层</text>
+  <text x="750" y="552" class="b" text-anchor="middle">统一工具描述 · 参数格式 · 返回结果</text>
 
-  <rect x="110" y="720" width="1180" height="100" rx="24" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="150" y="762" class="tag">一句话总结</text>
-  <text x="150" y="798" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的开放标准。</text>
+  <!-- Sub chips showing protocol responsibilities -->
+  <g transform="translate(560, 580)">
+    <g><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">discover</text></g>
+    <g transform="translate(130,0)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">describe</text></g>
+    <g transform="translate(260,0)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">invoke</text></g>
+    <g transform="translate(65,50)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">stream</text></g>
+    <g transform="translate(195,50)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">respond</text></g>
+  </g>
+
+  <!-- Node 3: Tools -->
+  <g filter="url(#softShadow)">
+    <rect x="1050" y="460" width="350" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="1050" y="460" width="350" height="6" fill="url(#cyan)"/>
+  <rect x="1076" y="488" width="64" height="22" rx="11" fill="url(#cyan)"/>
+  <text x="1108" y="503" class="layerTag" text-anchor="middle">TOOLS</text>
+  <text x="1225" y="555" class="hNode" text-anchor="middle">工具服务</text>
+  <text x="1225" y="588" class="b" text-anchor="middle">本地脚本 · MCP Server</text>
+  <line x1="1100" y1="610" x2="1350" y2="610" stroke="#E5EBFF" stroke-width="1.5"/>
+  <g transform="translate(1100, 628)">
+    <g><rect width="70" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="35" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">TS</text></g>
+    <g transform="translate(80,0)"><rect width="86" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="43" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">Python</text></g>
+    <g transform="translate(176,0)"><rect width="70" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="35" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">Dart</text></g>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M450 570 L515 570" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M985 570 L1045 570" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <g filter="url(#softShadow)">
+    <rect x="447" y="538" width="70" height="22" rx="11" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1"/>
+  </g>
+  <text x="482" y="553" class="protoLabel" text-anchor="middle">REQUEST</text>
+  <g filter="url(#softShadow)">
+    <rect x="985" y="538" width="70" height="22" rx="11" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1"/>
+  </g>
+  <text x="1020" y="553" class="protoLabel" text-anchor="middle">INVOKE</text>
+
+  <!-- Summary ribbon -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="740" width="1340" height="110" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="740" width="6" height="110" rx="3" fill="url(#amber)"/>
+  <g transform="translate(130, 795)">
+    <circle r="22" fill="url(#amber)"/>
+    <text y="7" text-anchor="middle" style="font: 800 20px -apple-system; fill:#FFFFFF">✓</text>
+  </g>
+  <text x="170" y="786" class="sumH">一句话总结</text>
+  <text x="170" y="820" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的<tspan font-weight="800" fill="#4C63E8">开放标准</tspan>。</text>
 </svg>

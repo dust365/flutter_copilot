@@ -1,53 +1,148 @@
-<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="980" viewBox="0 0 1500 980" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 Z" fill="#4B5EAA"/>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="indigo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
     </marker>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .b { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .layerName { font: 700 15px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 1.5px; }
+      .h { font: 800 30px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .hSub { font: 600 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .b { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .small { font: 500 13px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+      .code { font: 600 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #1A234A; letter-spacing: 0.3px; }
+      .chip { font: 600 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; }
+      .protoLabel { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .badgeLabel { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .badgeNum { font: 900 56px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #FFFFFF; }
+      .badgeUnit { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #E7ECFF; letter-spacing: 0.5px; }
     </style>
   </defs>
-  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
-  <text x="80" y="90" class="title">Flutter Copilot 整体架构</text>
-  <text x="80" y="125" class="subtitle">AI Client → MCP Server → Flutter Binding → Running App</text>
 
-  <!-- Layer 1: AI Client -->
-  <rect x="90" y="190" width="1320" height="150" rx="28" fill="#FFFFFF" stroke="#8EA3FF" stroke-width="3"/>
-  <text x="140" y="248" class="h">AI Client</text>
-  <text x="140" y="283" class="b">Claude Code / Cursor</text>
-  <text x="140" y="318" class="small">决定要做什么：点击、输入、截图、抓日志、分析问题</text>
+  <rect width="1500" height="980" rx="28" fill="url(#bg)"/>
 
-  <!-- Arrow -->
-  <line x1="750" y1="340" x2="750" y2="400" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
-  <text x="785" y="378" class="small">MCP 协议</text>
+  <!-- header -->
+  <text x="80" y="80" class="tag">ARCHITECTURE · 3 LAYERS</text>
+  <text x="80" y="130" class="title">Flutter Copilot 整体架构</text>
+  <text x="80" y="165" class="subtitle">AI Client  →  MCP Server  →  Flutter Binding  →  Running App</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
 
-  <!-- Layer 2: MCP Server -->
-  <rect x="90" y="410" width="1320" height="170" rx="28" fill="#EEF3FF" stroke="#6E86FF" stroke-width="3"/>
-  <text x="140" y="470" class="h">flutter_copilot_mcp</text>
-  <text x="140" y="505" class="b">MCP Server / Tool Bridge</text>
-  <text x="140" y="540" class="small">把 AI 的意图翻译成工具调用，连接 VM Service，调用 Flutter 的 Service Extension</text>
-  <text x="140" y="568" class="small">对外暴露：connect / tap / enter_text / get_logs / screenshots / hot_reload / rebuild_snapshot ...</text>
+  <!-- Layer 01: AI Client -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="1340" height="170" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="220" width="6" height="170" rx="3" fill="url(#accent)"/>
+  <rect x="110" y="245" width="90" height="26" rx="13" fill="url(#accent)"/>
+  <text x="155" y="263" class="layerTag" text-anchor="middle">LAYER 01</text>
+  <text x="210" y="264" class="layerName">AI CLIENT</text>
+  <text x="110" y="316" class="h">AI Client</text>
+  <text x="110" y="350" class="b">Claude Code · Cursor — 决定要做什么</text>
+  <text x="110" y="376" class="small">点击 · 输入 · 截图 · 抓日志 · 分析问题</text>
 
-  <!-- Highlight box -->
-  <rect x="980" y="450" width="350" height="90" rx="20" fill="#DDE7FF" stroke="#6E86FF"/>
-  <text x="1155" y="488" class="b" text-anchor="middle">15 个 MCP 工具</text>
-  <text x="1155" y="518" class="small" text-anchor="middle">观察 → 操作 → 诊断</text>
+  <!-- Right visual on Layer 1: agent avatar chips -->
+  <g transform="translate(1040, 280)">
+    <rect x="0" y="0" width="160" height="46" rx="23" fill="#FFFFFF" stroke="#7B8DFF" stroke-width="1.5"/>
+    <circle cx="24" cy="23" r="10" fill="url(#accent)"/>
+    <text x="42" y="28" class="chip">Claude Code</text>
 
-  <!-- Arrow -->
-  <line x1="750" y1="580" x2="750" y2="640" stroke="#4B5EAA" stroke-width="5" marker-end="url(#arrow)"/>
-  <text x="785" y="618" class="small">VM Service / Service Extension</text>
+    <rect x="180" y="0" width="160" height="46" rx="23" fill="#FFFFFF" stroke="#7B8DFF" stroke-width="1.5"/>
+    <circle cx="204" cy="23" r="10" fill="url(#accent)"/>
+    <text x="222" y="28" class="chip">Cursor</text>
+  </g>
 
-  <!-- Layer 3: Flutter App -->
-  <rect x="90" y="650" width="1320" height="170" rx="28" fill="#FFFFFF" stroke="#4B5EAA" stroke-width="3"/>
-  <text x="140" y="710" class="h">flutter_copilot_claw + Running Flutter App</text>
-  <text x="140" y="745" class="b">Flutter Binding / Runtime Capability Layer</text>
-  <text x="140" y="780" class="small">注册 Service Extension，在 Widget 树中查找元素，执行点击 / 输入 / 滚动 / 截图 / 日志收集 / 重绘监测</text>
+  <!-- Arrow 1 -->
+  <path d="M750 395 L750 445" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <g filter="url(#softShadow)">
+    <rect x="790" y="406" width="170" height="32" rx="16" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1.5"/>
+  </g>
+  <text x="875" y="427" class="protoLabel" text-anchor="middle">MCP PROTOCOL</text>
+
+  <!-- Layer 02: MCP Server -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="460" width="1340" height="210" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+  </g>
+  <rect x="80" y="460" width="6" height="210" rx="3" fill="url(#indigo)"/>
+  <rect x="110" y="485" width="90" height="26" rx="13" fill="url(#indigo)"/>
+  <text x="155" y="503" class="layerTag" text-anchor="middle">LAYER 02</text>
+  <text x="210" y="504" class="layerName">MCP SERVER</text>
+  <text x="110" y="556" class="h">flutter_copilot_mcp</text>
+  <text x="110" y="590" class="b">Tool Bridge · Workflow Router</text>
+  <text x="110" y="616" class="small">把 AI 意图翻译成工具调用，连接 VM Service，调用 Service Extension</text>
+
+  <!-- tool chips -->
+  <g transform="translate(110, 630)">
+    <g><rect width="82" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="41" y="18" class="chip" text-anchor="middle">connect</text></g>
+    <g transform="translate(92,0)"><rect width="58" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="29" y="18" class="chip" text-anchor="middle">tap</text></g>
+    <g transform="translate(160,0)"><rect width="90" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="45" y="18" class="chip" text-anchor="middle">enter_text</text></g>
+    <g transform="translate(260,0)"><rect width="80" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="40" y="18" class="chip" text-anchor="middle">get_logs</text></g>
+    <g transform="translate(350,0)"><rect width="100" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="50" y="18" class="chip" text-anchor="middle">screenshots</text></g>
+    <g transform="translate(460,0)"><rect width="96" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="48" y="18" class="chip" text-anchor="middle">hot_reload</text></g>
+    <g transform="translate(566,0)"><rect width="148" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="74" y="18" class="chip" text-anchor="middle">rebuild_snapshot ...</text></g>
+  </g>
+
+  <!-- 15 tools big badge on right -->
+  <g filter="url(#softShadow)">
+    <rect x="1170" y="490" width="220" height="150" rx="20" fill="url(#accent)"/>
+  </g>
+  <text x="1280" y="520" class="badgeLabel" text-anchor="middle">MCP TOOLS</text>
+  <text x="1280" y="585" class="badgeNum" text-anchor="middle">15</text>
+  <text x="1280" y="615" class="badgeUnit" text-anchor="middle">观察 · 操作 · 诊断</text>
+
+  <!-- Arrow 2 -->
+  <path d="M750 675 L750 725" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <g filter="url(#softShadow)">
+    <rect x="720" y="686" width="310" height="32" rx="16" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1.5"/>
+  </g>
+  <text x="875" y="707" class="protoLabel" text-anchor="middle">VM SERVICE · SERVICE EXTENSION</text>
+
+  <!-- Layer 03: Flutter App -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="740" width="1340" height="210" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="740" width="6" height="210" rx="3" fill="url(#cyan)"/>
+  <rect x="110" y="765" width="90" height="26" rx="13" fill="url(#cyan)"/>
+  <text x="155" y="783" class="layerTag" text-anchor="middle">LAYER 03</text>
+  <text x="210" y="784" class="layerName">RUNTIME</text>
+  <text x="110" y="836" class="h">flutter_copilot_claw</text>
+  <text x="450" y="836" class="hSub">+ Running Flutter App</text>
+  <text x="110" y="870" class="b">Flutter Binding · Runtime Capability Layer</text>
+  <text x="110" y="896" class="small">注册 Service Extension，在 Widget Tree 中查找元素</text>
+
+  <!-- capability chips row -->
+  <g transform="translate(110, 910)">
+    <g><rect width="108" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="54" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Widget Tree</text></g>
+    <g transform="translate(118,0)"><rect width="80" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="40" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Gesture</text></g>
+    <g transform="translate(208,0)"><rect width="86" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="43" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Log Pipe</text></g>
+    <g transform="translate(304,0)"><rect width="100" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="50" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Screenshot</text></g>
+    <g transform="translate(414,0)"><rect width="80" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="40" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Rebuild</text></g>
+    <g transform="translate(504,0)"><rect width="140" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="70" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Service Extension</text></g>
+    <g transform="translate(654,0)"><rect width="130" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="65" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Navigator Hook</text></g>
+    <g transform="translate(794,0)"><rect width="130" height="26" rx="13" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="65" y="18" class="chip" text-anchor="middle" style="fill:#2E7FAC">Element Match</text></g>
+  </g>
 </svg>

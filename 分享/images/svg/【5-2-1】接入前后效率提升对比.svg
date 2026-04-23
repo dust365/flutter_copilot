@@ -1,80 +1,167 @@
 <svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF4FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
+    <linearGradient id="before" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB4A8"/>
+      <stop offset="100%" stop-color="#E68A7D"/>
+    </linearGradient>
+    <linearGradient id="after" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/>
+      <stop offset="100%" stop-color="#4C63E8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
     <style>
-      .title { font: 700 34px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #5D6B8A; }
-      .axis { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #7A88A8; }
-      .metric { font: 600 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #2F3A56; }
-      .labelBefore { font: 600 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #C0392B; }
-      .labelAfter { font: 600 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E9E57; }
-      .summary { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #1E2A4A; }
-      .small { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #61708F; }
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .axis { font: 500 14px 'SF Mono',Menlo,monospace; fill: #9FACCE; }
+      .metric { font: 700 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .beforeLabel { font: 700 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #C65B4D; }
+      .afterLabel { font: 700 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #4C63E8; }
+      .legendText { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .summary { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .summarySub { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .ribbonNum { font: 900 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #F0A03D; letter-spacing: 1px; }
+      .deltaLabel { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 1px; }
     </style>
   </defs>
 
   <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
 
-  <text x="80" y="90" class="title">接入前 VS 接入后</text>
-  <text x="80" y="125" class="subtitle">双柱状图表达：红色代表接入前，绿色代表接入后；示意数据可按真实结果替换</text>
+  <!-- header -->
+  <text x="80" y="80" class="tag">IMPACT · BEFORE VS AFTER</text>
+  <text x="80" y="130" class="title">接入前后效率提升对比</text>
+  <text x="80" y="165" class="subtitle">示意数据，可按真实结果替换 · 左红右蓝，越低越好</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
 
   <!-- Legend -->
-  <rect x="1000" y="78" width="22" height="22" rx="5" fill="#E85B52"/>
-  <text x="1034" y="95" class="small">接入前</text>
-  <rect x="1140" y="78" width="22" height="22" rx="5" fill="#2DBE6C"/>
-  <text x="1174" y="95" class="small">接入后</text>
+  <g transform="translate(1120, 110)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="300" height="56" rx="16" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+    <rect x="20" y="18" width="20" height="20" rx="5" fill="url(#before)"/>
+    <text x="50" y="34" class="legendText">接入前</text>
+    <rect x="160" y="18" width="20" height="20" rx="5" fill="url(#after)"/>
+    <text x="190" y="34" class="legendText">接入后</text>
+  </g>
 
-  <!-- Chart area -->
-  <rect x="80" y="170" width="1340" height="530" rx="26" fill="#FFFFFF" stroke="#D6DFF8" stroke-width="2"/>
+  <!-- Chart panel -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="1340" height="500" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
 
-  <!-- Grid lines -->
-  <line x1="140" y1="630" x2="1370" y2="630" stroke="#BFCBE8" stroke-width="2"/>
-  <line x1="140" y1="530" x2="1370" y2="530" stroke="#E6ECFA" stroke-width="1.5"/>
-  <line x1="140" y1="430" x2="1370" y2="430" stroke="#E6ECFA" stroke-width="1.5"/>
-  <line x1="140" y1="330" x2="1370" y2="330" stroke="#E6ECFA" stroke-width="1.5"/>
-  <line x1="140" y1="230" x2="1370" y2="230" stroke="#E6ECFA" stroke-width="1.5"/>
+  <!-- Chart area constants:
+       top = 260, bottom (baseline) = 600
+       4 grid lines + baseline, 5 levels of 0, 25, 50, 75, 100 -->
+
+  <!-- grid -->
+  <g>
+    <line x1="150" y1="600" x2="1380" y2="600" stroke="#CCD5EE" stroke-width="2"/>
+    <line x1="150" y1="515" x2="1380" y2="515" stroke="#ECEFFA" stroke-width="1"/>
+    <line x1="150" y1="430" x2="1380" y2="430" stroke="#ECEFFA" stroke-width="1"/>
+    <line x1="150" y1="345" x2="1380" y2="345" stroke="#ECEFFA" stroke-width="1"/>
+    <line x1="150" y1="260" x2="1380" y2="260" stroke="#ECEFFA" stroke-width="1"/>
+  </g>
 
   <!-- Y-axis labels -->
-  <text x="105" y="635" class="axis">0</text>
-  <text x="96" y="535" class="axis">25</text>
-  <text x="96" y="435" class="axis">50</text>
-  <text x="96" y="335" class="axis">75</text>
-  <text x="90" y="235" class="axis">100</text>
-  <text x="130" y="665" class="axis">相对耗时 / 人工投入指数</text>
+  <text x="128" y="605" class="axis" text-anchor="end">0</text>
+  <text x="128" y="520" class="axis" text-anchor="end">25</text>
+  <text x="128" y="435" class="axis" text-anchor="end">50</text>
+  <text x="128" y="350" class="axis" text-anchor="end">75</text>
+  <text x="128" y="265" class="axis" text-anchor="end">100</text>
 
-  <!-- Metric 1: 表单验证 -->
-  <rect x="230" y="230" width="68" height="400" rx="10" fill="#E85B52"/>
-  <rect x="312" y="530" width="68" height="100" rx="10" fill="#2DBE6C"/>
-  <text x="214" y="205" class="labelBefore">2~3 分钟</text>
-  <text x="296" y="505" class="labelAfter">20~40 秒</text>
-  <text x="260" y="728" class="metric" text-anchor="middle">表单验证</text>
+  <!-- Y-axis title -->
+  <g transform="translate(60, 430) rotate(-90)">
+    <text class="axis" text-anchor="middle">相对耗时 / 人工投入指数</text>
+  </g>
 
-  <!-- Metric 2: 日志排查 -->
-  <rect x="510" y="230" width="68" height="400" rx="10" fill="#E85B52"/>
-  <rect x="592" y="490" width="68" height="140" rx="10" fill="#2DBE6C"/>
-  <text x="494" y="205" class="labelBefore">5~10 分钟</text>
-  <text x="578" y="465" class="labelAfter">1~3 分钟</text>
-  <text x="540" y="728" class="metric" text-anchor="middle">日志排查</text>
+  <!-- Bar chart. 4 groups. Each group width ~ 280, centered at 280, 580, 880, 1180 -->
+  <!--
+    Values (before / after):
+    表单验证: 100 / 25  → heights 340 / 85, baseline 600
+    日志排查: 100 / 35  → 340 / 119
+    人工参与: 100 / 20  → 340 / 68
+    反馈闭环: 100 / 30  → 340 / 102
+  -->
 
-  <!-- Metric 3: 人工参与 -->
-  <rect x="790" y="230" width="68" height="400" rx="10" fill="#E85B52"/>
-  <rect x="872" y="550" width="68" height="80" rx="10" fill="#2DBE6C"/>
-  <text x="770" y="205" class="labelBefore">5~7 次操作</text>
-  <text x="856" y="525" class="labelAfter">1~2 次指令</text>
-  <text x="820" y="728" class="metric" text-anchor="middle">人工参与</text>
+  <!-- helpers for bar positioning:
+       group center x positions: 290, 600, 910, 1220
+       bar width 82; gap 22 -->
+  <g>
+    <!-- 1. 表单验证 -->
+    <g>
+      <rect x="238" y="260" width="82" height="340" rx="10" fill="url(#before)"/>
+      <rect x="330" y="515" width="82" height="85" rx="10" fill="url(#after)"/>
+      <text x="279" y="245" class="beforeLabel" text-anchor="middle">2~3 分钟</text>
+      <text x="371" y="500" class="afterLabel" text-anchor="middle">20~40 秒</text>
+      <text x="325" y="640" class="metric" text-anchor="middle">表单验证</text>
+      <g transform="translate(325, 660)">
+        <rect x="-38" y="0" width="76" height="24" rx="12" fill="#EEF3FF"/>
+        <text y="16" class="deltaLabel" text-anchor="middle">-75%</text>
+      </g>
+    </g>
 
-  <!-- Metric 4: 反馈闭环 -->
-  <rect x="1070" y="230" width="68" height="400" rx="10" fill="#E85B52"/>
-  <rect x="1152" y="510" width="68" height="120" rx="10" fill="#2DBE6C"/>
-  <text x="1050" y="205" class="labelBefore">10~15 分钟</text>
-  <text x="1136" y="485" class="labelAfter">3~5 分钟</text>
-  <text x="1100" y="728" class="metric" text-anchor="middle">反馈闭环</text>
+    <!-- 2. 日志排查 -->
+    <g>
+      <rect x="548" y="260" width="82" height="340" rx="10" fill="url(#before)"/>
+      <rect x="640" y="481" width="82" height="119" rx="10" fill="url(#after)"/>
+      <text x="589" y="245" class="beforeLabel" text-anchor="middle">5~10 分钟</text>
+      <text x="681" y="466" class="afterLabel" text-anchor="middle">1~3 分钟</text>
+      <text x="635" y="640" class="metric" text-anchor="middle">日志排查</text>
+      <g transform="translate(635, 660)">
+        <rect x="-38" y="0" width="76" height="24" rx="12" fill="#EEF3FF"/>
+        <text y="16" class="deltaLabel" text-anchor="middle">-65%</text>
+      </g>
+    </g>
 
-  <!-- Bottom summary -->
-  <rect x="80" y="770" width="1340" height="100" rx="22" fill="#FFF4D9" stroke="#F1B55C" stroke-width="2"/>
-  <text x="130" y="812" class="summary">综合结论：多角色协作效率整体提升 30%~40%</text>
-  <text x="130" y="846" class="small">核心价值不是只省几分钟，而是把"验证、观察、定位、反馈"压缩成一条 Agent 可执行的闭环。</text>
+    <!-- 3. 人工参与 -->
+    <g>
+      <rect x="858" y="260" width="82" height="340" rx="10" fill="url(#before)"/>
+      <rect x="950" y="532" width="82" height="68" rx="10" fill="url(#after)"/>
+      <text x="899" y="245" class="beforeLabel" text-anchor="middle">5~7 次操作</text>
+      <text x="991" y="517" class="afterLabel" text-anchor="middle">1~2 次指令</text>
+      <text x="945" y="640" class="metric" text-anchor="middle">人工参与</text>
+      <g transform="translate(945, 660)">
+        <rect x="-38" y="0" width="76" height="24" rx="12" fill="#EEF3FF"/>
+        <text y="16" class="deltaLabel" text-anchor="middle">-80%</text>
+      </g>
+    </g>
+
+    <!-- 4. 反馈闭环 -->
+    <g>
+      <rect x="1168" y="260" width="82" height="340" rx="10" fill="url(#before)"/>
+      <rect x="1260" y="498" width="82" height="102" rx="10" fill="url(#after)"/>
+      <text x="1209" y="245" class="beforeLabel" text-anchor="middle">10~15 分钟</text>
+      <text x="1301" y="483" class="afterLabel" text-anchor="middle">3~5 分钟</text>
+      <text x="1255" y="640" class="metric" text-anchor="middle">反馈闭环</text>
+      <g transform="translate(1255, 660)">
+        <rect x="-38" y="0" width="76" height="24" rx="12" fill="#EEF3FF"/>
+        <text y="16" class="deltaLabel" text-anchor="middle">-70%</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Summary ribbon -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="750" width="1340" height="110" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="750" width="6" height="110" rx="3" fill="url(#amber)"/>
+  <g transform="translate(130, 790)">
+    <circle r="28" fill="url(#amber)"/>
+    <text y="7" class="ribbonNum" style="fill:#FFFFFF; font-size:22px" text-anchor="middle">↑</text>
+  </g>
+  <text x="175" y="788" class="summary">综合结论：多角色协作效率整体提升 30% ~ 40%</text>
+  <text x="175" y="820" class="summarySub">核心价值不是只省几分钟，而是把"验证 · 观察 · 定位 · 反馈"压缩成一条 Agent 可执行的闭环。</text>
 </svg>
