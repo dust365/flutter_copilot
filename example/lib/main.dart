@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
-import 'pages/basic_interaction_demo_page.dart';
+import 'pages/tap_demo_page.dart';
 import 'pages/debug_monitor_demo_page.dart';
 import 'pages/gesture_demo_page.dart';
 import 'pages/home_page.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/home': (context) => const HomePage(),
-        '/basic-interaction-demo': (context) => const BasicInteractionDemoPage(),
+        '/tap-demo': (context) => const TapDemoPage(),
         '/text-input-demo': (context) => const TextInputDemoPage(),
         '/scroll-demo': (context) => const ScrollDemoPage(),
         '/gesture-demo': (context) => const GestureDemoPage(),

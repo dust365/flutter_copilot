@@ -23,9 +23,9 @@ class HomePage extends StatelessWidget {
   // 定义测试页面列表
   static final List<DemoPageInfo> demoPages = [
     const DemoPageInfo(
-      title: '基础交互',
-      description: '测试 tap 工具 - 点击各种按钮和交互元素',
-      route: '/basic-interaction-demo',
+      title: '点击',
+      description: '测试 tap 工具 - 触发按钮、卡片、图标按钮等真实业务操作',
+      route: '/tap-demo',
       icon: Icons.touch_app,
       color: Colors.blue,
     ),

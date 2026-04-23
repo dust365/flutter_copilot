@@ -1,50 +1,67 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 /// Service for controlling Flutter app navigation through VM service extensions.
 class NavigationService {
-  /// Gets the BuildContext from the root element.
-  BuildContext? get context {
-    final rootElement = WidgetsBinding.instance.rootElement;
-    if (rootElement == null) {
-      return null;
+  /// Finds the root [NavigatorState] by walking descendants of the root element.
+  ///
+  /// `WidgetsBinding.instance.rootElement` is an ancestor of `MaterialApp`, so
+  /// `Navigator.of(rootElement)` always fails. Instead we locate the first
+  /// `NavigatorState` in the element tree (which is the root Navigator created
+  /// by `MaterialApp` / `WidgetsApp`).
+  NavigatorState? _findRootNavigator() {
+    final root = WidgetsBinding.instance.rootElement;
+    if (root == null) return null;
+
+    NavigatorState? found;
+    void visit(Element element) {
+      if (found != null) return;
+      if (element is StatefulElement && element.state is NavigatorState) {
+        found = element.state as NavigatorState;
+        return;
+      }
+      element.visitChildren(visit);
     }
-    return rootElement;
+
+    visit(root);
+    return found;
+  }
+
+  NavigatorState _requireNavigator() {
+    final navigator = _findRootNavigator();
+    if (navigator == null) {
+      throw Exception(
+        'No Navigator found in the widget tree. '
+        'Ensure the app uses MaterialApp/CupertinoApp/WidgetsApp.',
+      );
+    }
+    return navigator;
   }
 
   /// Pushes a new route onto the navigator.
   ///
-  /// If [route] is provided, uses named route. Otherwise creates a MaterialPageRoute.
-  /// [arguments] are passed to the route.
+  /// [route] is the named route to push. [arguments] are passed to the route.
+  ///
+  /// Note: This does NOT await the pushed route's completion — the returned
+  /// [Future] from `pushNamed` only completes when the route is popped, so
+  /// awaiting it would block the MCP call indefinitely.
   Future<void> push({
     String? route,
     Map<String, dynamic>? arguments,
   }) async {
-    final ctx = context;
-    if (ctx == null) {
-      throw Exception('No BuildContext available. App may not be initialized.');
-    }
-
-    final navigator = Navigator.of(ctx, rootNavigator: true);
-
-    if (route != null) {
-      await navigator.pushNamed(route, arguments: arguments);
-    } else {
+    if (route == null) {
       throw Exception('Route name is required for push operation');
     }
+    // Intentionally not awaited: pushNamed completes only on pop.
+    unawaited(_requireNavigator().pushNamed<Object?>(route, arguments: arguments));
   }
 
   /// Pops the current route from the navigator.
   ///
   /// Returns [result] if provided.
   Future<void> pop([dynamic result]) async {
-    final ctx = context;
-    if (ctx == null) {
-      throw Exception('No BuildContext available. App may not be initialized.');
-    }
-
-    final navigator = Navigator.of(ctx, rootNavigator: true);
-
+    final navigator = _requireNavigator();
     if (navigator.canPop()) {
       navigator.pop(result);
     } else {
@@ -52,43 +69,28 @@ class NavigationService {
     }
   }
 
-  /// Replaces the current route with a new route.
-  ///
-  /// If [route] is provided, uses named route. Otherwise creates a MaterialPageRoute.
-  /// [arguments] are passed to the route.
+  /// Replaces the current route with a new named route.
   Future<void> pushReplacement({
     String? route,
     Map<String, dynamic>? arguments,
   }) async {
-    final ctx = context;
-    if (ctx == null) {
-      throw Exception('No BuildContext available. App may not be initialized.');
-    }
-
-    final navigator = Navigator.of(ctx, rootNavigator: true);
-
-    if (route != null) {
-      await navigator.pushReplacementNamed(route, arguments: arguments);
-    } else {
+    if (route == null) {
       throw Exception('Route name is required for pushReplacement operation');
     }
+    // Intentionally not awaited — see [push] for rationale.
+    unawaited(
+      _requireNavigator()
+          .pushReplacementNamed<Object?, Object?>(route, arguments: arguments),
+    );
   }
 
   /// Pops routes until a route with the given [routeName] is found.
   ///
   /// If [routeName] is null, pops until the root route.
   Future<void> popUntil(String? routeName) async {
-    final ctx = context;
-    if (ctx == null) {
-      throw Exception('No BuildContext available. App may not be initialized.');
-    }
-
-    final navigator = Navigator.of(ctx, rootNavigator: true);
-
+    final navigator = _requireNavigator();
     if (routeName != null) {
-      navigator.popUntil((route) {
-        return route.settings.name == routeName;
-      });
+      navigator.popUntil((route) => route.settings.name == routeName);
     } else {
       navigator.popUntil((route) => route.isFirst);
     }
@@ -96,18 +98,13 @@ class NavigationService {
 
   /// Gets information about the current navigation stack.
   Map<String, dynamic> getNavigationStack() {
-    final ctx = context;
-    if (ctx == null) {
+    final navigator = _findRootNavigator();
+    if (navigator == null) {
       return {
         'status': 'Error',
-        'error': 'No BuildContext available',
+        'error': 'No Navigator found in the widget tree',
       };
     }
-
-    final navigator = Navigator.of(ctx, rootNavigator: true);
-
-    // Note: Navigator doesn't expose route stack directly in a simple way
-    // This is a simplified implementation
     return {
       'status': 'Success',
       'canPop': navigator.canPop(),
