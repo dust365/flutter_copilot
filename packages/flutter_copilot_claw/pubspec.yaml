@@ -1,7 +1,13 @@
 name: flutter_copilot_claw
-description: Flutter extensions enabling AI agents to inspect and interact with running Flutter apps via Flutter Copilot MCP.
-version: 1.0.1
+description: Flutter runtime binding for AI-driven app inspection and interaction via Flutter Copilot. #mcp #ai #copilot #flutter_copilot.
+version: 1.0.2
 repository: https://github.com/dust365/flutter_copilot
+topics:
+  - flutter
+  - mcp
+  - ai
+  - flutter-copilot
+  - copilot
 resolution: workspace
 
 environment:
