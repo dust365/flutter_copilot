@@ -1,50 +1,39 @@
-# Flutter Copilot
+# flutter_copilot_claw
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+[![flutter_copilot_claw pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_claw)](https://pub.dev/packages/flutter_copilot_claw)
 [![flutter_copilot_mcp pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_mcp)](https://pub.dev/packages/flutter_copilot_mcp)
 
-**让 Claude Code、Cursor 等 AI Agent 直接操作正在运行的 Flutter App。**
+**`flutter_copilot_claw` is the Flutter-side mounting plugin for Flutter Copilot.**
 
-Flutter Copilot 是一套面向运行时交互的 MCP 方案：
+It runs inside your Flutter app and registers the VM Service extensions used by `flutter_copilot_mcp`.
 
-- 连接 Flutter App 的 VM Service
-- 获取当前页面可交互元素
-- 点击、输入、滚动、截图
-- 读取日志、热重载、查看重绘热点
+## Start with flutter_copilot_mcp
 
-适合用来做：
+**The core product is [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp).**
 
-- 冒烟测试
-- 页面验证
-- 交互排查
-- Agent 驱动的 UI 调试
+- **pub.dev:** [flutter_copilot_mcp](https://pub.dev/packages/flutter_copilot_mcp)
+- **GitHub:** [flutter_copilot](https://github.com/dust365/flutter_copilot)
 
----
+**Complete documentation, installation steps, MCP tool list, Cursor setup, and Claude Code setup are all in `flutter_copilot_mcp`.**
 
-## 它包含什么
+## What this package does
 
-这个仓库有两部分：
+`flutter_copilot_claw` only handles the in-app side:
 
-- `flutter_copilot_claw`：集成到 Flutter App 内，注册 VM Service 扩展
-- `flutter_copilot_mcp`：MCP Server，供 Claude Code / Cursor 调用
+- mounts Flutter Copilot inside your Flutter app
+- registers Flutter Copilot VM Service extensions
+- exposes runtime hooks used by the MCP server
 
-一句话理解：
+If you want the full workflow, quick start, and tool overview, use `flutter_copilot_mcp`.
 
-> `claw` 在 App 里，`mcp` 在 App 外，Agent 通过 `mcp` 去操作运行中的 App。
+## One-line minimal setup
 
----
-
-## 3 分钟接入
-
-### 1. 给 Flutter App 加依赖
-
-```bash
-flutter pub add flutter_copilot_claw
+```dart
+FlutterCopilotBinding.ensureInitialized();
 ```
 
-### 2. 在 `main.dart` 初始化
-
-只需要 UI 交互：
+Typical usage in `main.dart`:
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -62,138 +51,18 @@ void main() {
 }
 ```
 
-如果你还希望 `get_logs` 收集 `print()` 和未捕获错误：
+If you also want log capture and uncaught error capture:
 
 ```dart
-void main() {
-  if (kDebugMode) {
-    FlutterCopilotBinding.runAppWithConfig(const MyApp());
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-    runApp(const MyApp());
-  }
-}
+FlutterCopilotBinding.runAppWithConfig(const MyApp());
 ```
 
-### 3. 安装 MCP Server
+## Looking for the real docs?
 
-推荐全局安装：
+- [flutter_copilot_mcp on pub.dev](https://pub.dev/packages/flutter_copilot_mcp)
+- [flutter_copilot on GitHub](https://github.com/dust365/flutter_copilot)
 
-```bash
-dart pub global activate flutter_copilot_mcp
-```
-
-也可以作为 dev dependency：
-
-```bash
-dart pub add dev:flutter_copilot_mcp
-```
-
----
-
-## Agent 侧配置
-
-### Cursor
-
-Cursor 读取 [`.cursor/mcp.json`](.cursor/mcp.json)。
-
-最简单的配置是：
-
-```json
-{
-  "mcpServers": {
-    "flutter_copilot": {
-      "type": "stdio",
-      "command": "flutter_copilot_mcp"
-    }
-  }
-}
-```
-
-### Claude Code
-
-```bash
-claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_copilot_mcp
-```
-
-如果你是在这个仓库里直接调试源码：
-
-```bash
-claude mcp add --scope project --transport stdio flutter_copilot_mcp -- dart run ./packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST
-```
-
-Claude Code 调试本地 MCP 的详细说明见：
-
-- [文档/ClaudeCode调试本地MCP教程.md](文档/ClaudeCode调试本地MCP教程.md)
-
----
-
-## 怎么用
-
-1. 启动 Flutter App
-   ```bash
-   flutter run
-   ```
-
-2. 拿到 VM Service URI，例如：
-   ```text
-   ws://127.0.0.1:12345/ws
-   ```
-
-3. 让 Agent 先调用 `connect`
-
-4. 再调用：
-   - `get_interactive_elements`
-   - `tap`
-   - `enter_text`
-   - `scroll_to`
-   - `take_screenshots`
-   - `get_logs`
-   - `hot_reload`
-
----
-
-## 本仓库本地开发
-
-运行示例：
-
-```bash
-cd example && flutter run
-```
-
-直接运行 MCP：
-
-```bash
-cd packages/flutter_copilot_mcp && dart run bin/flutter_copilot_mcp.dart -l FINEST
-```
-
-常用检查：
-
-```bash
-cd packages/flutter_copilot_mcp && dart analyze --fatal-infos lib bin
-cd packages/flutter_copilot_claw && flutter analyze --fatal-infos lib
-cd packages/flutter_copilot_claw && flutter test
-cd example && flutter analyze
-cd example && flutter test
-dart tool/generate_version.dart
-```
-
----
-
-## 限制
-
-- 只支持 **Debug / Profile**，不支持 Release
-- 最稳定的元素定位方式是 `ValueKey<String>`
-- 大量自定义组件时，建议补 `FlutterCopilotConfiguration`
-- Web 下 `get_rebuild_snapshot` 为空是预期行为
-
----
-
-## 文档
-
-- [文档/项目说明.md](文档/项目说明.md)
-- [文档/VM_Service连接原理与实现.md](文档/VM_Service连接原理与实现.md)
-- [文档/ClaudeCode调试本地MCP教程.md](文档/ClaudeCode调试本地MCP教程.md)
+**All complete docs, installation, and MCP tools are documented in `flutter_copilot_mcp`.**
 
 ## License
 
