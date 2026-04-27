@@ -1,6 +1,6 @@
 name: flutter_copilot_claw
 description: Flutter runtime binding for AI-driven app inspection and interaction via Flutter Copilot. #mcp #ai #copilot #flutter_copilot.
-version: 1.0.2
+version: 1.0.3
 repository: https://github.com/dust365/flutter_copilot
 topics:
   - flutter

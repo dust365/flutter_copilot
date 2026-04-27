@@ -1,4 +1,4 @@
-# flutter_copilot_claw
+# flutter_copilot_mcp
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![flutter_copilot_mcp pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_mcp)](https://pub.dev/packages/flutter_copilot_mcp)
@@ -7,6 +7,12 @@
 **Flutter MCP for Cursor, Claude Code, and AI agents. Inspect, control, test, and debug a running Flutter app through VM Service.**
 
 Flutter Copilot MCP is an MCP server for Flutter app automation. It gives AI agents Playwright-like control over a live Flutter app: connect to the app, inspect interactive widgets, tap elements, enter text, scroll, take screenshots, read logs, navigate, hot reload, and inspect rebuild hotspots.
+
+<a href="https://github.com/dust365/flutter_copilot/blob/main/docs/video/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4">
+  <img src="https://github.com/dust365/flutter_copilot/blob/v1.0.0/docs/images/demo-preview.gif" alt="Flutter Copilot Demo" width="360" />
+</a>
+
+See the full demo video in the repository: [演示视频](https://github.com/dust365/flutter_copilot/blob/main/docs/video/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4).
 
 If you are searching for **Flutter MCP**, **Flutter AI automation**, **Cursor Flutter MCP**, **Claude Code Flutter**, **Flutter app inspection**, or **Flutter UI testing with AI**, this package is the main entry.
 
