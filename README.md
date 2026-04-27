@@ -10,7 +10,7 @@
 
 ## Demo
 
-![Flutter Copilot Demo](docs/images/demo-cover.png)
+<img src="docs/images/demo-cover.png" alt="Flutter Copilot Demo" width="360" />
 
 Flutter Copilot 包含两个已发布到 pub.dev 的包：
 
