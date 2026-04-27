@@ -8,22 +8,25 @@
 
 它通过 `MCP + VM Service` 把 AI 工具和 Flutter 运行时连接起来，让 Agent 不只停留在代码层面，还能进入真实应用状态完成页面验证、交互调试、日志排查和运行时诊断。
 
-## 演示视频
+## Demo
 
-通过下面的演示视频，可以更快了解 Flutter Copilot 的实际工作方式：
+![Flutter Copilot Demo](文档/images/demo 首图.png)
 
-[文档/video/演示视频.mp4](文档/video/演示视频.mp4)
+Flutter Copilot 包含两个已发布到 pub.dev 的包：
+
+- [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：MCP Server，负责让 Claude Code、Cursor 等 AI Client 连接并调用 Flutter 能力
+- [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：Flutter 侧挂载插件，负责在 App 内注册运行时能力
+
+更多演示功能请查看[演示视频](文档/video/演示视频.mp4)。
 
 ## 项目概述
 
-Flutter Copilot 由两部分组成：
-
-![Flutter Copilot 整体架构](分享/images/svg/【3-1-1】FlutterCopilot整体架构.svg)
-
-上图展示了项目的整体结构：AI Client 通过 MCP 调用 `flutter_copilot_mcp`，后者再通过 VM Service 与集成了 `flutter_copilot_claw` 的 Flutter App 通信。
+Flutter Copilot 由两部分组成，均已发布到 pub.dev：
 
 - [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：运行在 App 外部的 MCP Server，对 AI Client 暴露标准工具能力
 - [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：集成在 Flutter App 内的运行时挂载插件，负责注册 VM Service 扩展
+
+![Flutter Copilot 整体架构](文档/images/svg/【3-1-1】FlutterCopilot整体架构.svg)
 
 一句话理解：
 
@@ -42,21 +45,26 @@ Flutter Copilot 适合这些典型场景：
 
 ## 核心能力
 
-![Flutter Copilot 能力总览](分享/images/svg/【3-4-1】FlutterCopilot能力总览.svg)
+![Flutter Copilot 能力总览](文档/images/svg/【3-4-1】FlutterCopilot能力总览.svg)
 
-上图概括了 Flutter Copilot 当前覆盖的能力范围，包括连接、观察、交互、导航和诊断，适合构建从页面验证到问题排查的完整运行时协作链路。
-
-当前能力覆盖连接、观察、交互、导航和诊断几个方向：
+### 连接与观察
 
 - 连接 Flutter App 的 VM Service
 - 获取当前页面可交互元素
-- 点击、输入、滚动、拖拽、滑动、长按、双击
-- 页面导航控制
 - 截图与日志获取
+
+### 交互与导航
+
+- 点击、输入、滚动
+- 拖拽、滑动、长按、双击
+- 页面导航控制
 - Hot Reload
+
+### 诊断能力
+
 - Rebuild Snapshot / 重建热点分析
 
-元素定位支持以下方式：
+### 元素定位方式
 
 - `ValueKey<String>`
 - 文本内容
@@ -67,9 +75,7 @@ Flutter Copilot 适合这些典型场景：
 
 ## 工作原理
 
-![MCP 协议与 VM Service 调用链路](分享/images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
-
-这张图展示了从 AI 发起请求，到 MCP Server 翻译意图，再到 Flutter 运行时实际执行并返回结果的完整链路。
+![MCP 协议与 VM Service 调用链路](文档/images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
 
 Flutter Copilot 的调用链路可以概括为：
 
@@ -80,6 +86,143 @@ Flutter Copilot 的调用链路可以概括为：
 
 这使得 AI 可以直接基于 Flutter 运行时状态进行判断，而不是只依赖源码或屏幕像素猜测。
 
+## Quick Start
+
+如果你是第一次接触这个项目，建议从 [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp) 开始；它是主要入口，包含安装、快速开始、工具列表和 Agent 配置方式。`flutter_copilot_claw` 则负责 Flutter 侧运行时挂载。
+
+### 1. Add `flutter_copilot_claw` to your Flutter app
+
+```bash
+flutter pub add flutter_copilot_claw
+```
+
+在 `main.dart` 中初始化 Flutter Copilot。
+
+只需要 UI 交互能力时：
+
+```dart
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
+
+void main() {
+  if (kDebugMode) {
+    FlutterCopilotBinding.ensureInitialized();
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
+
+  runApp(const MyApp());
+}
+```
+
+如果你还希望 Agent 可以读取 `print()` 输出和未捕获错误：
+
+```dart
+void main() {
+  if (kDebugMode) {
+    FlutterCopilotBinding.runAppWithConfig(const MyApp());
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(const MyApp());
+  }
+}
+```
+
+### 2. Install `flutter_copilot_mcp`
+
+全局安装：
+
+```bash
+dart pub global activate flutter_copilot_mcp
+```
+
+或者作为开发依赖安装：
+
+```bash
+dart pub add dev:flutter_copilot_mcp
+```
+
+### 3. Run your Flutter app in debug mode
+
+```bash
+flutter run
+```
+
+从控制台拿到 VM Service URI，例如：
+
+```text
+ws://127.0.0.1:12345/ws
+```
+
+### 4. Configure the MCP server in your Agent
+
+#### Claude Code
+
+```bash
+claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_copilot_mcp
+```
+
+如果你是在当前仓库里直接调试源码：
+
+```bash
+claude mcp add --scope project --transport stdio flutter_copilot_mcp -- dart run ./packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST
+```
+
+#### Cursor
+
+Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
+
+```json
+{
+  "mcpServers": {
+    "flutter_copilot": {
+      "type": "stdio",
+      "command": "flutter_copilot_mcp"
+    }
+  }
+}
+```
+
+### 5. Connect and use the app
+
+完成配置后，推荐按下面的顺序使用：
+
+1. 调用 `connect`，传入 VM Service URI
+2. 调用 `get_interactive_elements`、`take_screenshots`、`get_logs` 了解当前页面状态
+3. 再调用交互工具，例如：
+   - `tap`
+   - `enter_text`
+   - `scroll_to`
+   - `flutter_copilot_drag`
+   - `swipe`
+   - `long_press`
+   - `double_tap`
+   - `navigate`
+4. 在需要时调用：
+   - `hot_reload`
+   - `get_rebuild_snapshot`
+
+为了让 Agent 更稳定地操作 Flutter App，建议：
+
+- 优先给关键元素添加 `ValueKey<String>`
+- 先从核心路径开始接入，例如登录、表单、详情页
+- 调试阶段优先使用 Debug 模式
+- 在需要日志和异常信息时启用 `runAppWithConfig`
+
+## 平台支持
+
+| Platform | Support | Notes |
+| --- | --- | --- |
+| Android | ✅ | Debug mode |
+| iOS | ✅ | Debug mode |
+| Web | ✅ | 部分诊断能力存在平台差异 |
+| macOS | ✅ | Debug mode |
+| Windows | ✅ | Debug mode |
+| Linux | ✅ | Debug mode |
+
+实际能力依赖 Flutter 调试能力与 VM Service，可用性以调试模式下的运行环境为准。
+
 ## 仓库结构
 
 - [packages/flutter_copilot_mcp/](packages/flutter_copilot_mcp/) — MCP Server 与工具桥接层
@@ -88,68 +231,13 @@ Flutter Copilot 的调用链路可以概括为：
 - [tool/](tool/) — 仓库工具脚本
 - [文档/](文档/) — 补充文档
 
-## 从哪里开始
-
-如果你是第一次接触这个项目，建议从 `flutter_copilot_mcp` 开始：
-
-- [flutter_copilot_mcp on pub.dev](https://pub.dev/packages/flutter_copilot_mcp)
-- [flutter_copilot_mcp README](packages/flutter_copilot_mcp/README.md)
-- [flutter_copilot_claw on pub.dev](https://pub.dev/packages/flutter_copilot_claw)
-
-其中：
-
-- `flutter_copilot_mcp` 是主要入口，包含安装、快速开始、工具列表和 Agent 配置方式
-- `flutter_copilot_claw` 是 Flutter 侧接入包，职责更偏向运行时挂载
-
-## 平台支持
-
-Flutter Copilot 面向 Flutter 调试运行时，适用于：
-
-- Android
-- iOS
-- Web
-- macOS
-- Windows
-- Linux
-
-实际能力依赖 Flutter 调试能力与 VM Service，可用性以调试模式下的运行环境为准。
-
-## 本地开发
-
-运行示例应用：
-
-```bash
-cd example && flutter run
-```
-
-从源码运行 MCP Server：
-
-```bash
-cd packages/flutter_copilot_mcp && dart run bin/flutter_copilot_mcp.dart -l FINEST
-```
-
-常用检查：
-
-```bash
-cd packages/flutter_copilot_mcp && dart analyze --fatal-infos lib bin
-cd packages/flutter_copilot_claw && flutter analyze --fatal-infos lib
-cd packages/flutter_copilot_claw && flutter test
-cd example && flutter analyze
-cd example && flutter test
-dart tool/generate_version.dart
-```
-
-## 文档
+## 相关文档
 
 - [项目说明](文档/项目说明.md)
 - [VM Service 连接原理与实现](文档/VM_Service连接原理与实现.md)
 - [Claude Code 调试本地 MCP 教程](文档/ClaudeCode调试本地MCP教程.md)
-- [GitHub Repository](https://github.com/dust365/flutter_copilot)
-
-## 发布包
-
-- [flutter_copilot_mcp](https://pub.dev/packages/flutter_copilot_mcp)
-- [flutter_copilot_claw](https://pub.dev/packages/flutter_copilot_claw)
+- [flutter_copilot_mcp README](packages/flutter_copilot_mcp/README.md)
+- [flutter_copilot_claw README](packages/flutter_copilot_claw/README.md)
 
 ## License
 
