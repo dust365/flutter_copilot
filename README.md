@@ -10,7 +10,9 @@
 
 ## Demo
 
-<img src="docs/images/demo-cover.png" alt="Flutter Copilot Demo" width="360" />
+<a href="docs/video/演示视频.mp4">
+  <img src="docs/images/demo-preview.gif" alt="Flutter Copilot Demo" width="360" />
+</a>
 
 Flutter Copilot 包含两个已发布到 pub.dev 的包：
 
