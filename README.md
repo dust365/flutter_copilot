@@ -10,14 +10,14 @@
 
 ## Demo
 
-![Flutter Copilot Demo](文档/images/demo 首图.png)
+![Flutter Copilot Demo](docs/images/demo-cover.png)
 
 Flutter Copilot 包含两个已发布到 pub.dev 的包：
 
 - [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：MCP Server，负责让 Claude Code、Cursor 等 AI Client 连接并调用 Flutter 能力
 - [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：Flutter 侧挂载插件，负责在 App 内注册运行时能力
 
-更多演示功能请查看[演示视频](文档/video/演示视频.mp4)。
+更多演示功能请查看[演示视频](docs/video/演示视频.mp4)。
 
 ## 项目概述
 
@@ -26,7 +26,7 @@ Flutter Copilot 由两部分组成，均已发布到 pub.dev：
 - [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：运行在 App 外部的 MCP Server，对 AI Client 暴露标准工具能力
 - [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：集成在 Flutter App 内的运行时挂载插件，负责注册 VM Service 扩展
 
-![Flutter Copilot 整体架构](文档/images/svg/【3-1-1】FlutterCopilot整体架构.svg)
+![Flutter Copilot 整体架构](docs/images/svg/【3-1-1】FlutterCopilot整体架构.svg)
 
 一句话理解：
 
@@ -45,7 +45,7 @@ Flutter Copilot 适合这些典型场景：
 
 ## 核心能力
 
-![Flutter Copilot 能力总览](文档/images/svg/【3-4-1】FlutterCopilot能力总览.svg)
+![Flutter Copilot 能力总览](docs/images/svg/【3-4-1】FlutterCopilot能力总览.svg)
 
 ### 连接与观察
 
@@ -75,7 +75,7 @@ Flutter Copilot 适合这些典型场景：
 
 ## 工作原理
 
-![MCP 协议与 VM Service 调用链路](文档/images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
+![MCP 协议与 VM Service 调用链路](docs/images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
 
 Flutter Copilot 的调用链路可以概括为：
 
@@ -210,16 +210,37 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 - 调试阶段优先使用 Debug 模式
 - 在需要日志和异常信息时启用 `runAppWithConfig`
 
+### 6. Use the `flutter-copilot` skill for auto-connect
+
+如果你在觉得上面手动链接的方案，不方便，请使用项目使用本仓库内置的 `flutter-copilot` skill，可以使用更自动化的连接方案。
+
+这个 skill 会优先从项目根目录的 `.vm_service_uri` 文件读取当前 Flutter App 的 VM Service URI，再完成 Flutter Copilot MCP 连接。相比手动复制 URI，这种方式更适合持续调试、截图验证和热重载后的重复连接。
+
+推荐流程：
+
+1. 通过项目里的启动方式运行 Flutter App，例如 `scripts/flutter_run.sh` 或对应的 VS Code 启动配置
+2. 确认项目根目录下已经生成 `.vm_service_uri`
+3. 在 Claude Code 中使用 `flutter-copilot` skill，让它自动读取 URI 并连接
+4. 后续继续使用截图、点击、输入、滚动、热重载等能力
+
+这种方式特别适合：
+
+- 频繁重启 App 后重新连接
+- 需要快速截图或验证 UI 修改结果
+- 把 Flutter Copilot 作为其他 skill 的前置能力
+
+如果应用重启后 URI 变化，只需要重新使用 `flutter-copilot` skill，它会按新的 `.vm_service_uri` 重新连接。
+
 ## 平台支持
 
-| Platform | Support | Notes |
-| --- | --- | --- |
-| Android | ✅ | Debug mode |
-| iOS | ✅ | Debug mode |
-| Web | ✅ | 部分诊断能力存在平台差异 |
-| macOS | ✅ | Debug mode |
-| Windows | ✅ | Debug mode |
-| Linux | ✅ | Debug mode |
+| Platform | Support | Notes                    |
+| -------- | ------- | ------------------------ |
+| Android  | ✅      | Debug mode               |
+| iOS      | ✅      | Debug mode               |
+| Web      | ✅      | 部分诊断能力存在平台差异 |
+| macOS    | ✅      | Debug mode               |
+| Windows  | ✅      | Debug mode               |
+| Linux    | ✅      | Debug mode               |
 
 实际能力依赖 Flutter 调试能力与 VM Service，可用性以调试模式下的运行环境为准。
 
@@ -229,13 +250,13 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 - [packages/flutter_copilot_claw/](packages/flutter_copilot_claw/) — Flutter 侧运行时绑定与 VM Service 扩展
 - [example/](example/) — 示例应用
 - [tool/](tool/) — 仓库工具脚本
-- [文档/](文档/) — 补充文档
+- [docs/](docs/) — 补充文档
 
 ## 相关文档
 
-- [项目说明](文档/项目说明.md)
-- [VM Service 连接原理与实现](文档/VM_Service连接原理与实现.md)
-- [Claude Code 调试本地 MCP 教程](文档/ClaudeCode调试本地MCP教程.md)
+- [项目说明](docs/项目说明.md)
+- [VM Service 连接原理与实现](docs/VM_Service连接原理与实现.md)
+- [Claude Code 调试本地 MCP 教程](docs/ClaudeCode调试本地MCP教程.md)
 - [flutter_copilot_mcp README](packages/flutter_copilot_mcp/README.md)
 - [flutter_copilot_claw README](packages/flutter_copilot_claw/README.md)
 

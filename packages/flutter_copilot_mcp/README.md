@@ -220,9 +220,9 @@ dart tool/generate_version.dart
 ## More documentation
 
 - [Repository home](https://github.com/dust365/flutter_copilot)
-- [项目说明](https://github.com/dust365/flutter_copilot/blob/main/文档/项目说明.md)
-- [VM Service 连接原理与实现](https://github.com/dust365/flutter_copilot/blob/main/文档/VM_Service连接原理与实现.md)
-- [Claude Code 调试本地 MCP 教程](https://github.com/dust365/flutter_copilot/blob/main/文档/ClaudeCode调试本地MCP教程.md)
+- [项目说明](https://github.com/dust365/flutter_copilot/blob/main/docs/项目说明.md)
+- [VM Service 连接原理与实现](https://github.com/dust365/flutter_copilot/blob/main/docs/VM_Service连接原理与实现.md)
+- [Claude Code 调试本地 MCP 教程](https://github.com/dust365/flutter_copilot/blob/main/docs/ClaudeCode调试本地MCP教程.md)
 
 ## License
 
