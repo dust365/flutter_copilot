@@ -22,44 +22,54 @@ import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 /// A custom binding that extends Flutter's default binding to provide
 /// integration points for the Flutter Copilot MCP.
 ///
-/// **Usage**: Call [ensureInitialized] as a **drop-in replacement** for
-/// `WidgetsFlutterBinding.ensureInitialized()` at the very start of `main()`:
+/// **Single recommended entry point** — works in debug, profile, and
+/// release without any `kDebugMode` branching:
 ///
 /// ```dart
-/// void main() async {
-///   // Use FlutterCopilotBinding instead of WidgetsFlutterBinding
+/// void main() => FlutterCopilotBinding.captureLogs(() async {
 ///   FlutterCopilotBinding.ensureInitialized();
 ///   await setupSystemUI();
-///   await SomeInitializer.init();
 ///   runApp(const MyApp());
-/// }
+/// });
 /// ```
 ///
-/// Or use [runAppWithConfig] for automatic log/error zone capture:
+/// In release mode both [captureLogs] and [ensureInitialized] short-circuit:
+/// no zone is installed, no copilot services are wired up, no VM extensions
+/// are registered — they collapse into a plain `body()` and
+/// `WidgetsFlutterBinding.ensureInitialized()`. So the snippet above is also
+/// the right snippet for shipping builds.
 ///
-/// ```dart
-/// void main() {
-///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
-/// }
-/// ```
+/// In debug / profile mode (i.e. whenever Dart VM service is reachable):
+/// - [captureLogs] wraps `body` in a [runZonedGuarded] zone that forwards
+///   `print()` and uncaught async errors into the copilot log buffer.
+/// - [ensureInitialized] installs [FlutterCopilotBinding] as the active
+///   [WidgetsBinding], registers all `flutter_copilot.*` VM extensions, and
+///   enables optional rebuild tracking / tap feedback per [configuration].
 ///
-/// **Important**: Do NOT call `WidgetsFlutterBinding.ensureInitialized()`
-/// before [ensureInitialized] or [runAppWithConfig] — it will cause a
-/// "Binding already initialized" error. [FlutterCopilotBinding] is a
-/// subclass of [WidgetsFlutterBinding] and provides the same functionality.
+/// **Important**: do not call `WidgetsFlutterBinding.ensureInitialized()`
+/// before [ensureInitialized] in debug/profile — it would lock in the
+/// wrong binding and trigger an "already initialized" failure.
 class FlutterCopilotBinding extends WidgetsFlutterBinding {
-  /// Creates and initializes the binding with the given configuration.
+  /// Initializes the binding.
   ///
-  /// This is a **drop-in replacement** for `WidgetsFlutterBinding.ensureInitialized()`.
-  /// Call this at the very start of `main()` instead of
-  /// `WidgetsFlutterBinding.ensureInitialized()`.
+  /// In **release** mode: transparently delegates to
+  /// `WidgetsFlutterBinding.ensureInitialized()` and returns. No copilot
+  /// services are created and no VM extensions are registered, so this call
+  /// has zero ongoing overhead in shipping builds.
   ///
-  /// Returns the singleton instance of [FlutterCopilotBinding].
-  static FlutterCopilotBinding ensureInitialized([
+  /// In **debug / profile** mode: installs [FlutterCopilotBinding] as the
+  /// active [WidgetsBinding] and wires up all copilot services. Acts as a
+  /// drop-in replacement for `WidgetsFlutterBinding.ensureInitialized()` —
+  /// you should NOT call the latter beforehand.
+  static void ensureInitialized([
     FlutterCopilotConfiguration configuration =
         const FlutterCopilotConfiguration(),
   ]) {
-    if (_instance != null) return instance;
+    if (kReleaseMode) {
+      WidgetsFlutterBinding.ensureInitialized();
+      return;
+    }
+    if (_instance != null) return;
 
     try {
       FlutterCopilotBinding._(configuration);
@@ -87,7 +97,6 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
         ),
       ]);
     }
-    return instance;
   }
 
   /// The singleton instance of [FlutterCopilotBinding].
@@ -230,7 +239,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// Registers error monitors (FlutterError, PlatformDispatcher.onError).
-  /// For print() and zone errors use [runAppWithConfig]. For custom logs use [addLog].
+  /// For `print()` capture and zone error capture wrap `main()` in
+  /// [captureLogs]. For custom logs use [addLog].
   void _registerLogMonitors() {
     final previousFlutterError = FlutterError.onError;
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -251,40 +261,50 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     };
   }
 
-  /// Runs the app with optional [configuration], and Zone-based capture of [print] and zone uncaught errors.
-  /// Prefer this so [getLogs] includes print() and async errors. Add custom logs with [addLog].
+  /// Wraps [body] in a [runZonedGuarded] zone that forwards `print()` and
+  /// uncaught async errors into the copilot log buffer so they show up in
+  /// `get_logs`.
   ///
-  /// **用法一（最简单）**: 不需要在 main() 中做 async 初始化：
-  /// ```dart
-  /// void main() {
-  ///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
-  /// }
-  /// ```
+  /// In **release** mode this short-circuits to `body()` directly: no zone
+  /// is installed and no per-`print` overhead is paid, since copilot tools
+  /// are unreachable in release anyway. The same call site therefore works
+  /// for debug, profile, and release builds with no `kDebugMode` guard.
   ///
-  /// **用法二**: 需要先做 async 初始化（如 setupSystemUI、插件初始化等）：
+  /// Typical (and recommended) usage:
   /// ```dart
-  /// void main() async {
+  /// void main() => FlutterCopilotBinding.captureLogs(() async {
   ///   FlutterCopilotBinding.ensureInitialized();
   ///   await setupSystemUI();
   ///   await SomeInitializer.init();
-  ///   FlutterCopilotBinding.runAppWithConfig(const MyApp());
-  /// }
+  ///   runApp(const MyApp());
+  /// });
   /// ```
   ///
-  /// **注意**: 不要在调用本方法前调用 `WidgetsFlutterBinding.ensureInitialized()`。
-  /// 如需提前初始化 binding，请改用 `FlutterCopilotBinding.ensureInitialized()`。
-  static void runAppWithConfig(Widget app,
-      [FlutterCopilotConfiguration? configuration]) {
-    runZonedGuarded(
-      () {
-        ensureInitialized(configuration ?? const FlutterCopilotConfiguration());
-        runApp(app);
-      },
+  /// The wrapper does not call `runApp` for you and does not touch the
+  /// binding, so it composes cleanly with other zone-based tooling
+  /// (Sentry, Crashlytics, Firebase).
+  ///
+  /// Pass [onError] to forward uncaught zone errors to your own reporter.
+  /// When omitted, errors are printed to the parent zone after being
+  /// captured into the log buffer.
+  static R? captureLogs<R>(
+    R Function() body, {
+    void Function(Object error, StackTrace stack)? onError,
+  }) {
+    if (kReleaseMode) return body();
+    return runZonedGuarded<R>(
+      body,
       (Object error, StackTrace stack) {
-        LogCollector.addConsoleLogStatic('Uncaught error: $error\n$stack',
-            isError: true);
-        // ignore: avoid_print
-        print('Uncaught error: $error\n$stack');
+        LogCollector.addConsoleLogStatic(
+          'Uncaught error: $error\n$stack',
+          isError: true,
+        );
+        if (onError != null) {
+          onError(error, stack);
+        } else {
+          // ignore: avoid_print
+          print('Uncaught error: $error\n$stack');
+        }
       },
       zoneSpecification: ZoneSpecification(
         print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
@@ -295,9 +315,12 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     );
   }
 
-  /// Adds a custom log entry to the collector (included in [getLogs]).
-  /// Call after [ensureInitialized]. Use for app-specific messages.
+  /// Adds a custom log entry to the collector (included in `get_logs`).
+  ///
+  /// In release mode this is a no-op — log buffer and VM extensions are
+  /// not wired up — so it's safe to leave these calls in shipping code.
   static void addLog(String message, {bool isError = false}) {
+    if (kReleaseMode) return;
     LogCollector.addConsoleLogStatic(message, isError: isError);
   }
 

@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.1.0
+
+### Breaking changes (flutter_copilot_claw)
+
+- `FlutterCopilotBinding.ensureInitialized()` now returns `void` instead of `FlutterCopilotBinding`. Callers that ignored the return value (the common pattern) need no change; callers that assigned it should access `WidgetsBinding.instance` directly or drop the assignment.
+- `FlutterCopilotBinding.runAppWithConfig(...)` has been removed. Use the new `captureLogs` + `runApp` pattern below.
+
+### New API (flutter_copilot_claw)
+
+- `FlutterCopilotBinding.captureLogs<R>(R Function() body, {void Function(Object, StackTrace)? onError})` — a thin `runZonedGuarded` wrapper that forwards `print()` output and uncaught async errors into the copilot log buffer so they show up in `get_logs`. Independent of `ensureInitialized` / `runApp`, so it composes cleanly with other zone-based tooling (Sentry, Crashlytics, Firebase). Optional `onError` lets callers forward zone errors to their own reporter.
+
+### Release behavior (flutter_copilot_claw)
+
+- `ensureInitialized()`, `captureLogs(...)`, and `addLog(...)` now all short-circuit to no-ops in release builds — no zone, no copilot services, no VM extensions, no log buffer writes. The same `main()` now works for debug, profile, and release with zero overhead in shipping builds, so `kDebugMode` branching at the init site is no longer needed.
+
+### Migration
+
+```dart
+// Before
+void main() => FlutterCopilotBinding.runAppWithConfig(const MyApp());
+
+// After — single path, release-safe
+void main() {
+  FlutterCopilotBinding.captureLogs(() async {
+    FlutterCopilotBinding.ensureInitialized();
+    runApp(const MyApp());
+  });
+}
+```
+
+See the updated "Logging: `captureLogs` vs `addLog`" section in the README for guidance on when to use each logging entry point.
+
 ## 1.0.5
 
 ### Bug fixes (flutter_copilot_claw)

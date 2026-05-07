@@ -61,8 +61,8 @@ Run commands from the repository root unless noted otherwise.
 ## Architecture
 
 ### End-to-end flow
-1. A Flutter app integrates `flutter_copilot_claw` and initializes `FlutterCopilotBinding` in debug mode.
-2. `FlutterCopilotBinding` installs services and registers custom VM service extensions under `ext.flutter.flutter_copilot.*`.
+1. A Flutter app integrates `flutter_copilot_claw` and calls `FlutterCopilotBinding.ensureInitialized()` (typically inside `FlutterCopilotBinding.captureLogs(() async { ... })`). In release mode both calls are no-ops, so the same `main()` ships unchanged.
+2. In debug/profile, `FlutterCopilotBinding` installs services and registers custom VM service extensions under `ext.flutter.flutter_copilot.*`.
 3. The `flutter_copilot_mcp` CLI connects to the app's Dart VM service URI.
 4. `VmServiceConnector` calls those custom extensions and wraps the responses.
 5. `VmServiceContext` registers MCP tools that map almost 1:1 to connector methods and present them to the AI client.
@@ -74,10 +74,13 @@ The key split is: `flutter_copilot_claw` runs inside the target Flutter app, whi
 The main entry point is `packages/flutter_copilot_claw/lib/src/binding/flutter_copilot_binding.dart`.
 
 Important responsibilities of `FlutterCopilotBinding`:
-- Acts as a drop-in replacement for `WidgetsFlutterBinding.ensureInitialized()`.
-- Creates the runtime services used by the VM extensions: widget finding/matching, gesture dispatch, text entry, scrolling, screenshots, navigation, log capture, and rebuild tracking.
-- Registers VM service extensions for interaction and inspection.
-- Optionally captures `print`, Flutter errors, and uncaught async errors via `runAppWithConfig`.
+- `ensureInitialized()` is the single init entry. In release mode it transparently delegates to `WidgetsFlutterBinding.ensureInitialized()` and returns — no copilot services, no VM extensions, no overhead. In debug/profile it installs `FlutterCopilotBinding` as the active `WidgetsBinding`.
+- `captureLogs(body)` is a thin `runZonedGuarded` wrapper that forwards `print()` and uncaught async errors into the copilot log buffer. Also short-circuits to `body()` in release.
+- `addLog(...)` writes a custom log entry; no-op in release.
+- The recommended call site is `FlutterCopilotBinding.captureLogs(() async { FlutterCopilotBinding.ensureInitialized(); … runApp(...); });` — one snippet for debug/profile/release, no `kDebugMode` branching.
+- Creates the runtime services used by the VM extensions (debug/profile only): widget finding/matching, gesture dispatch, text entry, scrolling, screenshots, navigation, log capture, and rebuild tracking.
+- Registers VM service extensions for interaction and inspection (debug/profile only).
+- Registers error hooks (`FlutterError.onError`, `PlatformDispatcher.instance.onError`) inside the binding init, so framework errors are captured even without `captureLogs`.
 - Optionally enables rebuild tracking through a custom `CopilotBuildOwner`.
 - Optionally injects a tap-feedback overlay.
 
@@ -104,7 +107,7 @@ Element targeting is centered on widget matching. The tool layer accepts `key`, 
 
 ### Logging and rebuild diagnostics
 
-`runAppWithConfig` is not just a convenience wrapper around `runApp`; it is the path that captures `print()` output and zone errors for `get_logs`. Binding initialization also hooks `FlutterError.onError` and `PlatformDispatcher.instance.onError`.
+`FlutterCopilotBinding.captureLogs(...)` is a thin `runZonedGuarded` wrapper that forwards `print()` output and uncaught async errors into the shared log collector so they surface in `get_logs`. It is independent of `runApp` and composes with other zone-based tooling. Binding initialization also hooks `FlutterError.onError` and `PlatformDispatcher.instance.onError` directly, so framework errors are captured even without `captureLogs`.
 
 Rebuild diagnostics are opt-in through `FlutterCopilotConfiguration(enableGlobalRebuildHook: true)`. On Web, rebuild snapshots remain empty because the custom `BuildOwner` hook is not injected there.
 

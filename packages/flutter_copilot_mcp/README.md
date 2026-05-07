@@ -54,31 +54,26 @@ flutter pub add flutter_copilot_claw
 For UI interaction only:
 
 ```dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 
 void main() {
-  if (kDebugMode) {
+  FlutterCopilotBinding.captureLogs(() async {
+    // captureLogs + ensureInitialized are no-ops in release mode (zero
+    // overhead, no VM extensions), so this single path works for debug,
+    // profile, and release.
     FlutterCopilotBinding.ensureInitialized();
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
-
-  runApp(const MyApp());
+    runApp(const MyApp());
+  });
 }
 ```
 
-If you also want `get_logs` to capture `print()` output and uncaught errors:
+If you don't need `print()` capture, drop the outer `captureLogs`:
 
 ```dart
 void main() {
-  if (kDebugMode) {
-    FlutterCopilotBinding.runAppWithConfig(const MyApp());
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-    runApp(const MyApp());
-  }
+  FlutterCopilotBinding.ensureInitialized();
+  runApp(const MyApp());
 }
 ```
 
@@ -191,7 +186,7 @@ After calling `connect`, an agent can use these MCP tools:
 
 - use `ValueKey<String>` for stable targeting
 - run the app in **Debug** or **Profile** mode, not Release
-- use `FlutterCopilotBinding.runAppWithConfig` when logs matter
+- wrap `main()` with `FlutterCopilotBinding.captureLogs(...)` when logs matter
 - if a flow is hard to automate, add explicit keys in the app
 
 ## Limitations

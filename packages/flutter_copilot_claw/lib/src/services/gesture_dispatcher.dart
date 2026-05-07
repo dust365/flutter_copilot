@@ -67,7 +67,8 @@ class GestureDispatcher {
 
     // Show feedback first, then wait before executing the tap
     onTapAt?.call(globalPosition);
-    await Future<void>.delayed(const Duration(milliseconds: kTapFeedbackDelayMs));
+    await Future<void>.delayed(
+        const Duration(milliseconds: kTapFeedbackDelayMs));
 
     // Build the event records
     final records = [
@@ -87,13 +88,15 @@ class GestureDispatcher {
 
     final delta = to - from;
     final distance = delta.distance;
-    final stepCount = (distance / kMaxDelta).ceil().clamp(1, double.infinity).toInt();
+    final stepCount =
+        (distance / kMaxDelta).ceil().clamp(1, double.infinity).toInt();
 
     final moveRecords = <List<PointerEvent>>[];
     for (var i = 1; i <= stepCount; i++) {
       final t = i / stepCount;
       final position = Offset.lerp(from, to, t)!;
-      final previousPosition = i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
+      final previousPosition =
+          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
       final stepDelta = position - previousPosition;
 
       moveRecords.add([
@@ -209,7 +212,8 @@ class GestureDispatcher {
         endPosition = startPosition + Offset(0, distance);
         break;
       default:
-        throw Exception('Invalid swipe direction: $direction. Must be left, right, up, or down');
+        throw Exception(
+            'Invalid swipe direction: $direction. Must be left, right, up, or down');
     }
 
     // Use faster drag for swipe (fewer steps, shorter delay)
@@ -260,7 +264,8 @@ class GestureDispatcher {
     Duration duration,
   ) async {
     onTapAt?.call(globalPosition);
-    await Future<void>.delayed(const Duration(milliseconds: kTapFeedbackDelayMs));
+    await Future<void>.delayed(
+        const Duration(milliseconds: kTapFeedbackDelayMs));
 
     final pointerId = _nextPointerId++;
 
@@ -362,7 +367,8 @@ class GestureDispatcher {
     for (var i = 1; i <= stepCount; i++) {
       final t = i / stepCount;
       final position = Offset.lerp(from, to, t)!;
-      final previousPosition = i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
+      final previousPosition =
+          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
       final stepDelta = position - previousPosition;
 
       moveRecords.add([

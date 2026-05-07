@@ -35,7 +35,7 @@ machine-readable surface.
 | Command        | Description                                                                   |
 | -------------- | ----------------------------------------------------------------------------- |
 | `elements`     | List the interactive element tree on the current screen.                      |
-| `logs`         | Dump logs captured since the app started (requires `runAppWithConfig`).       |
+| `logs`         | Dump logs captured since the app started (requires `captureLogs` wrapper).    |
 | `rebuild`      | Fetch the latest rebuild snapshot / hot-spot analysis.                        |
 | `screenshot`   | Take a screenshot of each live view (`-o <path>` to save; `--numbered` to always suffix `_N`). |
 | `watch`        | Stream logs / rebuild events; `--logs --rebuilds --interval <ms>`.            |
@@ -152,7 +152,12 @@ pnpm unlink --global
 Start an app with `flutter_copilot_claw` initialised:
 
 ```dart
-void main() => FlutterCopilotBinding.runAppWithConfig(const MyApp());
+void main() {
+  FlutterCopilotBinding.captureLogs(() {
+    FlutterCopilotBinding.ensureInitialized();
+    runApp(const MyApp());
+  });
+}
 ```
 
 ### Target resolution — no `--uri` needed

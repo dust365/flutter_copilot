@@ -20,7 +20,8 @@ class TapFeedbackOverlay extends StatelessWidget {
     return IgnorePointer(
       child: ValueListenableBuilder<TapFeedbackState?>(
         valueListenable: controller.state,
-        builder: (BuildContext context, TapFeedbackState? state, Widget? child) {
+        builder:
+            (BuildContext context, TapFeedbackState? state, Widget? child) {
           if (state == null) return const SizedBox.shrink();
           final double r = _kTapFeedbackRadius;
           return Stack(

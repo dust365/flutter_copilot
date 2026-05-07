@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.1.0
+
+Shared release with `flutter_copilot_claw`. The MCP server itself is unchanged; this version bump ships to keep `flutter_copilot_claw` and `flutter_copilot_mcp` aligned (they share a single version line via `tool/version.dart`).
+
+### Breaking changes (flutter_copilot_claw)
+
+- `FlutterCopilotBinding.ensureInitialized()` now returns `void` instead of `FlutterCopilotBinding`. Callers that ignored the return value (the common pattern) need no change.
+- `FlutterCopilotBinding.runAppWithConfig(...)` has been removed. Use the new `captureLogs` + `runApp` pattern (see `flutter_copilot_claw` 1.1.0 release notes).
+
+### New API (flutter_copilot_claw)
+
+- `FlutterCopilotBinding.captureLogs<R>(R Function() body, {void Function(Object, StackTrace)? onError})` — independent `runZonedGuarded` wrapper that forwards `print()` and uncaught async errors into `get_logs`.
+- `ensureInitialized()`, `captureLogs(...)`, and `addLog(...)` all short-circuit to no-ops in release builds, so the same `main()` is safe to ship without `kDebugMode` branching.
+
+### Migration
+
+```dart
+// Before
+void main() => FlutterCopilotBinding.runAppWithConfig(const MyApp());
+
+// After — single path, release-safe
+void main() {
+  FlutterCopilotBinding.captureLogs(() async {
+    FlutterCopilotBinding.ensureInitialized();
+    runApp(const MyApp());
+  });
+}
+```
+
 ## 1.0.5
 
 ### Bug fixes (flutter_copilot_claw)

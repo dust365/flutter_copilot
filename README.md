@@ -101,38 +101,76 @@ Flutter Copilot 的调用链路可以概括为：
 flutter pub add flutter_copilot_claw
 ```
 
-在 `main.dart` 中初始化 Flutter Copilot。
-
-只需要 UI 交互能力时：
+在 `main.dart` 中初始化 Flutter Copilot。一行搞定，debug/profile/release 都安全 —— release 下 `captureLogs` 和 `ensureInitialized` 自动短路为 no-op，零开销，无需 `kDebugMode` 分支：
 
 ```dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 
 void main() {
-  if (kDebugMode) {
+  FlutterCopilotBinding.captureLogs(() async {
     FlutterCopilotBinding.ensureInitialized();
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
+    // 任何 async 初始化（SystemChrome / 插件 / 远端配置等）都可以放在这里，
+    // 它们的 print() 和未捕获异常都会进入 get_logs。
+    runApp(const MyApp());
+  });
+}
+```
 
+如果你只需要 UI 交互、不在意 `print()` 捕获，可以省掉外层 `captureLogs`：
+
+```dart
+void main() {
+  FlutterCopilotBinding.ensureInitialized();
   runApp(const MyApp());
 }
 ```
 
-如果你还希望 Agent 可以读取 `print()` 输出和未捕获错误：
+#### 日志三路：`captureLogs` vs `addLog` vs 自动捕获
+
+`get_logs` 的内容来自三个互相独立的来源，分别对应不同的入口：
+
+| 来源 | 捕获什么 | 怎么开 |
+|---|---|---|
+| 框架错误 | `FlutterError.onError` + `PlatformDispatcher.onError` | 自动 —— `ensureInitialized()` 内部已挂好。 |
+| 环境输出 | 所有 `print()` / `debugPrint()` 输出 + 未捕获的 async 异常 | 用 `captureLogs(body)` 包住要监听的代码块。 |
+| 显式打点 | 你主动写的字符串 | 在调用点写 `FlutterCopilotBinding.addLog(message, isError: false)`。 |
+
+`addLog` 和 `captureLogs` **完全独立**：只要 `ensureInitialized()` 跑过，不管外面有没有 zone，都能直接 `addLog`。它更适合打"业务事件标记"（`login:attempt` / `payment:step:confirm`），在 MCP 日志流里一眼能 grep 到，不用跟散落的 `print()` 混在一起。
+
+**什么时候用哪个**
+
+- **只用 `captureLogs`**：零改动迁移。现有代码里所有 `print()` 自动进 `get_logs`。
+- **只用 `addLog`**：不想多套一层 zone，想完全控制哪些事件进日志。
+- **两个都用**：信息量最全。`captureLogs` 兜底一切，`addLog` 负责高信号标记。
+
+**两者都用的示例**
 
 ```dart
 void main() {
-  if (kDebugMode) {
-    FlutterCopilotBinding.runAppWithConfig(const MyApp());
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
+  FlutterCopilotBinding.captureLogs(() async {
+    FlutterCopilotBinding.ensureInitialized();
+    FlutterCopilotBinding.addLog('app:boot:start');
+    await SomePlugin.init();
+    FlutterCopilotBinding.addLog('app:boot:plugins-ready');
     runApp(const MyApp());
+  });
+}
+
+// 业务页面中任何位置都能直接调
+Future<void> _login() async {
+  FlutterCopilotBinding.addLog('login:attempt');
+  try {
+    await AuthService.signIn();
+    FlutterCopilotBinding.addLog('login:success');
+  } catch (e) {
+    FlutterCopilotBinding.addLog('login:error: $e', isError: true);
+    rethrow; // 未捕获异常也会被外层 captureLogs 兜住
   }
 }
 ```
+
+**release 行为**：三个入口都 release-safe —— `captureLogs` 退化为直接 `body()`，`addLog` 变 no-op，`ensureInitialized` 退化为 `WidgetsFlutterBinding.ensureInitialized()`。所以上面所有写法都可以不加 `kDebugMode` 保护就直接留在生产代码里。
 
 ### 2. Install `flutter_copilot_mcp`
 
@@ -213,7 +251,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 - 优先给关键元素添加 `ValueKey<String>`
 - 先从核心路径开始接入，例如登录、表单、详情页
 - 调试阶段优先使用 Debug 模式
-- 在需要日志和异常信息时启用 `runAppWithConfig`
+- 在需要日志和异常信息时用 `FlutterCopilotBinding.captureLogs(...)` 包裹 `main()`
 
 ### 6. Use the `flutter-copilot` skill for auto-connect
 
@@ -280,7 +318,12 @@ fcc --help
 先确保 Flutter App 已经初始化 `flutter_copilot_claw`:
 
 ```dart
-void main() => FlutterCopilotBinding.runAppWithConfig(const MyApp());
+void main() {
+  FlutterCopilotBinding.captureLogs(() {
+    FlutterCopilotBinding.ensureInitialized();
+    runApp(const MyApp());
+  });
+}
 ```
 
 CLI 按如下顺序解析 VM Service URI,通常无需手动传入：

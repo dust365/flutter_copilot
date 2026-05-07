@@ -54,7 +54,8 @@ class NavigationService {
       throw Exception('Route name is required for push operation');
     }
     // Intentionally not awaited: pushNamed completes only on pop.
-    unawaited(_requireNavigator().pushNamed<Object?>(route, arguments: arguments));
+    unawaited(
+        _requireNavigator().pushNamed<Object?>(route, arguments: arguments));
   }
 
   /// Pops the current route from the navigator.

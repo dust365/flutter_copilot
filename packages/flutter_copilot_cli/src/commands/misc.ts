@@ -75,9 +75,9 @@ Exits 1 on failure.
     .addHelpText(
       'after',
       `
-Requires \`FlutterCopilotBinding.runAppWithConfig(...)\` on the Flutter side so
-\`print\` output and zone errors are captured into the shared log buffer.
-For a live feed use \`watch --logs\` instead.
+Requires wrapping \`main()\` with \`FlutterCopilotBinding.captureLogs(...)\`
+on the Flutter side so \`print\` output and zone errors are captured into
+the shared log buffer. For a live feed use \`watch --logs\` instead.
 `,
     );
 

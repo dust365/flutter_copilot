@@ -51,7 +51,8 @@ class WidgetRebuildTracker {
   /// Returns current snapshot: frame, total rebuilds, and top widgets.
   Map<String, dynamic> getSnapshot({int topLimit = 20}) {
     final total = _globalCounts.values.fold<int>(0, (a, b) => a + b);
-    final entries = _globalCounts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final entries = _globalCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     final top = entries.take(topLimit).map((e) {
       final parts = e.key.split('#');
       final type = parts[0];

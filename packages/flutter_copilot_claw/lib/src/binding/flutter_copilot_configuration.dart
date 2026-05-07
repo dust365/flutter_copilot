@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 /// 用于自定义 MCP 如何识别可交互元素、提取文本和截屏尺寸。标准 Flutter 组件
 ///（如 [ElevatedButton]、[TextField]、[Switch] 等）已内置支持，无需配置。
 ///
-/// 传入方式：[FlutterCopilotBinding.ensureInitialized] 或
-/// [FlutterCopilotBinding.runAppWithConfig] 的第二参数。
+/// 传入方式：[FlutterCopilotBinding.ensureInitialized] 的第一参数。
+/// 若需同时捕获 `print()` 和未处理异步异常，把 `main()` 外层包在
+/// [FlutterCopilotBinding.captureLogs] 里即可。
 ///
 /// 配置项说明见 README 的「FlutterCopilotConfiguration 配置项」。
 class FlutterCopilotConfiguration {
@@ -54,7 +55,8 @@ class FlutterCopilotConfiguration {
 
   /// Checks if a widget type is interactive (built-in + custom).
   bool isInteractiveWidgetType(Type type) {
-    return _isBuiltInInteractiveWidget(type) || (isInteractiveWidget?.call(type) ?? false);
+    return _isBuiltInInteractiveWidget(type) ||
+        (isInteractiveWidget?.call(type) ?? false);
   }
 
   /// Returns whether traversal should stop at the given widget type.

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 import 'pages/tap_demo_page.dart';
@@ -11,13 +10,15 @@ import 'pages/scroll_demo_page.dart';
 import 'pages/text_input_demo_page.dart';
 
 void main() {
-  if (kDebugMode) {
+  // captureLogs 把 body 里的 print() 和未处理 async 异常都写进 get_logs；
+  // release 下自动短路为 body()，零开销。
+  FlutterCopilotBinding.captureLogs(() async {
     FlutterCopilotBinding.ensureInitialized();
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
-
-  runApp(const MyApp());
+    // 需要显式打一条业务日志时，用 addLog —— 它独立于 captureLogs，
+    // 任何地方都能调，release 下也是 no-op。
+    FlutterCopilotBinding.addLog('Flutter Copilot demo starting');
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
         '/navigation-demo': (context) => const NavigationDemoPage(),
         '/debug-monitor-demo': (context) => const DebugMonitorDemoPage(),
         '/rebuild-demo': (context) => const RebuildDemoPage(),
-        '/old-home': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
+        '/old-home': (context) =>
+            const MyHomePage(title: 'Flutter Demo Home Page'),
       },
     );
   }

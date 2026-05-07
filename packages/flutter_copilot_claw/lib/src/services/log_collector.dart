@@ -1,8 +1,9 @@
 import 'dart:collection';
 
 /// Collects and stores Flutter logs for retrieval via VM service extension.
-/// Logs are collected via [runAppWithConfig] (print + uncaught errors)
-/// and custom entries via [LogCollector.addConsoleLogStatic] / [FlutterCopilotBinding.addLog].
+/// Logs are collected via [FlutterCopilotBinding.captureLogs] (print +
+/// uncaught errors) and custom entries via
+/// [LogCollector.addConsoleLogStatic] / [FlutterCopilotBinding.addLog].
 class LogCollector {
   final _logs = Queue<String>();
   static const _maxLogs = 1000;
@@ -13,8 +14,8 @@ class LogCollector {
   static LogCollector? get instance => _instance;
 
   /// Initializes the log collector. No logging package is used; collection
-  /// is done by Zone in [FlutterCopilotBinding.runAppWithConfig] and
-  /// custom logs via [addConsoleLog] / [addConsoleLogStatic].
+  /// is done by Zone in [FlutterCopilotBinding.captureLogs] and custom logs
+  /// via [addConsoleLog] / [addConsoleLogStatic].
   void initialize() {
     if (_initialized) {
       return;

@@ -29,7 +29,8 @@ class TapFeedbackController {
   /// How long the feedback dot stays visible before being cleared.
   final Duration duration;
 
-  final ValueNotifier<TapFeedbackState?> _state = ValueNotifier<TapFeedbackState?>(null);
+  final ValueNotifier<TapFeedbackState?> _state =
+      ValueNotifier<TapFeedbackState?>(null);
 
   /// Notifier for the current feedback state. Null when no dot is shown.
   ValueListenable<TapFeedbackState?> get state => _state;

@@ -210,7 +210,7 @@ cd example && flutter run
 
 - MCP server 是否真的完成初始化
 - 是否已经连接到目标 Flutter 应用的 VM Service
-- Flutter 应用是否调用了 `FlutterCopilotBinding.ensureInitialized()` 或 `runAppWithConfig()`
+- Flutter 应用是否调用了 `FlutterCopilotBinding.ensureInitialized()`(可选叠加 `captureLogs()`)
 
 ---
 
