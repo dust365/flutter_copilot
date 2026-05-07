@@ -10,7 +10,7 @@ This repo is a Dart workspace with four members declared in the root `pubspec.ya
 - `example`: a Flutter demo app used to exercise the binding and MCP features.
 - `tool`: repo utilities such as version file generation.
 
-The two published packages share a version. `packages/flutter_copilot_mcp/lib/src/version.g.dart` is generated from both package pubspecs by `dart tool/generate_version.dart`, and CI fails if it is out of sync.
+The two published packages share a version. `packages/flutter_copilot_mcp/lib/src/version.g.dart` is generated from both package pubspecs by `dart tool/version.dart`, and CI fails if it is out of sync.
 
 ## Common commands
 
@@ -52,7 +52,7 @@ Run commands from the repository root unless noted otherwise.
 - `cd packages/flutter_copilot_mcp && dart run bin/flutter_copilot_mcp.dart --sse-port 8080`
 
 ### Regenerate version file
-- `dart tool/generate_version.dart`
+- `dart tool/version.dart`
 
 ### Publish helper
 - `./tool/publish.sh` for dry-run publish
@@ -111,7 +111,7 @@ Rebuild diagnostics are opt-in through `FlutterCopilotConfiguration(enableGlobal
 ## CI expectations
 
 GitHub Actions checks the following:
-- `dart tool/generate_version.dart` must leave `packages/flutter_copilot_mcp/lib/src/version.g.dart` unchanged.
+- `dart tool/version.dart` must leave `packages/flutter_copilot_mcp/lib/src/version.g.dart` unchanged.
 - `dart analyze --fatal-infos lib bin` for `flutter_copilot_mcp`.
 - `flutter analyze --fatal-infos lib` for `flutter_copilot_claw`.
 - formatting checks for `flutter_copilot_mcp`, `flutter_copilot_claw`, and `tool`.

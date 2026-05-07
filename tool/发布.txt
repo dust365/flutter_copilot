@@ -1,0 +1,202 @@
+================================================================
+flutter_copilot — 发布手册
+================================================================
+
+本目录下共有三个发布相关脚本:
+
+  tool/version.dart         版本号管理 (bump + 校验 + 同步生成文件)
+  tool/publish.sh           编排器: 三包可单发, 也可一键全发
+  tool/publish_cli.sh       仅 CLI 发布 (npm), publish.sh 内部也会调它
+
+三个包的版本必须保持一致:
+  packages/flutter_copilot_claw/pubspec.yaml     → pub.dev
+  packages/flutter_copilot_mcp/pubspec.yaml      → pub.dev
+  packages/flutter_copilot_cli/package.json      → npmjs.org
+
+两个自动生成的版本文件 (不要手动改):
+  packages/flutter_copilot_mcp/lib/src/version.g.dart
+  packages/flutter_copilot_cli/src/version.generated.ts
+
+
+----------------------------------------------------------------
+场景 1: 三包一起发布新版本 (最常见)
+----------------------------------------------------------------
+
+  # 1. 先 dry-run 看一眼
+  ./tool/publish.sh --version 1.0.4 --all
+
+  # 2. 看完 dry-run 没问题, 加 --force 真发
+  ./tool/publish.sh --version 1.0.4 --all --force
+
+  # 发布顺序自动为: claw → mcp → cli
+
+
+----------------------------------------------------------------
+场景 2: 只发某一个包 (版本已经对齐过)
+----------------------------------------------------------------
+
+  # 只发 CLI (两种写法等价)
+  ./tool/publish.sh --cli --force
+  ./tool/publish_cli.sh --force
+
+  # 只发两个 Dart 包
+  ./tool/publish.sh --mcp --claw --force
+
+  # 只发 claw
+  ./tool/publish.sh --claw --force
+
+
+----------------------------------------------------------------
+场景 3: 只想统一版本号, 暂时不发布
+----------------------------------------------------------------
+
+  ./tool/publish.sh --version 1.0.4
+
+  (会更新 3 个源文件 + 重新生成 version.g.dart / version.generated.ts)
+
+
+----------------------------------------------------------------
+场景 4: CLI 单独一路到底 (bump + 发布)
+----------------------------------------------------------------
+
+  ./tool/publish_cli.sh --version 1.0.4 --force
+
+
+----------------------------------------------------------------
+version.dart 的四种模式
+----------------------------------------------------------------
+
+  dart tool/version.dart                   # 默认: 校验对齐 + 重新生成
+  dart tool/version.dart --set 1.0.4       # 改 3 个源 + 重新生成 (原子回滚)
+  dart tool/version.dart --check           # CI 模式: 对齐 + 文件 drift 都 exit 1
+  dart tool/version.dart --print           # 仅打印当前共享版本号
+
+  从仓库根或 tool/ 任何位置跑都可以 (会自动定位仓库根)
+
+
+----------------------------------------------------------------
+发布前需要准备
+----------------------------------------------------------------
+
+  CLI (npm):
+    npm login                      # 首次发布前
+    npm whoami                     # 验证已登录
+    # 若账号开了 2FA (强烈建议), 每次 publish 时:
+    #   - 交互式 TTY: npm 会自己弹 "Enter OTP:" 提示, 输入 Authenticator 6 位码
+    #   - 非交互 / CI: 必须显式传 --otp <code> 参数, 否则脚本会直接报错
+    # 网络需能访问 https://registry.npmjs.org/
+    # 若本地 registry 指向镜像 (阿里源等), publishConfig 会临时切回 npmjs.org
+
+  Dart 包 (pub.dev):
+    dart pub login                 # 首次发布前
+    # 用 OAuth 浏览器流程, 不涉及 OTP
+    # 网络需能访问 https://pub.dev (不走镜像)
+    # 脚本会临时设 PUB_HOSTED_URL=https://pub.dev, 绕过 pub.flutter-io.cn 等镜像
+
+  工具链:
+    pnpm / npm / node >= 18        # CLI 构建与发布
+    dart sdk >= 3.6                # Dart 包构建与 version.dart
+
+
+----------------------------------------------------------------
+npm 2FA / OTP
+----------------------------------------------------------------
+
+  场景 A (日常本地发布, 推荐):
+    ./tool/publish.sh --version 1.0.5 --all --force
+    # 脚本会让 npm 自己和你的终端交互, 直接输入 Authenticator 6 位码即可
+
+  场景 B (CI / 脚本化):
+    ./tool/publish.sh --version 1.0.5 --all --force --otp 123456
+    # 提前在运行 CI 的人类机器上读取 6 位码传进来
+    # 注意 OTP 有效期通常 30 秒, 跑之前现查现用
+
+  场景 C (--otp 打错了):
+    脚本会识别 EOTP 错误并给出明确提示, 换个码重跑即可
+    Dart 包已经发成功的部分不会受影响 (1.0.5 已存在 → 自动跳过)
+
+
+----------------------------------------------------------------
+默认 dry-run, 加 --force 才真发
+----------------------------------------------------------------
+
+  所有发布命令默认都是 dry-run, 不会真正上传。
+  真发布必须显式加 --force。
+  dry-run 会完整走一遍: 版本校验 → 构建 → 测试 → 打包预览, 只差最后上传。
+
+
+----------------------------------------------------------------
+常见问题
+----------------------------------------------------------------
+
+  Q: npm publish 报 "You cannot publish over the previously published versions"
+  A: 同一个版本号 npm 不允许重发。用 --version 1.0.5 (或任何新版本) 先 bump。
+
+  Q: 某个包发失败了, 怎么恢复?
+  A: 如果是中途失败:
+       - Dart 包: pub.dev 上如果该版本号已经成功上传了, 再发同版本会被拒绝。
+         需要 bump 小版本号 (如 1.0.4 → 1.0.5) 重新来过。
+       - npm 包: 同理, bump 后重发。npm 的 unpublish 限制 72 小时内且不可重用版本号。
+     如果是 dry-run 阶段失败:
+       - 直接 fix 再来一次即可, 什么也没发生。
+
+  Q: 三包的版本不一致了, CI 挂了
+  A: 跑 dart tool/version.dart --set <target>, 提 PR。
+
+  Q: 为什么 dart tool/version.dart 要从仓库根跑?
+  A: 不必。脚本会自动往上找仓库根 (认 tool/ + packages/ 两个标记目录),
+     从 tool/ 里直接 dart version.dart 也能跑。
+
+
+----------------------------------------------------------------
+发布后的验证
+----------------------------------------------------------------
+
+  # CLI
+  npm view flutter_copilot_cli version               # 看 npm 上是否已出现
+  npx flutter_copilot_cli@latest --version           # 拉新版 smoke
+
+  # Dart 包
+  # 打开 https://pub.dev/packages/flutter_copilot_mcp
+  # 打开 https://pub.dev/packages/flutter_copilot_claw
+
+
+----------------------------------------------------------------
+版本号规范 (semver)
+----------------------------------------------------------------
+
+  MAJOR.MINOR.PATCH
+      |       |  |
+      |       |  └─ PATCH: bug 修复, 不改公开 API   (1.0.3 → 1.0.4)
+      |       └──── MINOR: 新增向后兼容的功能       (1.0.4 → 1.1.0)
+      └──────────── MAJOR: breaking change         (1.1.0 → 2.0.0)
+
+  可以带 prerelease tag, 如 1.0.4-beta.1, 1.1.0-rc.2
+
+
+----------------------------------------------------------------
+附录: 脚本内部都做了什么
+----------------------------------------------------------------
+
+  publish.sh --version X --all --force 的完整流程:
+
+    1. dart tool/version.dart --set X
+       (改 3 个源 + 生成 version.g.dart/version.generated.ts)
+
+    2. publish_dart(claw):
+       analyze → 拷到 tmp 目录 → 去掉 resolution:workspace
+       → dart pub get → dart pub publish --force
+
+    3. publish_dart(mcp):
+       重新跑 version.dart (确保 version.g.dart 和 pubspec 对齐)
+       → analyze → tmp → pub publish
+
+    4. publish_cli(cli):       # 委托给 publish_cli.sh
+       dart tool/version.dart --check (drift 保护)
+       → npm whoami → npm view (重名检查)
+       → pnpm install --frozen-lockfile
+       → pnpm clean → pnpm typecheck → pnpm build → pnpm test
+       → npm pack --dry-run (预览 tarball)
+       → npm publish --access public
+
+  任一步失败整条流水线立刻终止 (set -e)。

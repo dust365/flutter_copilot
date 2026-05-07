@@ -1,0 +1,16 @@
+name: smoke-counter
+stopOnFailure: true
+steps:
+  - action: assert-element
+    text: Increment
+  - action: tap
+    text: Increment
+  - action: wait
+    ms: 100
+  - action: tap
+    text: Increment
+    retry:
+      attempts: 3
+      delay: 200
+  - action: screenshot
+    output: /tmp/fc-smoke.png

@@ -21,7 +21,7 @@ description: 升级 flutter_copilot_claw 和 flutter_copilot_mcp 的共享版本
 - `packages/flutter_copilot_claw/CHANGELOG.md` — claw 发布说明
 - `packages/flutter_copilot_mcp/CHANGELOG.md` — mcp 发布说明
 - `packages/flutter_copilot_mcp/README.md` — mcp 的 pub.dev 首页说明
-- `packages/flutter_copilot_mcp/lib/src/version.g.dart` — 由 `dart tool/generate_version.dart` 生成的共享版本文件
+- `packages/flutter_copilot_mcp/lib/src/version.g.dart` — 由 `dart tool/version.dart` 生成的共享版本文件
 - `tool/publish.sh` — 仓库内置发布脚本，默认 dry-run，`--force` 时真正发布
 
 ## Release Rules
@@ -29,7 +29,7 @@ description: 升级 flutter_copilot_claw 和 flutter_copilot_mcp 的共享版本
 1. `flutter_copilot_claw` 和 `flutter_copilot_mcp` 必须使用**相同版本号**。
 2. 修改 `pubspec.yaml` 后，必须运行：
    ```bash
-   dart tool/generate_version.dart
+   dart tool/version.dart
    ```
 3. `CHANGELOG.md` 顶部必须新增当前版本条目，且内容和这次实际发布一致。
 4. 正式发布前必须先跑：
@@ -100,7 +100,7 @@ version: 1.0.4
 ### 4. 重新生成共享版本文件
 
 ```bash
-dart tool/generate_version.dart
+dart tool/version.dart
 ```
 
 生成结果应体现在：
@@ -170,7 +170,7 @@ git diff -- packages/flutter_copilot_claw/pubspec.yaml packages/flutter_copilot_
 
 ```bash
 # 1) 改版本号后生成共享版本文件
-dart tool/generate_version.dart
+dart tool/version.dart
 
 # 2) dry-run
 ./tool/publish.sh

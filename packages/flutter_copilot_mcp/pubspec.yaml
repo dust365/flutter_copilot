@@ -1,6 +1,6 @@
 name: flutter_copilot_mcp
 description: MCP server for AI agents to inspect and control running Flutter apps through VM Service and Flutter Copilot. #mcp #ai #copilot #flutter_copilot.
-version: 1.0.3
+version: 1.0.5
 repository: https://github.com/dust365/flutter_copilot
 topics:
   - flutter
@@ -24,3 +24,4 @@ dependencies:
 
 dev_dependencies:
   lints: ^3.0.0
+  test: ^1.25.0

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
@@ -55,7 +56,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   ///
   /// Returns the singleton instance of [FlutterCopilotBinding].
   static FlutterCopilotBinding ensureInitialized([
-    FlutterCopilotConfiguration configuration = const FlutterCopilotConfiguration(),
+    FlutterCopilotConfiguration configuration =
+        const FlutterCopilotConfiguration(),
   ]) {
     if (_instance != null) return instance;
 
@@ -89,7 +91,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// The singleton instance of [FlutterCopilotBinding].
-  static FlutterCopilotBinding get instance => BindingBase.checkInstance(_instance);
+  static FlutterCopilotBinding get instance =>
+      BindingBase.checkInstance(_instance);
   static FlutterCopilotBinding? _instance;
 
   FlutterCopilotBinding._(this.configuration);
@@ -240,8 +243,10 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     };
 
     final previousOnError = PlatformDispatcher.instance.onError;
-    PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
-      _logCollector.addConsoleLog('Uncaught error: $error\n$stackTrace', isError: true);
+    PlatformDispatcher.instance.onError =
+        (Object error, StackTrace stackTrace) {
+      _logCollector.addConsoleLog('Uncaught error: $error\n$stackTrace',
+          isError: true);
       return previousOnError?.call(error, stackTrace) ?? false;
     };
   }
@@ -268,14 +273,16 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   ///
   /// **注意**: 不要在调用本方法前调用 `WidgetsFlutterBinding.ensureInitialized()`。
   /// 如需提前初始化 binding，请改用 `FlutterCopilotBinding.ensureInitialized()`。
-  static void runAppWithConfig(Widget app, [FlutterCopilotConfiguration? configuration]) {
+  static void runAppWithConfig(Widget app,
+      [FlutterCopilotConfiguration? configuration]) {
     runZonedGuarded(
       () {
         ensureInitialized(configuration ?? const FlutterCopilotConfiguration());
         runApp(app);
       },
       (Object error, StackTrace stack) {
-        LogCollector.addConsoleLogStatic('Uncaught error: $error\n$stack', isError: true);
+        LogCollector.addConsoleLogStatic('Uncaught error: $error\n$stack',
+            isError: true);
         // ignore: avoid_print
         print('Uncaught error: $error\n$stack');
       },
@@ -356,7 +363,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Entered text into element matching: ${matcher.toJson()}',
+            'message':
+                'Entered text into element matching: ${matcher.toJson()}',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -491,7 +499,9 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          final direction = params['direction'] is String ? params['direction'] as String : null;
+          final direction = params['direction'] is String
+              ? params['direction'] as String
+              : null;
           final distance = _parseDouble(params['distance']) ?? 200.0;
 
           if (direction == null) {
@@ -511,7 +521,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Swiped element matching: ${matcher.toJson()} in direction: $direction',
+            'message':
+                'Swiped element matching: ${matcher.toJson()} in direction: $direction',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -529,7 +540,10 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          final durationMs = (params['duration'] as num?)?.toInt() ?? 500;
+          // VM service extension params arrive as Map<String, String>, so a
+          // raw `as num?` cast throws a TypeError for any caller-supplied
+          // value. Reuse _parseDouble to accept both num and numeric strings.
+          final durationMs = _parseDouble(params['duration'])?.toInt() ?? 500;
           final duration = Duration(milliseconds: durationMs);
 
           await _gestureDispatcher.longPress(
@@ -541,7 +555,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
 
           return <String, dynamic>{
             'status': 'Success',
-            'message': 'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
+            'message':
+                'Long pressed element matching: ${matcher.toJson()} for ${durationMs}ms',
           };
         } catch (err, st) {
           return <String, dynamic>{
@@ -559,7 +574,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       callback: (params) async {
         try {
           final matcher = WidgetMatcher.fromJson(params);
-          await _gestureDispatcher.doubleTap(matcher, _widgetFinder, configuration);
+          await _gestureDispatcher.doubleTap(
+              matcher, _widgetFinder, configuration);
 
           return <String, dynamic>{
             'status': 'Success',
@@ -588,10 +604,12 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             };
           }
 
-          final route = params['route'] is String ? params['route'] as String : null;
-          final arguments = params['arguments'] is Map<String, dynamic>
-              ? params['arguments'] as Map<String, dynamic>
-              : null;
+          final route =
+              params['route'] is String ? params['route'] as String : null;
+          // VM service params are Map<String, String>: nested maps arrive as
+          // JSON strings rather than Maps, so the previous `is Map` check was
+          // always false and `arguments` was silently dropped. Parse it back.
+          final arguments = _parseArguments(params['arguments']);
 
           switch (action.toLowerCase()) {
             case 'push':
@@ -613,7 +631,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             default:
               return <String, dynamic>{
                 'status': 'Error',
-                'error': 'Invalid action: $action. Must be push, pop, replace, or popUntil',
+                'error':
+                    'Invalid action: $action. Must be push, pop, replace, or popUntil',
               };
           }
 
@@ -641,7 +660,8 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
             return <String, dynamic>{
               'status': 'Success',
               'enabled': false,
-              'message': 'Rebuild tracking not enabled (enableGlobalRebuildHook is false)',
+              'message':
+                  'Rebuild tracking not enabled (enableGlobalRebuildHook is false)',
             };
           }
           final topLimit = params['topLimit'] is int
@@ -678,6 +698,31 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     if (value == null) return null;
     if (value is num) return value.toDouble();
     if (value is String) return double.tryParse(value);
+    return null;
+  }
+
+  /// Parses a nested map argument that may have been stringified by the VM
+  /// service extension transport.
+  ///
+  /// Accepts three shapes:
+  ///   - `null` → returns null
+  ///   - `Map<String, dynamic>` (direct call) → returned as-is
+  ///   - JSON-encoded String (VM service extension transport) → decoded
+  ///
+  /// Returns null for anything else, or if decoding fails / does not yield
+  /// an object.
+  static Map<String, dynamic>? _parseArguments(dynamic value) {
+    if (value == null) return null;
+    if (value is Map<String, dynamic>) return value;
+    if (value is String) {
+      if (value.isEmpty) return null;
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is Map<String, dynamic>) return decoded;
+      } on FormatException {
+        return null;
+      }
+    }
     return null;
   }
 }

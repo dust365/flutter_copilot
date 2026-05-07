@@ -3,6 +3,7 @@
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![flutter_copilot_mcp pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_mcp)](https://pub.dev/packages/flutter_copilot_mcp)
 [![flutter_copilot_claw pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_claw)](https://pub.dev/packages/flutter_copilot_claw)
+[![flutter_copilot_cli npm badge](https://img.shields.io/npm/v/flutter_copilot_cli)](https://www.npmjs.com/package/flutter_copilot_cli)
 
 **Flutter Copilot 是一个面向运行中 Flutter 应用的 MCP 方案，让 Claude Code、Cursor 等 AI Agent 能够直接连接、观察、操作和诊断 App。**
 
@@ -14,25 +15,27 @@
   <img src="docs/images/demo-preview.gif" alt="Flutter Copilot Demo" width="360" />
 </a>
 
-Flutter Copilot 包含两个已发布到 pub.dev 的包：
+Flutter Copilot 包含三个已发布的包：
 
 - [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：MCP Server，负责让 Claude Code、Cursor 等 AI Client 连接并调用 Flutter 能力
 - [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：Flutter 侧挂载插件，负责在 App 内注册运行时能力
+- [`flutter_copilot_cli`](https://www.npmjs.com/package/flutter_copilot_cli)：面向终端用户与 CI 的命令行工具，不依赖 MCP 协议即可直接驱动 Flutter App
 
 更多演示功能请查看[演示视频](docs/video/演示视频.mp4)。
 
 ## 项目概述
 
-Flutter Copilot 由两部分组成，均已发布到 pub.dev：
+Flutter Copilot 由三部分组成：
 
-- [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：运行在 App 外部的 MCP Server，对 AI Client 暴露标准工具能力
-- [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：集成在 Flutter App 内的运行时挂载插件，负责注册 VM Service 扩展
+- [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp)：运行在 App 外部的 MCP Server，对 AI Client 暴露标准工具能力（已发布到 pub.dev）
+- [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw)：集成在 Flutter App 内的运行时挂载插件，负责注册 VM Service 扩展（已发布到 pub.dev）
+- [`flutter_copilot_cli`](https://www.npmjs.com/package/flutter_copilot_cli)：基于 Node.js 的命令行工具，直连 VM Service 执行交互、截图、脚本化测试，适用于终端调试与 CI 流水线（已发布到 npm）
 
 ![Flutter Copilot 整体架构](docs/images/svg/【3-1-1】FlutterCopilot整体架构.svg)
 
 一句话理解：
 
-> `flutter_copilot_claw` 在 App 内提供能力，`flutter_copilot_mcp` 在 App 外桥接 AI，最终让 Agent 可以直接操作运行中的 Flutter 应用。
+> `flutter_copilot_claw` 在 App 内提供能力，`flutter_copilot_mcp` 在 App 外桥接 AI Agent，`flutter_copilot_cli` 则在终端/CI 中直接驱动 App，最终让人类与 AI 都能操作运行中的 Flutter 应用。
 
 ## 适用场景
 
@@ -233,6 +236,133 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 
 如果应用重启后 URI 变化，只需要重新使用 `flutter-copilot` skill，它会按新的 `.vm_service_uri` 重新连接。
 
+## Flutter Copilot CLI
+
+[`flutter_copilot_cli`](https://www.npmjs.com/package/flutter_copilot_cli)（命令名 `fcc` 或 `flutter_copilot_cli`，npm 地址：<https://www.npmjs.com/package/flutter_copilot_cli>）是与 MCP Server 并列的另一条使用路径。它直接通过 `ext.flutter.flutter_copilot.*` VM Service 扩展驱动 App，不依赖 MCP 协议，也不依赖任何 AI Client。
+
+### 为什么需要 CLI？
+
+- **给人用**：在终端里直接截图、点击、热重载，免去打开 AI Client 的链路
+- **给 CI 用**：在 GitHub Actions、Jenkins 等流水线中以 YAML playbook 运行冒烟测试
+- **给受限 AI 用**：对于不支持 MCP 协议的 Agent（或只能执行 shell 命令的小模型），通过 `fcc help-ai` 输出的 JSON 规范即可让它们驱动 App
+
+能力对照：
+
+| 能力                                          | `flutter_copilot_mcp` | `flutter_copilot_cli`         |
+| --------------------------------------------- | :-------------------: | ----------------------------- |
+| tap / drag / scroll / navigate / 日志 / 截图 |          ✅           | ✅                            |
+| 多 App 实例注册表                             |          ❌           | ✅ `register` / `list` / `doctor` |
+| 交互式 REPL                                   |          ❌           | ✅ `repl`                     |
+| 日志 / Rebuild 实时流                         |          ❌           | ✅ `watch --logs --rebuilds`  |
+| YAML playbook(CI/冒烟测试)                    |          ❌           | ✅ `run script.yaml`          |
+| 面向 AI 的自描述                              |      经由 MCP         | ✅ `help-ai`(JSON)            |
+| ADB reverse 辅助                              |          ❌           | ✅ `adb-reverse <port>`       |
+
+### 安装
+
+要求 Node.js **>= 18**。
+
+```bash
+# 全局安装(三选一)
+npm install -g flutter_copilot_cli
+pnpm add -g flutter_copilot_cli
+yarn global add flutter_copilot_cli
+
+# 校验
+fcc --version
+fcc --help
+```
+
+安装后会在 PATH 中注册两个等价命令：`flutter_copilot_cli`(全名) 与 `fcc`(别名)。
+
+### 快速上手
+
+先确保 Flutter App 已经初始化 `flutter_copilot_claw`:
+
+```dart
+void main() => FlutterCopilotBinding.runAppWithConfig(const MyApp());
+```
+
+CLI 按如下顺序解析 VM Service URI,通常无需手动传入：
+
+1. `--uri <ws://...>` — 显式指定
+2. `-i <name>` — 从 instance registry 中读取
+3. `FLUTTER_COPILOT_URI` 环境变量
+4. 当前目录或任一祖先目录下的 `.vm_service_uri` 文件
+
+推荐配合仓库内的 `scripts/flutter_run.sh` 使用,它会把 URI 写入 `.vm_service_uri`:
+
+```bash
+./scripts/flutter_run.sh -d macos       # 启动 App,自动写入 .vm_service_uri
+fcc doctor                              # 自动读取 URI 进行健康检查
+fcc elements                            # 列出当前可交互元素
+fcc tap --text "Increment"              # 按文本点击
+fcc screenshot -o /tmp/shot.png         # 截图
+fcc reload                              # 热重载
+```
+
+或者手动注册实例后按名字调用：
+
+```bash
+fcc register demo ws://127.0.0.1:8181/abc/ws
+fcc -i demo tap --text "Increment"
+fcc -i demo enter-text --key UsernameField --input "demo user"
+```
+
+### 实时流与自动重连
+
+```bash
+# 同时订阅日志与 rebuild 事件
+fcc -i demo watch --logs --rebuilds --interval 500
+
+# 配合 --watch-uri 可在 flutter 重启后自动重连
+fcc --watch-uri watch --rebuilds
+```
+
+### YAML Playbook(CI 场景)
+
+```yaml
+# smoke.yaml
+name: smoke-login
+stopOnFailure: true
+steps:
+  - action: tap
+    key: LoginBtn
+  - action: enter-text
+    key: UsernameField
+    input: demo
+  - action: wait
+    ms: 300
+  - action: screenshot
+    output: /tmp/after-login.png
+  - action: assert-element
+    text: Welcome
+```
+
+```bash
+fcc -i demo run smoke.yaml
+```
+
+每个步骤可附带 `retry: { attempts, delay }` 做自动重试。
+
+### Android 真机桥接
+
+当 App 跑在 Android 设备、VM Service 却绑在宿主 loopback 上时:
+
+```bash
+fcc adb-reverse 8181               # 建立端口转发
+fcc adb-reverse 8181 --remove      # 用完清理
+```
+
+### 给 AI Agent 使用
+
+```bash
+fcc help-ai                        # 输出完整命令表与脚本 schema 的 JSON
+fcc --json -i demo elements        # 所有命令都支持 --json,便于管道消费
+```
+
+更多命令、参数与示例参见 [packages/flutter_copilot_cli/README.md](packages/flutter_copilot_cli/README.md)。
+
 ## 平台支持
 
 | Platform | Support | Notes                    |
@@ -250,6 +380,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 
 - [packages/flutter_copilot_mcp/](packages/flutter_copilot_mcp/) — MCP Server 与工具桥接层
 - [packages/flutter_copilot_claw/](packages/flutter_copilot_claw/) — Flutter 侧运行时绑定与 VM Service 扩展
+- [packages/flutter_copilot_cli/](packages/flutter_copilot_cli/) — TypeScript/Node.js 命令行工具
 - [example/](example/) — 示例应用
 - [tool/](tool/) — 仓库工具脚本
 - [docs/](docs/) — 补充文档
@@ -261,6 +392,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 - [Claude Code 调试本地 MCP 教程](docs/ClaudeCode调试本地MCP教程.md)
 - [flutter_copilot_mcp README](packages/flutter_copilot_mcp/README.md)
 - [flutter_copilot_claw README](packages/flutter_copilot_claw/README.md)
+- [flutter_copilot_cli README](packages/flutter_copilot_cli/README.md)
 
 ## License
 

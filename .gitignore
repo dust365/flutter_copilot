@@ -8,7 +8,7 @@ build/
 # IDE
 .idea/
 *.iml
-.vscode/
+
 
 # macOS
 .DS_Store

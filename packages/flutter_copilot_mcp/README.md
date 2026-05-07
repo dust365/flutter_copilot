@@ -3,6 +3,7 @@
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![flutter_copilot_mcp pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_mcp)](https://pub.dev/packages/flutter_copilot_mcp)
 [![flutter_copilot_claw pub.dev badge](https://img.shields.io/pub/v/flutter_copilot_claw)](https://pub.dev/packages/flutter_copilot_claw)
+[![flutter_copilot_cli npm badge](https://img.shields.io/npm/v/flutter_copilot_cli)](https://www.npmjs.com/package/flutter_copilot_cli)
 
 **Flutter MCP for Cursor, Claude Code, and AI agents. Inspect, control, test, and debug a running Flutter app through VM Service.**
 
@@ -30,14 +31,15 @@ It is designed for runtime interaction instead of static analysis:
 
 ## Package layout
 
-Flutter Copilot has two packages:
+Flutter Copilot has three packages:
 
 - [`flutter_copilot_mcp`](https://pub.dev/packages/flutter_copilot_mcp): the MCP server used by Cursor, Claude Code, and other MCP clients
 - [`flutter_copilot_claw`](https://pub.dev/packages/flutter_copilot_claw): the Flutter-side mounting plugin added inside your app
+- [`flutter_copilot_cli`](https://www.npmjs.com/package/flutter_copilot_cli): a Node.js CLI (`fcc`) for humans at a terminal and CI pipelines — drives the same VM Service extensions without needing an MCP-capable AI client
 
 In one sentence:
 
-> `flutter_copilot_claw` runs inside the app, and `flutter_copilot_mcp` runs outside the app so an AI agent can inspect and operate the running UI.
+> `flutter_copilot_claw` runs inside the app, `flutter_copilot_mcp` bridges AI agents from outside the app, and `flutter_copilot_cli` lets you (or any shell-capable agent/CI job) drive the same app directly — so both humans and AI can inspect and operate the running UI.
 
 ## Quick start
 
@@ -220,7 +222,7 @@ cd packages/flutter_copilot_claw && flutter analyze --fatal-infos lib
 cd packages/flutter_copilot_claw && flutter test
 cd example && flutter analyze
 cd example && flutter test
-dart tool/generate_version.dart
+dart tool/version.dart
 ```
 
 ## More documentation

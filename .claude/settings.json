@@ -20,7 +20,7 @@
       "Bash(cd packages/flutter_copilot_mcp/example && flutter test *)",
       "Bash(cd tool && dart analyze *)",
       "Bash(cd tool && dart format *)",
-      "Bash(dart tool/generate_version.dart)",
+      "Bash(dart tool/version.dart)",
       "Bash(dart pub get)",
       "Bash(flutter pub get)"
     ],
