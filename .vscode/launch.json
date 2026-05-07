@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter(Copilot)",
+      "type": "dart",
+      "request": "launch",
+      "customTool": "${workspaceFolder}/scripts/flutter_run.sh",
+      "customToolReplacesArgs": 1
+    },
+    {
+      "name": "Flutter (All Devices)",
+      "type": "dart",
+      "request": "launch",
+      "program": "example/lib/main.dart"
+    }
+  ]
+}
