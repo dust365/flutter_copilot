@@ -14,7 +14,7 @@ describe('Script schema', () => {
         { action: 'tap', key: 'LoginBtn' },
         { action: 'enter-text', key: 'UsernameField', input: 'demo' },
         { action: 'wait', ms: 100 },
-        { action: 'screenshot', output: '/tmp/a.png' },
+        { action: 'take-screenshots', output: '/tmp/a.png' },
         { action: 'assert-element', text: 'Welcome' },
       ],
     });
@@ -74,8 +74,8 @@ class FakeConnector {
   swipe(m: Matcher, d: string, dist?: number) {
     return this.record('swipe', { m, d, dist }, { status: 'Success', message: 'swiped' });
   }
-  navigate(action: string, route?: string) {
-    return this.record('navigate', { action, route }, { status: 'Success', message: 'navved' });
+  navigate(action: string, route?: string, args?: Record<string, unknown>) {
+    return this.record('navigate', { action, route, args }, { status: 'Success', message: 'navved' });
   }
   hotReload() {
     return this.record('hotReload', {}, true);
@@ -209,7 +209,33 @@ describe('runScript', () => {
     expect(r[0]?.error).toMatch(/x\/y coordinate matchers/);
   });
 
-  it('screenshot step writes every view with numbered:true', async () => {
+  it('passes drag deltaX/deltaY through to the connector', async () => {
+    const fake = new FakeConnector();
+    const s = Script.parse({
+      steps: [{ action: 'drag', key: 'Slider', deltaX: 12, deltaY: -4 }],
+    });
+    const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
+    expect(r[0]?.ok).toBe(true);
+    expect(fake.calls[0]).toEqual({
+      method: 'drag',
+      args: { m: { key: 'Slider' }, o: { deltaX: 12, deltaY: -4 } },
+    });
+  });
+
+  it('passes navigate arguments through to the connector', async () => {
+    const fake = new FakeConnector();
+    const s = Script.parse({
+      steps: [{ action: 'navigate', op: 'push', route: '/detail', arguments: { id: 42 } }],
+    });
+    const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
+    expect(r[0]?.ok).toBe(true);
+    expect(fake.calls[0]).toEqual({
+      method: 'navigate',
+      args: { action: 'push', route: '/detail', args: { id: 42 } },
+    });
+  });
+
+  it('take-screenshots step writes every view with numbered:true', async () => {
     class MultiViewConnector extends FakeConnector {
       override takeScreenshots() {
         return Promise.resolve({
@@ -225,7 +251,7 @@ describe('runScript', () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'fcc-shot-'));
     const out = path.join(dir, 'shot.png');
     const s = Script.parse({
-      steps: [{ action: 'screenshot', output: out, numbered: true }],
+      steps: [{ action: 'take-screenshots', output: out, numbered: true }],
     });
     const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
     expect(r[0]?.ok).toBe(true);
@@ -233,7 +259,7 @@ describe('runScript', () => {
     expect(files).toEqual(['shot_0.png', 'shot_1.png']);
   });
 
-  it('screenshot step defaults to raw path for index 0 + _N for the rest', async () => {
+  it('take-screenshots step defaults to raw path for index 0 + _N for the rest', async () => {
     class MultiViewConnector extends FakeConnector {
       override takeScreenshots() {
         return Promise.resolve({
@@ -249,7 +275,7 @@ describe('runScript', () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'fcc-shot-'));
     const out = path.join(dir, 'shot.png');
     const s = Script.parse({
-      steps: [{ action: 'screenshot', output: out }],
+      steps: [{ action: 'take-screenshots', output: out }],
     });
     const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
     expect(r[0]?.ok).toBe(true);

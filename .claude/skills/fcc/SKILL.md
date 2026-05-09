@@ -1,109 +1,123 @@
 ---
 name: fcc
-description: 使用 flutter_copilot_cli (fcc) 命令行工具连接并驱动运行中的 Flutter 应用：自动发现 URI、手势交互、截图、日志、热重载、YAML 脚本回放
+description: 使用 flutter_copilot_cli (fcc) 命令行工具连接并驱动一个运行中的 Flutter debug 应用：自动发现 URI、截图、元素检查、手势交互、日志、热重载、YAML 脚本回放
 ---
 
 # Flutter Copilot CLI (fcc) Skill
 
-通过 `fcc` 命令行直接驱动运行中的 debug Flutter 应用，无需 MCP 中间层。
+通过 `fcc` 命令行直接驱动运行中的 Flutter debug 应用，无需 MCP 中间层。
+
+当前 `fcc` 是单实例目标模型：每次命令只解析一个 VM Service URI，不再使用 registry / 多实例命名实例。
 
 ## When to Use
 
-- 需要从终端直接操控 Flutter 应用（点击、输入、滑动、截图等）
-- 需要检查 Flutter 应用连通性（`fcc doctor`）
-- 需要实时监听应用日志或 rebuild 事件（`fcc watch`）
-- 需要运行 YAML 脚本做自动化冒烟测试（`fcc run`）
-- 需要注册/管理多个 Flutter 应用实例
-- 需要在 Android 真机上建立 adb reverse 端口映射
+- 需要从终端直接操控 Flutter 应用：点击、输入、滑动、截图等
+- 需要检查 Flutter Copilot 扩展是否连通：`fcc doctor`
+- 需要读取当前页面可交互元素树：`fcc --json get-interactive-elements`
+- 需要读取应用日志或 rebuild 热点：`fcc get-logs` / `fcc get-rebuild-snapshot`
+- 需要触发热重载：`fcc hot-reload`
+- 需要运行 YAML 脚本做自动化冒烟测试：`fcc run`
 
 ## Prerequisites
 
-确保 `fcc` 已构建并可用：
+确认 `fcc` 可用：
 
 ```bash
-cd packages/flutter_copilot_cli && pnpm install && pnpm build
+fcc --version
+fcc help-ai
 ```
 
-可通过 `npx fcc --version` 或全局 link 后直接使用 `fcc`。
-
-## Connection Flow
-
-### URI 自动发现（优先级从高到低）
-
-1. `--uri ws://...` — 显式指定
-2. `-i <name>` — 从注册表查找已命名实例
-3. `$FLUTTER_COPILOT_URI` — 环境变量
-4. `.vm_service_uri` — 从 cwd 向上遍历查找该文件
-
-### 典型连接步骤
+本项目通常通过 `scripts/flutter_run.sh` 启动 Flutter，并自动写入项目根目录的 `.vm_service_uri`：
 
 ```bash
-# 1. 启动 Flutter 应用（会写入 .vm_service_uri）
-./scripts/flutter_run.sh -d macos
+./scripts/flutter_run.sh -d <device-id>
+```
 
-# 2. 验证连通性
+如果 `.vm_service_uri` 不存在或过期，先重新启动 Flutter debug 会话。
+
+## Target Resolution
+
+目标 URI 解析优先级从高到低：
+
+1. `--uri ws://...`：本次命令显式指定
+2. `FLUTTER_COPILOT_URI`：环境变量
+3. `.vm_service_uri`：从当前目录或父目录查找最近的 URI 文件
+
+常用检查：
+
+```bash
+test -s .vm_service_uri && cat .vm_service_uri
 fcc doctor
-
-# 3. 开始交互
-fcc elements
-fcc tap --text "Increment"
-fcc screenshot -o /tmp/shot.png
 ```
 
-### 多实例管理
+也可以显式指定：
 
 ```bash
-# 注册
-fcc register demo ws://127.0.0.1:8181/abc/ws
-fcc register staging ws://127.0.0.1:8182/def/ws
-
-# 列出所有实例
-fcc list
-
-# 针对特定实例操作
-fcc -i demo tap --key LoginBtn
-fcc -i staging screenshot -o /tmp/staging.png
-
-# 注销
-fcc unregister demo
+fcc --uri "$(cat .vm_service_uri)" doctor
 ```
+
+## Connection Commands
+
+`connect` 会校验 URI 并写入当前工作目录的 `.vm_service_uri`。
+
+以下写法均应可用：
+
+```bash
+fcc connect --uri ws://127.0.0.1:8181/abc/ws
+fcc connect --uri=ws://127.0.0.1:8181/abc/ws
+fcc --uri ws://127.0.0.1:8181/abc/ws connect
+```
+
+断开当前项目连接文件：
+
+```bash
+fcc disconnect
+```
+
+注意：`disconnect` 只删除最近的 `.vm_service_uri` 文件；CLI 没有常驻 socket。
 
 ## Commands Reference
 
 ### 连接与健康检查
 
-| 命令 | 说明 |
-|------|------|
-| `fcc doctor` | 检查连通性（自动发现或已注册实例） |
-| `fcc register <name> <uri>` | 注册命名实例 |
-| `fcc unregister <name>` | 注销实例 |
-| `fcc list` | 列出所有注册实例 |
-
-### 手势交互
-
-所有手势命令共享 **matcher 选项**：`--key`、`--text`、`--type`、`--x`/`--y`、`--focused`
-
-| 命令 | 说明 | 示例 |
-|------|------|------|
-| `fcc tap` | 点击 | `fcc tap --text "Submit"` |
-| `fcc double-tap` | 双击 | `fcc double-tap --key Avatar` |
-| `fcc long-press` | 长按 | `fcc long-press --key Card --duration 800` |
-| `fcc enter-text` | 输入文本 | `fcc enter-text --key Username --input demo` |
-| `fcc scroll-to` | 滚动至可见 | `fcc scroll-to --text "Bottom Item"` |
-| `fcc drag` | 拖拽 | `fcc drag --key Card1 --dx -100` |
-| `fcc swipe` | 滑动 | `fcc swipe --key Feed --direction up --distance 500` |
-| `fcc navigate` | 路由导航 | `fcc navigate --op push --route /settings` |
+| 命令                      | 说明                                                        |
+| ------------------------- | ----------------------------------------------------------- |
+| `fcc doctor`              | 检查解析到的目标是否可连接，并确认 Flutter Copilot 扩展可用 |
+| `fcc connect --uri <uri>` | 校验 URI 并写入 `.vm_service_uri`                           |
+| `fcc disconnect`          | 删除最近的 `.vm_service_uri`                                |
+| `fcc help-ai`             | 输出机器可读命令表面，优先以它为准                          |
 
 ### 查询与诊断
 
-| 命令 | 说明 |
-|------|------|
-| `fcc elements` | 列出当前屏幕可交互元素树 |
-| `fcc logs` | 获取应用日志缓冲区 |
-| `fcc rebuild` | 获取 widget rebuild 计数快照 |
-| `fcc screenshot -o <path>` | 截图保存为 PNG |
+| 命令                                               | 说明                     |
+| -------------------------------------------------- | ------------------------ |
+| `fcc --json get-interactive-elements`              | 输出当前屏幕可交互元素树 |
+| `fcc get-logs --limit 50`                          | 读取应用日志缓冲区       |
+| `fcc get-rebuild-snapshot --top-limit 10`          | 读取 rebuild 热点快照    |
+| `fcc take-screenshots -o /tmp/shot.png --numbered` | 截图保存为 PNG           |
 
-### 热重载
+### 手势与输入
+
+所有手势命令共享 matcher：`--key`、`--text`、`--type`、`--x/--y`、`--focused`。
+
+| 命令             | 说明       | 示例                                                 |
+| ---------------- | ---------- | ---------------------------------------------------- |
+| `fcc tap`        | 点击       | `fcc tap --text "提交"`                              |
+| `fcc double-tap` | 双击       | `fcc double-tap --key LikeButton`                    |
+| `fcc long-press` | 长按       | `fcc long-press --key ItemCard --duration 800`       |
+| `fcc enter-text` | 输入文本   | `fcc enter-text --key UsernameField --input demo`    |
+| `fcc scroll-to`  | 滚动至可见 | `fcc scroll-to --text "提交"`                        |
+| `fcc drag`       | 拖拽       | `fcc drag --key Slider --delta-x 120`                |
+| `fcc swipe`      | 滑动       | `fcc swipe --key Feed --direction up --distance 500` |
+| `fcc navigate`   | 路由导航   | `fcc navigate --action push --route /settings`       |
+
+坐标点击示例：
+
+```bash
+fcc tap --x 200 --y 205
+```
+
+### 生命周期
 
 ```bash
 fcc hot-reload
@@ -112,77 +126,81 @@ fcc hot-reload
 ### 实时监听
 
 ```bash
-# 监听日志 + rebuild，支持 --watch-uri 自动重连
-fcc --watch-uri watch --logs --rebuilds
+fcc --json watch --logs --rebuilds --interval 500
+fcc --watch-uri repl
 ```
+
+`--watch-uri` 仅用于 `watch` / `repl`，用于 `.vm_service_uri` 变化时自动重连。
 
 ### YAML 脚本回放
 
 ```bash
-fcc run smoke.yaml
+fcc --json run smoke.yaml
 ```
 
-### REPL 交互模式
+示例：
 
-```bash
-fcc repl
-fcc -i demo repl
-fcc --watch-uri repl   # URI 变化时自动重连
+```yaml
+name: smoke
+stopOnFailure: true
+steps:
+  - action: tap
+    text: "订单记录"
+  - action: wait
+    ms: 300
+  - action: take-screenshots
+    output: /tmp/order-record.png
+  - action: assert-element
+    text: "订单记录"
+    exists: true
 ```
 
-### ADB 端口映射（Android 真机）
+## Widget Matcher
 
-```bash
-fcc adb-reverse 8181        # 建立映射
-fcc adb-reverse-remove 8181 # 移除映射
-```
+定位优先级建议：
 
-### AI 辅助
+1. `--key <k>`：`ValueKey<String>`，最稳定
+2. `--text <t>`：可见文本
+3. `--type <n>`：Widget 类型名
+4. `--x <n> --y <n>`：逻辑像素坐标
+5. `--focused`：当前焦点元素
 
-```bash
-fcc help-ai   # 输出机器可读的命令表面，供 AI agent 消费
-```
+目标元素难以定位时，优先在 Flutter 代码里添加稳定 `ValueKey<String>`。
 
-## Global Options
+## Practical Workflow
 
-| 选项 | 说明 |
-|------|------|
-| `--uri <uri>` | 显式指定 VM Service URI |
-| `-i, --instance <name>` | 使用已注册实例名 |
-| `--no-auto-uri` | 禁用自动 URI 发现 |
-| `--watch-uri` | URI 文件变化时自动重连 |
-| `--timeout <sec>` | 连接超时秒数（默认 5） |
-| `--json` | JSON 输出模式（可 pipe 给 jq） |
+1. 先确认连接：
 
-## Widget Matcher 说明
+   ```bash
+   fcc doctor
+   ```
 
-matcher 是定位目标元素的核心机制，按可靠度排序：
+2. 读取元素树：
 
-1. **`--key <k>`** — `ValueKey<String>`，最可靠
-2. **`--text <t>`** — 可见文本匹配
-3. **`--type <n>`** — widget 类型名（如 `ElevatedButton`）
-4. **`--x <n> --y <n>`** — 逻辑像素坐标
-5. **`--focused`** — 当前焦点元素
+   ```bash
+   fcc --json get-interactive-elements
+   ```
 
-如果目标元素难以定位，推荐在 Flutter 代码中添加 `ValueKey<String>` 作为稳定锚点。
+3. 截图：
+
+   ```bash
+   fcc take-screenshots -o /tmp/youfi.png --numbered
+   ```
+
+4. 交互后再次截图或读取元素：
+
+   ```bash
+   fcc tap --text "详情"
+   fcc take-screenshots -o /tmp/youfi-detail.png --numbered
+   ```
 
 ## Troubleshooting
 
-- **doctor 报连接失败**：确认 Flutter 应用正在运行且 `.vm_service_uri` 文件存在且非空
-- **URI 过期**：应用重启后 URI 会变，重新读取或使用 `--watch-uri`
-- **Android 真机连不上**：先执行 `fcc adb-reverse <port>`
-- **enter-text 无效**：确认目标是 TextField 且 matcher 正确定位到了输入框
-- **rebuild 为空**：需要 Flutter 侧开启 `FlutterCopilotConfiguration(enableGlobalRebuildHook: true)`，且不支持 Web
+- **`No VM Service URI`**：确认 `.vm_service_uri` 存在且非空，或使用 `--uri` 显式指定。
+- **`ECONNREFUSED`**：URI 对应的 Flutter debug 会话已退出，重新启动 App 获取新 URI。
+- **`EPERM 127.0.0.1`**：当前执行环境不允许连接本机 VM Service，需要在允许本机 socket 的环境执行。
+- **`doctor` 成功但元素为空**：确认 App 侧已集成并注册 `flutter_copilot_claw` 扩展。
+- **`enter-text` 无效**：确认目标是 TextField，并且 matcher 命中了正确输入框。
+- **`get-rebuild-snapshot` 为空**：Flutter 侧需要启用 `FlutterCopilotConfiguration(enableGlobalRebuildHook: true)`；Web 平台不支持该 hook。
 
-## Key Files
-
-- `packages/flutter_copilot_cli/src/index.ts` — CLI 入口与命令注册
-- `packages/flutter_copilot_cli/src/vm/connector.ts` — VM Service 连接器
-- `packages/flutter_copilot_cli/src/vm/discover.ts` — isolate 发现逻辑
-- `packages/flutter_copilot_cli/src/registry/auto_uri.ts` — URI 自动发现
-- `packages/flutter_copilot_cli/src/registry/instance_registry.ts` — 多实例注册表
-- `packages/flutter_copilot_cli/src/commands/gestures.ts` — 手势命令
-- `packages/flutter_copilot_cli/src/commands/misc.ts` — 截图/日志/热重载等
-- `packages/flutter_copilot_cli/src/commands/watch.ts` — 实时监听
-- `packages/flutter_copilot_cli/src/commands/run.ts` — YAML 脚本执行
-- `packages/flutter_copilot_cli/src/commands/repl.ts` — REPL 模式
+始终优先以当前环境的 `fcc help-ai` 输出为准。

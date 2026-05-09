@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import type { FlutterCopilotConnector, Matcher } from '../vm/connector.js';
 import type { ScriptT, StepT } from './schema.js';
 import { resolveShotPath } from '../screenshot_path.js';
+import { getOutputMode } from '../logging.js';
 
 export interface StepResult {
   index: number;
@@ -47,7 +48,8 @@ export async function runScript(
     }
     const dur = Date.now() - t0;
     results.push({ index: i, step, ok, attempts: used, durationMs: dur, error: lastError?.message });
-    process.stdout.write(
+    const progress = getOutputMode() === 'json' ? process.stderr : process.stdout;
+    progress.write(
       ok
         ? `${chalk.green('✓')} [${i + 1}/${script.steps.length}] ${label} (${dur}ms, ${used}x)\n`
         : `${chalk.red('✗')} [${i + 1}/${script.steps.length}] ${label} (${dur}ms): ${lastError?.message}\n`,
@@ -87,8 +89,8 @@ async function executeStep(c: FlutterCopilotConnector, step: StepT): Promise<voi
         toX?: number;
         toY?: number;
       } = {};
-      if (step.dx !== undefined) opts.deltaX = step.dx;
-      if (step.dy !== undefined) opts.deltaY = step.dy;
+      if (step.deltaX !== undefined) opts.deltaX = step.deltaX;
+      if (step.deltaY !== undefined) opts.deltaY = step.deltaY;
       if (step.fromX !== undefined) opts.fromX = step.fromX;
       if (step.fromY !== undefined) opts.fromY = step.fromY;
       if (step.toX !== undefined) opts.toX = step.toX;
@@ -104,7 +106,7 @@ async function executeStep(c: FlutterCopilotConnector, step: StepT): Promise<voi
       if (!ok) throw new Error('hot reload reported failure');
       return;
     }
-    case 'screenshot': {
+    case 'take-screenshots': {
       const r = await c.takeScreenshots();
       const shots = r.screenshots ?? [];
       if (shots.length === 0) throw new Error('no screenshots captured');

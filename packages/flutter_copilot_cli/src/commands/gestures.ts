@@ -1,5 +1,4 @@
 import { Command, Option } from 'commander';
-import { InstanceRegistry } from '../registry/instance_registry.js';
 import { withConnector } from './base.js';
 import { buildMatcher, isMatcherEmpty, type MatcherArgs } from '../matcher.js';
 import * as log from '../logging.js';
@@ -22,7 +21,7 @@ function requireMatcher(opts: MatcherArgs): ReturnType<typeof buildMatcher> {
   return m;
 }
 
-export function gestureCommands(program: Command, registry: InstanceRegistry): void {
+export function gestureCommands(program: Command): void {
   // tap
   const tap = attachMatcherOptions(
     program
@@ -30,7 +29,7 @@ export function gestureCommands(program: Command, registry: InstanceRegistry): v
       .description('Tap an element by key, text, type, or coordinates.'),
   ).action(async (opts: MatcherArgs) => {
     const m = requireMatcher(opts);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.tap(m);
       log.ok(String(r['message'] ?? 'tapped'), { result: r });
     });
@@ -53,7 +52,7 @@ Examples:
       .description('Double-tap an element.'),
   ).action(async (opts: MatcherArgs) => {
     const m = requireMatcher(opts);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.doubleTap(m);
       log.ok(String(r['message'] ?? 'double tapped'), { result: r });
     });
@@ -68,7 +67,7 @@ Examples:
   ).action(async (opts: MatcherArgs & { duration: string }) => {
     const m = requireMatcher(opts);
     const dur = Number(opts.duration);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.longPress(m, dur);
       log.ok(String(r['message'] ?? 'long pressed'), { result: r });
     });
@@ -82,7 +81,7 @@ Examples:
       .requiredOption('--input <text>', 'Text to enter.'),
   ).action(async (opts: MatcherArgs & { input: string }) => {
     const m = requireMatcher(opts);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.enterText(m, opts.input);
       log.ok(String(r['message'] ?? 'entered text'), { result: r });
     });
@@ -105,7 +104,7 @@ The target TextField gains focus, then receives the characters one by one.
       .description('Scroll until an element is visible.'),
   ).action(async (opts: MatcherArgs) => {
     const m = requireMatcher(opts);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.scrollTo(m);
       log.ok(String(r['message'] ?? 'scrolled'), { result: r });
     });
@@ -116,8 +115,8 @@ The target TextField gains focus, then receives the characters one by one.
     program
       .command('drag')
       .description('Drag an element by delta, or from/to absolute coordinates.')
-      .option('--dx <n>', 'Delta X', '0')
-      .option('--dy <n>', 'Delta Y', '0')
+      .option('--delta-x <n>', 'Delta X', '0')
+      .option('--delta-y <n>', 'Delta Y', '0')
       .option('--from-x <n>', 'From X (absolute)')
       .option('--from-y <n>', 'From Y (absolute)')
       .option('--to-x <n>', 'To X (absolute)')
@@ -125,8 +124,8 @@ The target TextField gains focus, then receives the characters one by one.
   ).action(
     async (
       opts: MatcherArgs & {
-        dx: string;
-        dy: string;
+        deltaX: string;
+        deltaY: string;
         fromX?: string;
         fromY?: string;
         toX?: string;
@@ -144,10 +143,10 @@ The target TextField gains focus, then receives the characters one by one.
           'Provide a matcher (--key/--text/--type/--x/--y) or all four of --from-x/--from-y/--to-x/--to-y.',
         );
       }
-      await withConnector(program, registry, async (c) => {
+      await withConnector(program, async (c) => {
         const r = await c.drag(m, {
-          deltaX: Number(opts.dx),
-          deltaY: Number(opts.dy),
+          deltaX: Number(opts.deltaX),
+          deltaY: Number(opts.deltaY),
           ...(opts.fromX !== undefined ? { fromX: Number(opts.fromX) } : {}),
           ...(opts.fromY !== undefined ? { fromY: Number(opts.fromY) } : {}),
           ...(opts.toX !== undefined ? { toX: Number(opts.toX) } : {}),
@@ -162,7 +161,7 @@ The target TextField gains focus, then receives the characters one by one.
     `
 Examples:
   # Drag an element by 100px left
-  fcc drag --key Card1 --dx -100
+  fcc drag --key Card1 --delta-x -100
 
   # Free drag between two absolute points (no matcher needed)
   fcc drag --from-x 50 --from-y 400 --to-x 300 --to-y 400
@@ -182,7 +181,7 @@ Examples:
       .option('--distance <n>', 'Swipe distance in pixels.', '200'),
   ).action(async (opts: MatcherArgs & { direction: 'up' | 'down' | 'left' | 'right'; distance: string }) => {
     const m = requireMatcher(opts);
-    await withConnector(program, registry, async (c) => {
+    await withConnector(program, async (c) => {
       const r = await c.swipe(m, opts.direction, Number(opts.distance));
       log.ok(String(r['message'] ?? 'swiped'), { result: r });
     });
@@ -200,23 +199,23 @@ Examples:
     .command('navigate')
     .description('Drive the app Navigator (push / pop / replace / pushReplacement / popUntil).')
     .addOption(
-      new Option('--op <op>', 'Navigator operation.')
+      new Option('--action <action>', 'Navigator operation.')
         .choices(['push', 'pop', 'replace', 'pushReplacement', 'popUntil'])
         .makeOptionMandatory(),
     )
     .option('--route <name>', 'Route name (required for push/replace/pushReplacement/popUntil).')
-    .option('--args <json>', 'Route arguments as JSON object.')
-    .action(async (opts: { op: 'push' | 'pop' | 'replace' | 'pushReplacement' | 'popUntil'; route?: string; args?: string }) => {
+    .option('--arguments <json>', 'Route arguments as JSON object.')
+    .action(async (opts: { action: 'push' | 'pop' | 'replace' | 'pushReplacement' | 'popUntil'; route?: string; arguments?: string }) => {
       let args: Record<string, unknown> | undefined;
-      if (opts.args) {
+      if (opts.arguments) {
         try {
-          args = JSON.parse(opts.args) as Record<string, unknown>;
+          args = JSON.parse(opts.arguments) as Record<string, unknown>;
         } catch (e) {
-          throw new Error(`Invalid --args JSON: ${(e as Error).message}`);
+          throw new Error(`Invalid --arguments JSON: ${(e as Error).message}`);
         }
       }
-      await withConnector(program, registry, async (c) => {
-        const r = await c.navigate(opts.op, opts.route, args);
+      await withConnector(program, async (c) => {
+        const r = await c.navigate(opts.action, opts.route, args);
         log.ok(String(r['message'] ?? 'navigated'), { result: r });
       });
     });
@@ -224,12 +223,12 @@ Examples:
     'after',
     `
 Examples:
-  fcc navigate --op push --route /settings
-  fcc navigate --op push --route /detail --args '{"id":42}'
-  fcc navigate --op replace --route /home
-  fcc navigate --op pushReplacement --route /onboarding
-  fcc navigate --op pop
-  fcc navigate --op popUntil --route /
+  fcc navigate --action push --route /settings
+  fcc navigate --action push --route /detail --arguments '{"id":42}'
+  fcc navigate --action replace --route /home
+  fcc navigate --action pushReplacement --route /onboarding
+  fcc navigate --action pop
+  fcc navigate --action popUntil --route /
 `,
   );
 }

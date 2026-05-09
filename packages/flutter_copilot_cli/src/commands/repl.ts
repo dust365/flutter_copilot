@@ -3,7 +3,6 @@ import readline from 'node:readline';
 import chalk from 'chalk';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { InstanceRegistry } from '../registry/instance_registry.js';
 import { withConnector, reconnectWithBackoff } from './base.js';
 import { UriFileWatcher } from '../vm/uri_watcher.js';
 import { buildMatcher, type MatcherArgs } from '../matcher.js';
@@ -17,19 +16,19 @@ import type { FlutterCopilotConnector } from '../vm/connector.js';
  * Example:
  *   > tap key=LoginBtn
  *   > enter-text key=UsernameField input="demo user"
- *   > screenshot output=/tmp/s.png
+ *   > take-screenshots output=/tmp/s.png
  *   > reload
- *   > elements
- *   > logs 20
+ *   > get-interactive-elements
+ *   > get-logs 20
  *   > help
  *   > exit
  */
-export function replCommand(program: Command, registry: InstanceRegistry): void {
+export function replCommand(program: Command): void {
   program
     .command('repl')
     .description('Interactive shell for driving the app (multi-command session).')
     .action(async () => {
-      await withConnector(program, registry, async (connector, target) => {
+      await withConnector(program, async (connector, target) => {
         const rl = readline.createInterface({
           input: process.stdin,
           output: process.stdout,
@@ -47,7 +46,7 @@ export function replCommand(program: Command, registry: InstanceRegistry): void 
           if (!target.autoUriPath) {
             process.stderr.write(
               chalk.yellow(
-                '! --watch-uri requires URI auto-detection; ignored because --uri / -i was used.\n',
+                '! --watch-uri requires URI auto-detection; ignored because --uri was used.\n',
               ),
             );
           } else {
@@ -113,15 +112,15 @@ Examples (at the fc> prompt):
   tap text="Increment"
   enter-text key=UsernameField input="demo user"
   swipe key=Feed direction=up distance=400
-  navigate op=push route=/settings
-  screenshot output=/tmp/s.png
+  navigate action=push route=/settings
+  take-screenshots output=/tmp/s.png
   reload
-  elements
-  logs 20
+  get-interactive-elements
+  get-logs 20
   help
 
 Aliases: dtap (double-tap), lpress (long-press), text (enter-text),
-scroll (scroll-to), nav (navigate), shot (screenshot), ls (elements).
+scroll (scroll-to), nav (navigate), shot (take-screenshots), ls (get-interactive-elements).
 
 Combine with \`--watch-uri\` to transparently reconnect across \`flutter run\`
 restarts without leaving the session.
@@ -162,13 +161,13 @@ async function runReplCommand(line: string, c: FlutterCopilotConnector): Promise
       ok(await c.swipe(buildMatcher(args as MatcherArgs), dir, dist));
       break;
     }
-    case 'elements':
+    case 'get-interactive-elements':
     case 'ls': {
       const r = await c.getInteractiveElements();
       process.stdout.write(JSON.stringify(r['elements'] ?? r, null, 2) + '\n');
       break;
     }
-    case 'logs': {
+    case 'get-logs': {
       const limit = rest[0] ? Number(rest[0]) : 20;
       const r = await c.getLogs();
       const entries = Array.isArray(r.logs) ? r.logs : [];
@@ -178,7 +177,7 @@ async function runReplCommand(line: string, c: FlutterCopilotConnector): Promise
       }
       break;
     }
-    case 'rebuild': {
+    case 'get-rebuild-snapshot': {
       const r = await c.getRebuildSnapshot(10);
       process.stdout.write(JSON.stringify(r, null, 2) + '\n');
       break;
@@ -189,7 +188,7 @@ async function runReplCommand(line: string, c: FlutterCopilotConnector): Promise
       process.stdout.write(s ? chalk.green('✓ reloaded\n') : chalk.red('✗ reload failed\n'));
       break;
     }
-    case 'screenshot':
+    case 'take-screenshots':
     case 'shot': {
       const out = String(args['output'] ?? args['o'] ?? `fc-${Date.now()}.png`);
       const forceNumbered = args['numbered'] === true || args['numbered'] === 'true';
@@ -208,14 +207,18 @@ async function runReplCommand(line: string, c: FlutterCopilotConnector): Promise
     }
     case 'navigate':
     case 'nav': {
-      const act = String(args['op'] ?? args['action'] ?? 'push') as
+      const act = String(args['action'] ?? 'push') as
         | 'push'
         | 'pop'
         | 'replace'
         | 'pushReplacement'
         | 'popUntil';
       const route = args['route'] ? String(args['route']) : undefined;
-      ok(await c.navigate(act, route));
+      const parsedArgs =
+        typeof args['arguments'] === 'string'
+          ? JSON.parse(args['arguments']) as Record<string, unknown>
+          : undefined;
+      ok(await c.navigate(act, route, parsedArgs));
       break;
     }
     default:
@@ -237,12 +240,12 @@ function printHelp(): void {
     '  enter-text <matcher> input="..."    (alias: text)',
     '  scroll-to <matcher>                 (alias: scroll)',
     '  swipe <matcher> direction=up|down|left|right distance=<px>',
-    '  navigate op=push|pop|replace|pushReplacement|popUntil route=<name>   (alias: nav)',
-    '  elements                            (alias: ls)',
-    '  logs [N]',
-    '  rebuild',
+    '  navigate action=push|pop|replace|pushReplacement|popUntil route=<name> arguments=<json>   (alias: nav)',
+    '  get-interactive-elements            (alias: ls)',
+    '  get-logs [N]',
+    '  get-rebuild-snapshot',
     '  hot-reload                          (alias: reload)',
-    '  screenshot output=<path>            (alias: shot)',
+    '  take-screenshots output=<path>      (alias: shot)',
     '  help | exit',
     '',
     'matcher keys: key, text, type, x, y, focused',

@@ -289,12 +289,11 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 | 能力                                          | `flutter_copilot_mcp` | `flutter_copilot_cli`         |
 | --------------------------------------------- | :-------------------: | ----------------------------- |
 | tap / drag / scroll / navigate / 日志 / 截图 |          ✅           | ✅                            |
-| 多 App 实例注册表                             |          ❌           | ✅ `register` / `list` / `doctor` |
+| 当前 App 连接管理                             |      `connect` 工具   | ✅ `.vm_service_uri` / `connect` |
 | 交互式 REPL                                   |          ❌           | ✅ `repl`                     |
 | 日志 / Rebuild 实时流                         |          ❌           | ✅ `watch --logs --rebuilds`  |
 | YAML playbook(CI/冒烟测试)                    |          ❌           | ✅ `run script.yaml`          |
 | 面向 AI 的自描述                              |      经由 MCP         | ✅ `help-ai`(JSON)            |
-| ADB reverse 辅助                              |          ❌           | ✅ `adb-reverse <port>`       |
 
 ### 安装
 
@@ -329,34 +328,34 @@ void main() {
 CLI 按如下顺序解析 VM Service URI,通常无需手动传入：
 
 1. `--uri <ws://...>` — 显式指定
-2. `-i <name>` — 从 instance registry 中读取
-3. `FLUTTER_COPILOT_URI` 环境变量
-4. 当前目录或任一祖先目录下的 `.vm_service_uri` 文件
+2. `FLUTTER_COPILOT_URI` 环境变量
+3. 当前目录或任一祖先目录下的 `.vm_service_uri` 文件
 
 推荐配合仓库内的 `scripts/flutter_run.sh` 使用,它会把 URI 写入 `.vm_service_uri`:
 
 ```bash
 ./scripts/flutter_run.sh -d macos       # 启动 App,自动写入 .vm_service_uri
 fcc doctor                              # 自动读取 URI 进行健康检查
-fcc elements                            # 列出当前可交互元素
+fcc --uri "$(cat .vm_service_uri)" doctor # 只检查显式传入的 URI
+fcc get-interactive-elements            # 列出当前可交互元素
 fcc tap --text "Increment"              # 按文本点击
-fcc screenshot -o /tmp/shot.png         # 截图
-fcc reload                              # 热重载
+fcc take-screenshots -o /tmp/shot.png   # 截图
+fcc hot-reload                          # 热重载
 ```
 
-或者手动注册实例后按名字调用：
+或者手动保存当前项目连接：
 
 ```bash
-fcc register demo ws://127.0.0.1:8181/abc/ws
-fcc -i demo tap --text "Increment"
-fcc -i demo enter-text --key UsernameField --input "demo user"
+fcc connect --uri ws://127.0.0.1:8181/abc/ws
+fcc tap --text "Increment"
+fcc enter-text --key UsernameField --input "demo user"
 ```
 
 ### 实时流与自动重连
 
 ```bash
 # 同时订阅日志与 rebuild 事件
-fcc -i demo watch --logs --rebuilds --interval 500
+fcc watch --logs --rebuilds --interval 500
 
 # 配合 --watch-uri 可在 flutter 重启后自动重连
 fcc --watch-uri watch --rebuilds
@@ -376,32 +375,23 @@ steps:
     input: demo
   - action: wait
     ms: 300
-  - action: screenshot
+  - action: take-screenshots
     output: /tmp/after-login.png
   - action: assert-element
     text: Welcome
 ```
 
 ```bash
-fcc -i demo run smoke.yaml
+fcc run smoke.yaml
 ```
 
 每个步骤可附带 `retry: { attempts, delay }` 做自动重试。
-
-### Android 真机桥接
-
-当 App 跑在 Android 设备、VM Service 却绑在宿主 loopback 上时:
-
-```bash
-fcc adb-reverse 8181               # 建立端口转发
-fcc adb-reverse 8181 --remove      # 用完清理
-```
 
 ### 给 AI Agent 使用
 
 ```bash
 fcc help-ai                        # 输出完整命令表与脚本 schema 的 JSON
-fcc --json -i demo elements        # 所有命令都支持 --json,便于管道消费
+fcc --json get-interactive-elements # 所有命令都支持 --json,便于管道消费
 ```
 
 更多命令、参数与示例参见 [packages/flutter_copilot_cli/README.md](packages/flutter_copilot_cli/README.md)。

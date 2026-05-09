@@ -1,13 +1,12 @@
 import { Command } from 'commander';
 import { promises as fs } from 'node:fs';
 import YAML from 'yaml';
-import { InstanceRegistry } from '../registry/instance_registry.js';
 import { withConnector } from './base.js';
 import { Script } from '../script/schema.js';
 import { runScript } from '../script/runner.js';
 import * as log from '../logging.js';
 
-export function runCommand(program: Command, registry: InstanceRegistry): void {
+export function runCommand(program: Command): void {
   program
     .command('run <script>')
     .description('Run a YAML playbook of actions against the target app.')
@@ -16,7 +15,7 @@ export function runCommand(program: Command, registry: InstanceRegistry): void {
       const parsed = YAML.parse(raw);
       const script = Script.parse(parsed);
 
-      await withConnector(program, registry, async (connector) => {
+      await withConnector(program, async (connector) => {
         const results = await runScript(connector, script);
         const failed = results.filter((r) => !r.ok);
         log.data({
@@ -38,7 +37,7 @@ optional \`retry: { attempts, delay }\`. Exits non-zero if any step fails when
 
 Supported actions:
   tap, double-tap, long-press, enter-text, scroll-to, swipe, drag,
-  navigate, hot-reload, screenshot, wait, assert-element
+  navigate, hot-reload, take-screenshots, wait, assert-element
 
 Minimal example (smoke.yaml):
 
@@ -52,7 +51,7 @@ Minimal example (smoke.yaml):
       input: demo
     - action: wait
       ms: 300
-    - action: screenshot
+    - action: take-screenshots
       output: /tmp/after-login.png
     - action: assert-element
       text: Welcome

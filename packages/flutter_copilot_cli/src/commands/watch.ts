@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { InstanceRegistry } from '../registry/instance_registry.js';
 import { withConnector, reconnectWithBackoff } from './base.js';
 import type { VmEvent } from '../vm/client.js';
 import { UriFileWatcher } from '../vm/uri_watcher.js';
@@ -14,7 +13,7 @@ import { getOutputMode } from '../logging.js';
  *
  * At least one source must be enabled.
  */
-export function watchCommand(program: Command, registry: InstanceRegistry): void {
+export function watchCommand(program: Command): void {
   program
     .command('watch')
     .description('Stream live logs and/or rebuild snapshots from the app until Ctrl-C.')
@@ -26,7 +25,7 @@ export function watchCommand(program: Command, registry: InstanceRegistry): void
         throw new Error('Pass at least one of --logs / --rebuilds.');
       }
 
-      await withConnector(program, registry, async (connector, target) => {
+      await withConnector(program, async (connector, target) => {
         const client = connector.client;
 
         let rebuildTimer: NodeJS.Timeout | null = null;
@@ -72,7 +71,7 @@ export function watchCommand(program: Command, registry: InstanceRegistry): void
           if (!target.autoUriPath) {
             process.stderr.write(
               chalk.yellow(
-                '! --watch-uri requires URI auto-detection; ignored because --uri / -i was used.\n',
+                '! --watch-uri requires URI auto-detection; ignored because --uri was used.\n',
               ),
             );
           } else {
@@ -112,7 +111,7 @@ Examples:
   fcc --watch-uri watch --logs --rebuilds
 
 \`--watch-uri\` is a global flag; it requires URI auto-detection (ignored when
-\`--uri\` or \`-i\` is passed).
+\`--uri\` is passed).
 `,
     );
 }

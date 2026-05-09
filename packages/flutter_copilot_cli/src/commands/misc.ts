@@ -1,18 +1,17 @@
 import { Command } from 'commander';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { InstanceRegistry } from '../registry/instance_registry.js';
 import { withConnector } from './base.js';
 import { resolveShotPath } from '../screenshot_path.js';
 import * as log from '../logging.js';
 
-export function miscCommands(program: Command, registry: InstanceRegistry): void {
-  // elements
+export function miscCommands(program: Command): void {
+  // get-interactive-elements
   program
-    .command('elements')
+    .command('get-interactive-elements')
     .description('List the tree of interactive elements currently on screen.')
     .action(async () => {
-      await withConnector(program, registry, async (c) => {
+      await withConnector(program, async (c) => {
         const r = await c.getInteractiveElements();
         log.data(r, () => {
           process.stdout.write(JSON.stringify(r['elements'] ?? r, null, 2) + '\n');
@@ -24,7 +23,7 @@ export function miscCommands(program: Command, registry: InstanceRegistry): void
       `
 Emits a JSON tree with each node's type, key, visible text, and bounds.
 Pipe to jq to filter:
-  fcc --json elements | jq '.elements'
+  fcc --json get-interactive-elements | jq '.elements'
 `,
     );
 
@@ -33,7 +32,7 @@ Pipe to jq to filter:
     .command('hot-reload')
     .description('Trigger a Flutter hot reload on the connected app.')
     .action(async () => {
-      await withConnector(program, registry, async (c) => {
+      await withConnector(program, async (c) => {
         const success = await c.hotReload();
         if (success) {
           log.ok('hot reload succeeded', { success: true });
@@ -52,13 +51,13 @@ Exits 1 on failure.
 `,
     );
 
-  // logs
+  // get-logs
   program
-    .command('logs')
+    .command('get-logs')
     .description('Fetch the in-app log buffer captured by flutter_copilot_claw.')
     .option('--limit <n>', 'Only print the last N entries.')
     .action(async (opts: { limit?: string }) => {
-      await withConnector(program, registry, async (c) => {
+      await withConnector(program, async (c) => {
         const r = await c.getLogs();
         const entries = Array.isArray(r.logs) ? r.logs : [];
         const limit = opts.limit ? Math.max(0, Number(opts.limit)) : entries.length;
@@ -81,14 +80,14 @@ the shared log buffer. For a live feed use \`watch --logs\` instead.
 `,
     );
 
-  // rebuild
+  // get-rebuild-snapshot
   program
-    .command('rebuild')
+    .command('get-rebuild-snapshot')
     .description('Snapshot per-widget rebuild counters (requires enableGlobalRebuildHook).')
-    .option('--top <n>', 'Top N rebuild counts.', '20')
-    .action(async (opts: { top: string }) => {
-      await withConnector(program, registry, async (c) => {
-        const r = await c.getRebuildSnapshot(Number(opts.top));
+    .option('--top-limit <n>', 'Top N rebuild counts.', '20')
+    .action(async (opts: { topLimit: string }) => {
+      await withConnector(program, async (c) => {
+        const r = await c.getRebuildSnapshot(Number(opts.topLimit));
         log.data(r);
       });
     })
@@ -101,9 +100,9 @@ Note: unsupported on Flutter Web (the custom BuildOwner hook is not installed).
 `,
     );
 
-  // screenshot
+  // take-screenshots
   program
-    .command('screenshot')
+    .command('take-screenshots')
     .description('Take a PNG screenshot of all views (one file per view).')
     .requiredOption(
       '-o, --output <path>',
@@ -114,7 +113,7 @@ Note: unsupported on Flutter Web (the custom BuildOwner hook is not installed).
       'Always append _0/_1/... — every file is numbered, including when there is only one view. Prevents overwriting on reruns.',
     )
     .action(async (opts: { output: string; numbered?: boolean }) => {
-      await withConnector(program, registry, async (c) => {
+      await withConnector(program, async (c) => {
         const r = await c.takeScreenshots();
         const shots = r.screenshots ?? [];
         if (shots.length === 0) {
@@ -138,13 +137,13 @@ Note: unsupported on Flutter Web (the custom BuildOwner hook is not installed).
       'after',
       `
 Examples:
-  fcc screenshot -o /tmp/shot.png
+  fcc take-screenshots -o /tmp/shot.png
   # Single view → /tmp/shot.png
   # Multiple views → /tmp/shot.png, /tmp/shot_1.png, /tmp/shot_2.png, ...
   # (Note: with only one view today and multiple tomorrow, /tmp/shot.png gets
   #  overwritten on rerun — use --numbered to always suffix.)
 
-  fcc screenshot -o /tmp/shot.png --numbered
+  fcc take-screenshots -o /tmp/shot.png --numbered
   # Always numbered → /tmp/shot_0.png, /tmp/shot_1.png, ...
 `,
     );

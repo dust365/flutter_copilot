@@ -12,5 +12,5 @@ steps:
     retry:
       attempts: 3
       delay: 200
-  - action: screenshot
+  - action: take-screenshots
     output: /tmp/fc-smoke.png

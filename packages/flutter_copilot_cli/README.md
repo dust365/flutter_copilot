@@ -14,52 +14,51 @@ Think of it as an alternative to `flutter_copilot_mcp` that is designed for
 
 ## Command reference
 
-All commands accept the global flags `-i <instance>` / `--uri <ws://...>` for
-target resolution, plus `--json` to emit machine-readable output. Run
+All app-driving commands accept the global flag `--uri <ws://...>` for explicit
+targeting, plus `--json` to emit machine-readable output. If `--uri` is omitted,
+the CLI uses `FLUTTER_COPILOT_URI` or the nearest `.vm_service_uri`. Run
 `fcc <command> --help` for per-command details, or `fcc help-ai` for the full
 machine-readable surface.
 
 ### Target & session
 
-| Command                  | Description                                                            |
-| ------------------------ | ---------------------------------------------------------------------- |
-| `doctor`                 | Probe the resolved VM Service URI and the Copilot extensions.          |
-| `register <name> <uri>`  | Register a VM Service URI under a short name.                          |
-| `unregister <name>`      | Remove a registered instance.                                          |
-| `list`                   | List all registered instances.                                         |
-| `repl`                   | Open an interactive shell; supports `--watch-uri` auto-reconnect.      |
-| `adb-reverse <port>`     | `adb reverse tcp:<port> tcp:<port>`; `--remove` to undo.               |
+| Command               | Description                                                       |
+| --------------------- | ----------------------------------------------------------------- |
+| `connect --uri <uri>` | Validate a VM Service URI and save it to `.vm_service_uri`.       |
+| `disconnect`          | Remove the current `.vm_service_uri`.                             |
+| `doctor`              | Probe the current VM Service URI and the Copilot extensions.      |
+| `repl`                | Open an interactive shell; supports `--watch-uri` auto-reconnect. |
 
 ### Inspect & capture
 
-| Command        | Description                                                                   |
-| -------------- | ----------------------------------------------------------------------------- |
-| `elements`     | List the interactive element tree on the current screen.                      |
-| `logs`         | Dump logs captured since the app started (requires `captureLogs` wrapper).    |
-| `rebuild`      | Fetch the latest rebuild snapshot / hot-spot analysis.                        |
-| `screenshot`   | Take a screenshot of each live view (`-o <path>` to save; `--numbered` to always suffix `_N`). |
-| `watch`        | Stream logs / rebuild events; `--logs --rebuilds --interval <ms>`.            |
+| Command                    | Description                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `get-interactive-elements` | List the interactive element tree on the current screen.                    |
+| `get-logs`                 | Dump logs captured since the app started (requires `captureLogs` wrapper).  |
+| `get-rebuild-snapshot`     | Fetch the latest rebuild snapshot / hot-spot analysis.                      |
+| `take-screenshots`         | Take screenshots (`-o <path>` to save; `--numbered` to always suffix `_N`). |
+| `watch`                    | Stream logs / rebuild events; `--logs --rebuilds --interval <ms>`.          |
 
 ### Gestures & input
 
-| Command       | Description                                                                    |
-| ------------- | ------------------------------------------------------------------------------ |
-| `tap`         | Tap by `--key` / `--text` / `--type` / `--x --y` / `--focused`.                |
-| `double-tap`  | Double-tap using the same matchers as `tap`.                                   |
-| `long-press`  | Long-press using the same matchers; `--duration <ms>` is optional.             |
-| `enter-text`  | Focus a field and enter text. `--input <string>` is required.                  |
-| `scroll-to`   | Scroll until a matcher becomes visible.                                        |
-| `drag`        | Drag by `--dx --dy` from a matcher, or `--from-x/--from-y/--to-x/--to-y`.      |
-| `swipe`       | Swipe `--direction <up/down/left/right>` with `--distance`.                    |
-| `navigate`    | Route control: `--op push/pop/replace/pushReplacement/popUntil` with `--route` / `--args`.     |
+| Command      | Description                                                                                         |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| `tap`        | Tap by `--key` / `--text` / `--type` / `--x --y` / `--focused`.                                     |
+| `double-tap` | Double-tap using the same matchers as `tap`.                                                        |
+| `long-press` | Long-press using the same matchers; `--duration <ms>` is optional.                                  |
+| `enter-text` | Focus a field and enter text. `--input <string>` is required.                                       |
+| `scroll-to`  | Scroll until a matcher becomes visible.                                                             |
+| `drag`       | Drag by `--delta-x --delta-y` from a matcher, or `--from-x/--from-y/--to-x/--to-y`.                 |
+| `swipe`      | Swipe `--direction <up/down/left/right>` with `--distance`.                                         |
+| `navigate`   | Route control: `--action push/pop/replace/pushReplacement/popUntil` with `--route` / `--arguments`. |
 
 ### App lifecycle & automation
 
-| Command         | Description                                                                  |
-| --------------- | ---------------------------------------------------------------------------- |
-| `hot-reload`    | Trigger a Flutter hot reload.                                                |
-| `run <script>`  | Execute a YAML playbook; each step may carry `retry: { attempts, delay }`.   |
-| `help-ai`       | Print the entire command surface + script schema as JSON, for AI agents.     |
+| Command        | Description                                                                |
+| -------------- | -------------------------------------------------------------------------- |
+| `hot-reload`   | Trigger a Flutter hot reload.                                              |
+| `run <script>` | Execute a YAML playbook; each step may carry `retry: { attempts, delay }`. |
+| `help-ai`      | Print the entire command surface + script schema as JSON, for AI agents.   |
 
 ## Install
 
@@ -165,11 +164,8 @@ void main() {
 The CLI picks a VM Service URI from the first source that matches:
 
 1. `--uri <ws://...>` — explicit
-2. `-i <name>` — from the instance registry
-3. `FLUTTER_COPILOT_URI` env var
-4. `.vm_service_uri` in the current directory or any ancestor
-
-Use `--no-auto-uri` to disable #3/#4 if needed.
+2. `FLUTTER_COPILOT_URI` env var
+3. `.vm_service_uri` in the current directory or any ancestor
 
 #### Recommended: `scripts/flutter_run.sh`
 
@@ -179,23 +175,25 @@ The repo ships a helper that wraps `flutter run` and writes the detected URI to
 ```bash
 ./scripts/flutter_run.sh -d macos          # starts the app; writes .vm_service_uri
 fcc doctor                                 # auto-picks the URI from that file
+fcc --uri "$(cat .vm_service_uri)" doctor  # probes only this explicit URI
 fcc tap --text Counter
 ```
 
-#### Alternative: manual registry
+#### Manual connection
 
 ```bash
-fcc register demo ws://127.0.0.1:8181/abc/ws
-fcc -i demo doctor
-fcc -i demo elements
-fcc -i demo tap --text "Increment"
-fcc -i demo screenshot -o /tmp/shot.png
+fcc connect --uri ws://127.0.0.1:8181/abc/ws
+fcc doctor
+fcc get-interactive-elements
+fcc tap --text "Increment"
+fcc take-screenshots -o /tmp/shot.png
+fcc disconnect
 ```
 
 ### Real-time stream
 
 ```bash
-fcc -i demo watch --logs --rebuilds --interval 500
+fcc watch --logs --rebuilds --interval 500
 ```
 
 Add `--watch-uri` to survive `flutter run` restarts — the CLI tails
@@ -207,16 +205,16 @@ fcc --watch-uri watch --rebuilds
 ```
 
 The same flag works for `repl` too. It's a no-op for one-shot commands and
-requires URI auto-detection (it refuses when `--uri` / `-i` was used).
+requires URI auto-detection (it is ignored when `--uri` was used).
 
 ### Interactive REPL
 
 ```bash
-fcc -i demo repl
-fc[demo]> tap text="Increment"
-fc[demo]> enter-text key=UsernameField input="demo user"
-fc[demo]> screenshot output=/tmp/s.png
-fc[demo]> reload
+fcc repl
+fc[auto:.vm_service_uri]> tap text="Increment"
+fc[auto:.vm_service_uri]> enter-text key=UsernameField input="demo user"
+fc[auto:.vm_service_uri]> take-screenshots output=/tmp/s.png
+fc[auto:.vm_service_uri]> hot-reload
 ```
 
 ### YAML playbook
@@ -233,35 +231,22 @@ steps:
     input: demo
   - action: wait
     ms: 300
-  - action: screenshot
+  - action: take-screenshots
     output: /tmp/after-login.png
   - action: assert-element
     text: Welcome
 ```
 
 ```bash
-fcc -i demo run smoke.yaml
+fcc run smoke.yaml
 ```
 
 Each step may carry a `retry: { attempts, delay }` block.
 
-### Android: bridge VM Service over `adb reverse`
-
-When the app runs on an Android device but the VM Service is bound to the host's
-loopback, expose it to the device with:
-
-```bash
-fcc adb-reverse 8181
-# ... later
-fcc adb-reverse 8181 --remove
-```
-
-Fails fast if `adb` is not on `PATH`.
-
 ### JSON output for scripting
 
 ```bash
-fcc --json -i demo elements | jq '.elements'
+fcc --json get-interactive-elements | jq '.elements'
 ```
 
 ### Help for AI agents
@@ -271,10 +256,3 @@ fcc help-ai
 ```
 
 Outputs the full command surface and script schema as JSON.
-
-## Roadmap (not in v1)
-
-- `record-video` — needs a screencast extension on the `flutter_copilot_claw` side.
-- `pinch-zoom`, `press-back-button` — also need claw additions.
-- Process / DDS auto-discovery of VM Service URI.
-- Embedded MCP server subcommand.

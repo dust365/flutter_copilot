@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+
+- CLI targeting is now single-current-app only. Removed instance registry commands
+  (`register`, `unregister`, `list`) and the global `-i/--instance` option.
+- Removed `adb-reverse`; use `adb reverse ...` directly for rare device-network
+  setup needs.
+- Target resolution is now `--uri` → `FLUTTER_COPILOT_URI` → nearest
+  `.vm_service_uri`.
+- Inspection command names now align with MCP tools using kebab-case:
+  `get-interactive-elements`, `get-logs`, `get-rebuild-snapshot`,
+  `take-screenshots`.
+- `navigate` now uses `--action` and `--arguments`; `drag` now uses
+  `--delta-x` / `--delta-y`.
+- YAML screenshot steps are now `action: take-screenshots`.
+
+### New features
+
+- Added `connect --uri <uri>` to validate a VM Service URI and save it as the
+  current project `.vm_service_uri`.
+- Added `disconnect` to remove the current project `.vm_service_uri`.
+
 ## 1.0.5
 
 ### Breaking

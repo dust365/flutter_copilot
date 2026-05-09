@@ -41,8 +41,8 @@ const Step = z.discriminatedUnion('action', [
   }).merge(Matcher),
   BaseStep.extend({
     action: z.literal('drag'),
-    dx: z.number().optional(),
-    dy: z.number().optional(),
+    deltaX: z.number().optional(),
+    deltaY: z.number().optional(),
     fromX: z.number().optional(),
     fromY: z.number().optional(),
     toX: z.number().optional(),
@@ -58,7 +58,7 @@ const Step = z.discriminatedUnion('action', [
     action: z.literal('hot-reload'),
   }),
   BaseStep.extend({
-    action: z.literal('screenshot'),
+    action: z.literal('take-screenshots'),
     output: z.string(),
     numbered: z.boolean().optional(),
   }),
