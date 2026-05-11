@@ -115,7 +115,7 @@ export function helpAiCommand(program: Command): void {
             mcpTool: 'tap',
             description: 'Tap a matched element or coordinate.',
             options: '<matcher>',
-            example: 'fcc tap --text "Increment"',
+            example: 'fcc tap --text "点击"',
           },
           {
             name: 'double-tap',
@@ -139,7 +139,7 @@ export function helpAiCommand(program: Command): void {
             mcpTool: 'enter_text',
             description: 'Focus a matched text field and enter text.',
             options: { matcher: true, '--input <text>': 'required' },
-            example: 'fcc enter-text --key UsernameField --input demo',
+            example: 'fcc enter-text --focused --input demo',
           },
           {
             name: 'scroll-to',
@@ -270,14 +270,14 @@ export function helpAiCommand(program: Command): void {
             'assert-element': { fields: ['matcher', 'exists?', 'retry?', 'name?'] },
           },
           example: {
-            name: 'smoke-login',
+            name: 'smoke-home',
             stopOnFailure: true,
             steps: [
-              { action: 'tap', key: 'LoginBtn' },
-              { action: 'enter-text', key: 'UsernameField', input: 'demo' },
+              { action: 'assert-element', text: 'Flutter Copilot 功能演示', exists: true },
+              { action: 'tap', text: '点击' },
               { action: 'wait', ms: 300 },
-              { action: 'take-screenshots', output: '/tmp/after-login.png' },
-              { action: 'assert-element', text: 'Welcome', exists: true },
+              { action: 'take-screenshots', output: '/tmp/fcc-smoke.png' },
+              { action: 'assert-element', text: '点击', exists: true },
             ],
           },
         },

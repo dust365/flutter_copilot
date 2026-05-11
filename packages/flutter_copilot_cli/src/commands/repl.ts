@@ -14,8 +14,8 @@ import type { FlutterCopilotConnector } from '../vm/connector.js';
  *
  * Syntax: `<action> [k=v ...]`
  * Example:
- *   > tap key=LoginBtn
- *   > enter-text key=UsernameField input="demo user"
+ *   > tap text="点击"
+ *   > enter-text focused input="demo user"
  *   > take-screenshots output=/tmp/s.png
  *   > reload
  *   > get-interactive-elements
@@ -109,8 +109,8 @@ export function replCommand(program: Command): void {
 Syntax: \`<action> [key=value ...]\` — one command per line.
 
 Examples (at the fc> prompt):
-  tap text="Increment"
-  enter-text key=UsernameField input="demo user"
+  tap text="点击"
+  enter-text focused input="demo user"
   swipe key=Feed direction=up distance=400
   navigate action=push route=/settings
   take-screenshots output=/tmp/s.png
@@ -249,7 +249,7 @@ function printHelp(): void {
     '  help | exit',
     '',
     'matcher keys: key, text, type, x, y, focused',
-    'example: tap text="Increment"',
+    'example: tap text="点击"',
   ].join('\n');
   process.stdout.write(chalk.gray(lines + '\n'));
 }

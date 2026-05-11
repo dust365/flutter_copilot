@@ -38,8 +38,8 @@ export function gestureCommands(program: Command): void {
     'after',
     `
 Examples:
-  fcc tap --key LoginBtn
-  fcc tap --text "Increment"
+  fcc tap --text "点击"
+  fcc tap --key <ValueKey>
   fcc tap --type ElevatedButton
   fcc tap --x 120 --y 340
 `,
@@ -90,7 +90,7 @@ Examples:
     'after',
     `
 Examples:
-  fcc enter-text --key UsernameField --input demo
+  fcc enter-text --key <TextFieldKey> --input demo
   fcc enter-text --focused --input "hello world"
 
 The target TextField gains focus, then receives the characters one by one.

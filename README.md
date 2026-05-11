@@ -338,7 +338,7 @@ CLI 按如下顺序解析 VM Service URI,通常无需手动传入：
 fcc doctor                              # 自动读取 URI 进行健康检查
 fcc --uri "$(cat .vm_service_uri)" doctor # 只检查显式传入的 URI
 fcc get-interactive-elements            # 列出当前可交互元素
-fcc tap --text "Increment"              # 按文本点击
+fcc tap --text "点击"                   # 按文本点击
 fcc take-screenshots -o /tmp/shot.png   # 截图
 fcc hot-reload                          # 热重载
 ```
@@ -347,8 +347,7 @@ fcc hot-reload                          # 热重载
 
 ```bash
 fcc connect --uri ws://127.0.0.1:8181/abc/ws
-fcc tap --text "Increment"
-fcc enter-text --key UsernameField --input "demo user"
+fcc tap --text "点击"
 ```
 
 ### 实时流与自动重连
@@ -365,20 +364,19 @@ fcc --watch-uri watch --rebuilds
 
 ```yaml
 # smoke.yaml
-name: smoke-login
+name: smoke-home
 stopOnFailure: true
 steps:
+  - action: assert-element
+    text: Flutter Copilot 功能演示
   - action: tap
-    key: LoginBtn
-  - action: enter-text
-    key: UsernameField
-    input: demo
+    text: 点击
   - action: wait
     ms: 300
   - action: take-screenshots
-    output: /tmp/after-login.png
+    output: /tmp/fcc-smoke.png
   - action: assert-element
-    text: Welcome
+    text: 点击
 ```
 
 ```bash

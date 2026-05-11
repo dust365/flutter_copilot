@@ -39,22 +39,21 @@ Supported actions:
   tap, double-tap, long-press, enter-text, scroll-to, swipe, drag,
   navigate, hot-reload, take-screenshots, wait, assert-element
 
-Minimal example (smoke.yaml):
+Minimal example for the bundled demo home page (smoke.yaml):
 
-  name: smoke-login
+  name: smoke-home
   stopOnFailure: true
   steps:
+    - action: assert-element
+      text: Flutter Copilot 功能演示
     - action: tap
-      key: LoginBtn
-    - action: enter-text
-      key: UsernameField
-      input: demo
+      text: 点击
     - action: wait
       ms: 300
     - action: take-screenshots
-      output: /tmp/after-login.png
+      output: /tmp/fcc-smoke.png
     - action: assert-element
-      text: Welcome
+      text: 点击
 
 Then:
   fcc run smoke.yaml

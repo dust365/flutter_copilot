@@ -176,7 +176,7 @@ The repo ships a helper that wraps `flutter run` and writes the detected URI to
 ./scripts/flutter_run.sh -d macos          # starts the app; writes .vm_service_uri
 fcc doctor                                 # auto-picks the URI from that file
 fcc --uri "$(cat .vm_service_uri)" doctor  # probes only this explicit URI
-fcc tap --text Counter
+fcc tap --text "点击"
 ```
 
 #### Manual connection
@@ -185,7 +185,7 @@ fcc tap --text Counter
 fcc connect --uri ws://127.0.0.1:8181/abc/ws
 fcc doctor
 fcc get-interactive-elements
-fcc tap --text "Increment"
+fcc tap --text "点击"
 fcc take-screenshots -o /tmp/shot.png
 fcc disconnect
 ```
@@ -211,8 +211,8 @@ requires URI auto-detection (it is ignored when `--uri` was used).
 
 ```bash
 fcc repl
-fc[auto:.vm_service_uri]> tap text="Increment"
-fc[auto:.vm_service_uri]> enter-text key=UsernameField input="demo user"
+fc[auto:.vm_service_uri]> tap text="点击"
+fc[auto:.vm_service_uri]> enter-text focused input="demo user"
 fc[auto:.vm_service_uri]> take-screenshots output=/tmp/s.png
 fc[auto:.vm_service_uri]> hot-reload
 ```
@@ -221,20 +221,19 @@ fc[auto:.vm_service_uri]> hot-reload
 
 ```yaml
 # smoke.yaml
-name: smoke-login
+name: smoke-home
 stopOnFailure: true
 steps:
+  - action: assert-element
+    text: Flutter Copilot 功能演示
   - action: tap
-    key: LoginBtn
-  - action: enter-text
-    key: UsernameField
-    input: demo
+    text: 点击
   - action: wait
     ms: 300
   - action: take-screenshots
-    output: /tmp/after-login.png
+    output: /tmp/fcc-smoke.png
   - action: assert-element
-    text: Welcome
+    text: 点击
 ```
 
 ```bash

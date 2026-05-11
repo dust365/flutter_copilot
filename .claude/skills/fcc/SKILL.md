@@ -105,7 +105,7 @@ fcc disconnect
 | `fcc tap`        | 点击       | `fcc tap --text "提交"`                              |
 | `fcc double-tap` | 双击       | `fcc double-tap --key LikeButton`                    |
 | `fcc long-press` | 长按       | `fcc long-press --key ItemCard --duration 800`       |
-| `fcc enter-text` | 输入文本   | `fcc enter-text --key UsernameField --input demo`    |
+| `fcc enter-text` | 输入文本   | `fcc enter-text --key <TextFieldKey> --input demo`   |
 | `fcc scroll-to`  | 滚动至可见 | `fcc scroll-to --text "提交"`                        |
 | `fcc drag`       | 拖拽       | `fcc drag --key Slider --delta-x 120`                |
 | `fcc swipe`      | 滑动       | `fcc swipe --key Feed --direction up --distance 500` |

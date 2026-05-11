@@ -1,14 +1,14 @@
-name: smoke-counter
+name: smoke-home
 stopOnFailure: true
 steps:
   - action: assert-element
-    text: Increment
+    text: Flutter Copilot 功能演示
   - action: tap
-    text: Increment
+    text: 点击
   - action: wait
     ms: 100
   - action: tap
-    text: Increment
+    text: 点击
     retry:
       attempts: 3
       delay: 200

@@ -67,8 +67,7 @@ Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   ./scripts/flutter_run.sh -d macos
   fcc doctor
   fcc get-interactive-elements
-  fcc tap --text "Increment"
-  fcc enter-text --key UsernameField --input demo
+  fcc tap --text "点击"
   fcc take-screenshots -o /tmp/shot.png
   fcc hot-reload
 
