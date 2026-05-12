@@ -1,0 +1,104 @@
+<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="mcp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6C7CFF"/>
+      <stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cli" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1FB6A6"/>
+      <stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .tag { font: 700 13px 'SF Mono', Menlo, monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 42px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #151E3F; }
+      .subtitle { font: 500 19px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #5D6B8A; }
+      .cardTitle { font: 800 30px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #FFFFFF; }
+      .cardSub { font: 600 15px 'SF Mono', Menlo, monospace; fill: rgba(255,255,255,0.82); letter-spacing: 1px; }
+      .section { font: 800 21px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #1A234A; }
+      .item { font: 500 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #33415F; }
+      .muted { font: 500 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #63708D; }
+      .centerTitle { font: 800 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #151E3F; }
+      .centerText { font: 600 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; fill: #53617F; }
+      .pillText { font: 800 14px 'SF Mono', Menlo, monospace; fill: #FFFFFF; letter-spacing: 2px; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
+
+  <text x="80" y="78" class="tag">MCP VS CLI</text>
+  <text x="80" y="132" class="title">两条入口，复用同一套 Flutter 运行时能力</text>
+  <text x="80" y="168" class="subtitle">MCP 面向 AI 探索，CLI 面向命令行、脚本和 CI 沉淀</text>
+  <rect x="80" y="188" width="72" height="4" rx="2" fill="#4C63E8"/>
+
+  <g filter="url(#shadow)">
+    <rect x="80" y="235" width="580" height="555" rx="26" fill="#FFFFFF" stroke="#C4CEF2"/>
+    <rect x="80" y="235" width="580" height="112" rx="26" fill="url(#mcp)"/>
+    <rect x="80" y="315" width="580" height="32" fill="url(#mcp)"/>
+  </g>
+  <text x="122" y="285" class="cardSub">AI CLIENT ENTRY</text>
+  <text x="122" y="326" class="cardTitle">flutter_copilot_mcp</text>
+
+  <text x="122" y="395" class="section">优势</text>
+  <circle cx="126" cy="433" r="5" fill="#4057D6"/>
+  <text x="146" y="439" class="item">适合自然语言驱动的探索和修复</text>
+  <circle cx="126" cy="477" r="5" fill="#4057D6"/>
+  <text x="146" y="483" class="item">Agent 能根据截图、日志和结果继续调整</text>
+  <circle cx="126" cy="521" r="5" fill="#4057D6"/>
+  <text x="146" y="527" class="item">复杂任务拆解更灵活，适合人机协作</text>
+
+  <text x="122" y="590" class="section">限制</text>
+  <circle cx="126" cy="628" r="5" fill="#8EA0D4"/>
+  <text x="146" y="634" class="item">依赖 MCP Client 配置和工具调用链路</text>
+  <circle cx="126" cy="672" r="5" fill="#8EA0D4"/>
+  <text x="146" y="678" class="item">结果更偏交互式，不适合直接放进 CI</text>
+  <circle cx="126" cy="716" r="5" fill="#8EA0D4"/>
+  <text x="146" y="722" class="item">稳定流程需要再沉淀成脚本或规范</text>
+
+  <g filter="url(#shadow)">
+    <rect x="840" y="235" width="580" height="555" rx="26" fill="#FFFFFF" stroke="#B8DCD8"/>
+    <rect x="840" y="235" width="580" height="112" rx="26" fill="url(#cli)"/>
+    <rect x="840" y="315" width="580" height="32" fill="url(#cli)"/>
+  </g>
+  <text x="882" y="285" class="cardSub">TERMINAL / CI ENTRY</text>
+  <text x="882" y="326" class="cardTitle">flutter_copilot_cli / fcc</text>
+
+  <text x="882" y="395" class="section">优势</text>
+  <circle cx="886" cy="433" r="5" fill="#0D7F78"/>
+  <text x="906" y="439" class="item">命令确定，适合本地脚本和 CI 流水线</text>
+  <circle cx="886" cy="477" r="5" fill="#0D7F78"/>
+  <text x="906" y="483" class="item">支持 YAML playbook、JSON 输出和重试</text>
+  <circle cx="886" cy="521" r="5" fill="#0D7F78"/>
+  <text x="906" y="527" class="item">可直接验证 VM Service 扩展，便于排查 MCP</text>
+
+  <text x="882" y="590" class="section">限制</text>
+  <circle cx="886" cy="628" r="5" fill="#79AAA4"/>
+  <text x="906" y="634" class="item">需要把流程先写成命令或 YAML</text>
+  <circle cx="886" cy="672" r="5" fill="#79AAA4"/>
+  <text x="906" y="678" class="item">不负责复杂意图理解和自动任务拆解</text>
+  <circle cx="886" cy="716" r="5" fill="#79AAA4"/>
+  <text x="906" y="722" class="item">更适合固化流程，不适合开放式探索</text>
+
+  <g filter="url(#shadow)">
+    <rect x="635" y="402" width="230" height="220" rx="26" fill="#FFFFFF" stroke="#D4DBF2"/>
+  </g>
+  <text x="750" y="462" class="centerTitle" text-anchor="middle">共同底座</text>
+  <text x="750" y="505" class="centerText" text-anchor="middle">flutter_copilot_claw</text>
+  <text x="750" y="536" class="centerText" text-anchor="middle">VM Service Extensions</text>
+  <text x="750" y="576" class="muted" text-anchor="middle">同一套 App 内能力</text>
+
+  <path d="M660 500 C705 500 705 500 635 500" stroke="#8EA0D4" stroke-width="3" fill="none"/>
+  <path d="M840 500 C795 500 795 500 865 500" stroke="#79AAA4" stroke-width="3" fill="none"/>
+
+  <rect x="485" y="812" width="530" height="48" rx="24" fill="#151E3F"/>
+  <text x="750" y="842" class="pillText" text-anchor="middle">MCP 用来探索 · CLI 用来固化 · 两者组合成工程闭环</text>
+</svg>

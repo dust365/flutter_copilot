@@ -1,11 +1,11 @@
 {
   "name": "flutter_copilot_cli",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "TypeScript CLI for driving Flutter apps via flutter_copilot_claw VM service extensions.",
   "type": "module",
   "bin": {
-    "flutter_copilot_cli": "./dist/index.js",
-    "fcc": "./dist/index.js"
+    "flutter_copilot_cli": "dist/index.js",
+    "fcc": "dist/index.js"
   },
   "main": "./dist/index.js",
   "files": [

@@ -1,0 +1,89 @@
+<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#EEF3FF"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#182241"/>
+      <stop offset="100%" stop-color="#0F1732"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6476FF"/>
+      <stop offset="100%" stop-color="#3E55D8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-25%" width="140%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="14"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.13"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; letter-spacing: 0; }
+      .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
+      .ink { fill: #111A3A; }
+      .muted { fill: #4A5878; }
+      .white { fill: #FFFFFF; }
+      .blue { fill: #465EEA; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
+
+  <g transform="translate(96 96)">
+    <text class="mono blue" x="0" y="0" font-size="16" font-weight="800">OPEN DISCUSSION</text>
+    <text class="ink" x="0" y="92" font-size="92" font-weight="900">QA 环节</text>
+    <text class="muted" x="4" y="148" font-size="30" font-weight="700">把问题放回真实业务场景</text>
+    <rect x="4" y="186" width="112" height="7" rx="3.5" fill="url(#accent)"/>
+  </g>
+
+  <g transform="translate(810 88)" filter="url(#softShadow)">
+    <path d="M38 0 H526 C550 0 570 20 570 44 V90 C570 114 550 134 526 134 H152 L112 172 L124 134 H38 C14 134 -6 114 -6 90 V44 C-6 20 14 0 38 0 Z" fill="#FFFFFF" stroke="#C8D2FF" stroke-width="2"/>
+    <text class="ink" x="282" y="79" font-size="32" font-weight="900" text-anchor="middle">AI 干活，我的情绪价值呢？</text>
+  </g>
+
+  <g transform="translate(96 320)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="610" height="388" rx="34" fill="url(#panel)"/>
+    <text class="white" x="58" y="110" font-size="48" font-weight="900">哪些流程</text>
+    <text class="white" x="58" y="176" font-size="48" font-weight="900">值得交给 AI？</text>
+    <text x="58" y="240" font-size="24" font-weight="700" fill="#BFC9FF">从一个真实高频动作开始</text>
+    <rect x="58" y="292" width="172" height="54" rx="27" fill="url(#accent)"/>
+    <text class="white" x="144" y="327" font-size="22" font-weight="800" text-anchor="middle">欢迎提问</text>
+    <text x="448" y="292" font-size="220" font-weight="900" fill="#6476FF" opacity="0.42">?</text>
+  </g>
+
+  <g transform="translate(790 318)">
+    <path d="M0 52 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 194 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
+    <path d="M0 336 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
+
+    <g filter="url(#softShadow)">
+      <rect x="72" y="0" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#D8DFFC"/>
+    </g>
+    <rect x="104" y="32" width="40" height="40" rx="12" fill="#E8ECFF"/>
+    <text class="blue" x="124" y="60" font-size="26" font-weight="900" text-anchor="middle">1</text>
+    <text class="ink" x="170" y="48" font-size="30" font-weight="900">痛点</text>
+    <text class="muted" x="170" y="82" font-size="22" font-weight="700">各种难受，太烦、头大</text>
+
+    <g filter="url(#softShadow)">
+      <rect x="72" y="142" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#D5E6E2"/>
+    </g>
+    <rect x="104" y="174" width="40" height="40" rx="12" fill="#E3F6F3"/>
+    <text x="124" y="202" font-size="26" font-weight="900" text-anchor="middle" fill="#14A99C">2</text>
+    <text class="ink" x="170" y="190" font-size="30" font-weight="900">需求分析</text>
+    <text class="muted" x="170" y="224" font-size="22" font-weight="700">各种折腾，尝试</text>
+
+    <g filter="url(#softShadow)">
+      <rect x="72" y="284" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#F1D9BF"/>
+    </g>
+    <rect x="104" y="316" width="40" height="40" rx="12" fill="#FFF0E4"/>
+    <text x="124" y="344" font-size="26" font-weight="900" text-anchor="middle" fill="#F28A36">3</text>
+    <text class="ink" x="170" y="332" font-size="30" font-weight="900">工具落地</text>
+    <text class="muted" x="170" y="366" font-size="22" font-weight="700">爽，happy</text>
+  </g>
+</svg>

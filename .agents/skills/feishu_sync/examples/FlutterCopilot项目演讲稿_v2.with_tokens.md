@@ -2,29 +2,27 @@
 
 **Flutter Copilot 项目实践分享**
 
-![【0-0-1】让 AI 真正上手操作 App](./images/svg/【0-0-1】让AI真正上手操作App.svg)
+<image token="D7FkbIByDooQ9Yx8gx6c0oJQnhf" width="900" align="center"/>
 
 > 演讲时长：约 25 分钟 | 受众：产品、研发、Flutter、后端、设计
 
 ---
 
 ## 一、开场：我为什么要做这件事
-
-_配图建议：这一章用两张图更合适——第一页沿用封面图【0-0-1】，第二页切到这张痛点示意图【1-1-1】《这也太难了》。_
+*配图建议：这一章用两张图更合适——第一页沿用封面图【0-0-1】，第二页切到这张痛点示意图【1-1-1】《这也太难了》。*
 
 大家好，今天想和大家分享一个我最近做的开源项目，叫 Flutter Copilot。
 
 我做它的起点其实很简单。去年看到一些 AI 操作浏览器的案例时，我当时就在想：既然 AI 已经可以打开页面、点按钮、填表单、截图、读日志，**为什么 Flutter 不行？**
 
 因为我们今天说 AI 提效，很多时候还停留在代码层面。但真正耗时间的，往往是写完代码之后的验证和排查：
-
 - 要自己点页面确认结果
 - 要自己复现问题、截图录屏
 - 要自己获取日志贴给 AI
 - 要再把上下文转述给 AI
 - 还要自己一点点把流程重新操作一遍
 
-![【1-1-1】这也太难了](./images/svg/【1-1-1】这也太难了.svg)
+<image token="HgjHbbG2RoSEyGxjFicciY0ynPd" width="900" align="center"/>
 
 问题不是 AI 写代码不够快，而是它**看不到**你的 App。
 
@@ -39,38 +37,41 @@ Flutter Copilot 就是从这里开始的。
 ---
 
 ## 二、效果演示
+*配图建议：这一章尽量放真实演示截图或录屏关键帧，不建议再放原理图。*
 
-_配图建议：这一章尽量放真实演示截图或录屏关键帧，不建议再放原理图。_
+### 场景 A：AI 帮你验证一个表单流程
 
-### 场景 A：AI 帮你跑一遍 Demo 的核心交互
-
-> 以前的做法：改完代码 → 热重载 → 自己挨个点页面、输入文本、滑动列表、触发手势 → 出问题再翻控制台日志 → 手工截图贴给同事。一次完整回归少说 5-10 分钟。
+> 以前的做法：改完代码 → 热重载 → 自己打开页面 → 手动输入 → 手动点提交 → 看结果 → 不对再改 → 再来一遍。一次验证少说 2-3 分钟。
 >
-> 现在的做法：一句话告诉 AI "帮我把 Demo 的点击、输入、滚动、手势、日志走一遍"，它自己连 App、自动定位元素、依次完成操作，最后把每一步的截图和日志都交到你面前。
+> 现在的做法：告诉 AI "帮我试一下登录流程"，它自己连接 App、找到输入框、输入内容、点击按钮、截图告诉你结果。
 
-**[建议插入一段 30~60 秒的录屏：AI 一次性走完 点击 → 文本输入 → 滚动 → 手势 → 日志获取 的全流程]**
+**[建议新增配图：AI 自动执行登录/表单流程的终端对话 + App 页面结果截图]**
 
-_预期效果：观众看到的不是一段事先剪好的 demo，而是 AI 真的在和 App 实时对话——每一步点完、输完、划完之后，都有截图和状态变化可以验证。全程人没动鼠标，也没切应用。_
+*预期效果：观众看到 AI 自动连接 App → 识别页面元素 → 输入文本 → 点击按钮 → 返回截图和执行结果。全程无需人工操作。*
 
 ---
 
-### 场景 B：AI 自动发现并修复一个 UI Bug
+### 场景 B：结合 Figma MCP 和 skills 开发页面并修复 UI Bug
 
-> 以前的做法：写完代码 → 自己跑一遍 App → 发现按钮颜色不对 → 改颜色 → 热重载 → 再跑一遍 → 截图对比 → 发现间距也有问题 → 再改 → 再跑 → 反复 3-5 轮才能收敛。
+> 以前的做法：设计稿在 Figma，页面在 Flutter，改一个 UI 问题要来回对照设计稿、手工改代码、重新运行、再截图确认，反复很多轮。
 >
-> 现在的做法：告诉 AI "帮我检查一下 Demo 首页的 UI 细节，发现问题直接改"，AI 自动连接 App、截图、识别偏差、修改代码、热重载、再次截图验证，直到问题消失。全程人只需要最后验收那一下。
+> 现在的做法：让 AI 结合 Figma MCP 读取设计信息，再配合 skills 和 Flutter Copilot 一起改页面、运行 App、对照效果，发现 UI 偏差后继续修复，直到接近设计稿。
 
-**[建议插入一段 30~60 秒的录屏：AI 用 flutter_copilot skill 自动连接 → 截图发现 UI 问题 → 改代码 → hot reload → 再截图验证]**
+**[建议新增配图：Figma 设计稿、Flutter 页面修复前、修复后三栏对比图]**
 
-### 场景 C：AI 自动跑一段真实业务流程
+*预期效果：观众看到 AI 读取 Figma 设计信息，生成或修改 Flutter 页面代码，运行 App 后再对照界面结果继续修复 UI Bug，形成“设计 → 实现 → 验证 → 调整”的闭环。*
 
-> 以前的做法：业务同学或测试同学给一个流程描述，开发需要自己打开 App，找到入口，输入条件，点到目标页面，再把截图、日志、结果整理出来。
+---
+
+### 场景 C：AI 自动抓取日志并分析异常
+
+> 以前的做法：App 出了错 → 翻控制台日志 → 复制粘贴给 AI → AI 分析 → 再回去看代码。中间来回切换好几次。
 >
-> 现在的做法：把流程直接交给 AI。比如“找到自选股 BILI 并添加自选，然后下单 100 股，购买后在下单记录里找到订单，再进入订单详情查看交易信息”。AI 会按当前页面结构逐步定位元素、执行点击和输入、截图确认结果，并在失败时把日志一起带回来。
+> 现在的做法：AI 直接从运行中的 App 抓日志，拿到错误信息后立即分析，一步到位。
 
-**[建议插入一段 30~60 秒的小视频：AI 根据自然语言提示完成 添加自选股 → 下单 → 查订单 → 看详情 的完整流程]**
+**[建议新增配图：AI 获取日志并给出异常定位结论的截图]**
 
-这一段建议强调：这不是单个按钮的自动化，而是一个跨页面、带业务语义的流程验证。它最能说明 Flutter Copilot 的价值不是“能点一下”，而是能把多个运行时动作串成一个可复用的工作流。
+*预期效果：观众看到 AI 调用 `get_logs` 获取运行日志，自动识别错误信息，结合上下文给出问题定位。*
 
 ---
 
@@ -88,15 +89,14 @@ _预期效果：观众看到的不是一段事先剪好的 demo，而是 AI 真�
 
 ### 1. 整体架构：三层，各管一件事
 
-![【3-1-1】Flutter Copilot 整体架构](./images/svg/【3-1-1】FlutterCopilot整体架构.svg)
+<image token="Q8D4bnPCCoftGux2J78ceQyynUf" width="900" align="center"/>
+
+
 
 简单讲就是三句话：
-
-- **最上层**：AI 决定要做什么（比如"点击登录按钮"、"跑一遍下单流程"）
-- **中间层**：`flutter_copilot_mcp` 把 AI 的意图翻译成 Flutter 能理解的指令
-- **最下层**：`flutter_copilot_claw` 在 App 内注册运行时能力，真正执行操作并把结果返回
-
-本地项目里还有第三个包：`flutter_copilot_cli`，也就是命令行里的 `fcc`。它不走 MCP，适合开发者在终端或 CI 里直接驱动同一套 VM Service 扩展。
+- **最上层**：AI 决定要做什么（比如"点击登录按钮"）
+- **中间层**：MCP Server 把 AI 的意图翻译成 Flutter 能理解的指令
+- **最下层**：Flutter App 内部真正去执行这个操作，然后把结果返回
 
 如果拿大家熟悉的概念类比：中间层就像一个 **API 网关**，上面对接 AI 客户端，下面对接 Flutter 运行时。
 
@@ -112,10 +112,9 @@ MCP 是 AI 和工具之间的标准协议。
 
 如果你想给自己的技术栈也接一个类似的 AI 能力，MCP 协议也是开放的。
 
-![【3-2-1】MCP 是什么](./images/svg/【3-2-1】MCP是什么.svg)
+<image token="Xb94bUZg3oZofoxarYicNeRYnZb" width="900" align="center"/>
 
 我们这个项目的 Dart MCP Server 源码在：
-
 - `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart`
 
 核心思路就是：注册工具 → 处理调用 → 通过 VM Service 执行 → 返回结果。
@@ -126,7 +125,7 @@ VM Service 是 Dart/Flutter 在 Debug 模式下暴露的运行时调试服务。
 
 我们平时用的热重载、DevTools 调试，底层都是 VM Service。它提供了一个正式的入口，让 App 外部的进程可以和运行中的 App 通信。
 
-![【3-2-2】VM Service 是什么](./images/svg/【3-2-2】VMService是什么.svg)
+<image token="MVlab4EeyoTOZtxF6yzcJ38Rn8c" width="900" align="center"/>
 
 Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖连接、观察、交互、导航、诊断等几个核心方向；底层则通过 App 内部能力和 VM Service 调用链路把这些动作真正执行起来。
 
@@ -134,9 +133,10 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 **所以整个链路是这样的：AI 说话 → MCP 翻译 → VM Service 传达 → Flutter App 执行。**
 
-![【3-3-1】MCP 协议与 VM Service 调用链路](./images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
+<image token="FmuObAma6o7zbTx6zqYcUS5fnx5" width="900" align="center"/>
 
 这张图放在这里更合适，因为前面刚讲完 MCP 和 VM Service，这里正好把“协议”和“真正执行”之间的关系连起来。
+
 
 这里最关键的一点是：**AI 不是在模拟"点击屏幕坐标 (200, 350)"，而是在 Flutter 的 Widget 树里找到语义化的目标元素，然后派发手势。**
 
@@ -146,21 +146,11 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 给大家看一张总览图：
 
-![【3-4-1】Flutter Copilot 能力总览](./images/svg/【3-4-1】FlutterCopilot能力总览.svg)
+<image token="NM9mb2lIIoJE1Bx8SqYcpgfYnif" width="900" align="center"/>
 
 你在现场讲这一页时，可以先从“15 个 MCP 工具”总数切进去，再按连接、观察、交互、导航、诊断五类往下拆。
 
-支持 4 类元素定位方式：**Key（最稳定）、文本内容、Widget 类型、屏幕坐标**。其中 `ValueKey<String>` 是最推荐的方式；坐标是兜底方案，适合快速验证，但不适合作为长期稳定脚本的主路径。
-
-如果把 15 个 MCP 工具按用途拆开，现场可以这样讲：
-
-| 类别 | 工具 | 解决的问题 |
-| ---- | ---- | ---------- |
-| 连接 | `connect` / `disconnect` | 建立或断开和运行中 App 的 VM Service 连接 |
-| 观察 | `get_interactive_elements` / `take_screenshots` | 看当前页面有哪些可操作元素，以及页面真实长什么样 |
-| 交互 | `tap` / `enter_text` / `scroll_to` / `flutter_copilot_drag` / `swipe` / `long_press` / `double_tap` | 完成点击、输入、滚动、拖拽、滑动、长按、双击等人工操作 |
-| 诊断 | `get_logs` / `get_rebuild_snapshot` | 获取运行日志和组件重建热点 |
-| 开发闭环 | `hot_reload` / `navigate` | 修改代码后热重载，或直接控制路由跳转 |
+支持 3 种元素匹配方式：**Key（最稳定）、文本内容、Widget 类型**。
 
 这些能力组合起来，就能覆盖"观察 → 操作 → 诊断"一条完整的运行时协作链路。
 
@@ -168,26 +158,25 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 这套能力不是某个端的专属方案，**Flutter 跑得到的地方，Flutter Copilot 就能跑**。
 
-| 平台        | 支持情况    | 说明                                                      |
-| ----------- | ----------- | --------------------------------------------------------- |
-| **Android** | ✅ 支持 | 真机 / 模拟器均可，连接调试模式下的 VM Service |
-| **iOS**     | ✅ 支持 | 真机 / 模拟器均可，注意真机需要调试连接权限 |
-| **Web**     | ✅ 支持主要交互 | 截图、元素、日志等能力可用；重建热点快照为空，因为 Web 侧无法注入 `BuildOwner` hook |
-| **macOS**   | ✅ 支持 | Desktop 调试模式 |
-| **Windows** | ✅ 支持 | Desktop 调试模式 |
-| **Linux**   | ✅ 支持 | Desktop 调试模式 |
+| 平台 | 支持情况 | 说明 |
+|------|----------|------|
+| **Android** | ✅ 完整支持 | 真机 / 模拟器均可，连接本机 VM Service |
+| **iOS** | ✅ 完整支持 | 真机 / 模拟器均可，注意真机需开启调试 |
+| **Web** | ✅ 完整支持 | 调试模式下连接 Chrome DevTools Protocol 暴露的 VM Service |
+| **macOS** | ✅ 完整支持 | Desktop 调试模式 |
+| **Windows** | ✅ 完整支持 | Desktop 调试模式 |
+| **Linux** | ✅ 完整支持 | Desktop 调试模式 |
 
-这里有一个边界要讲清楚：`flutter_copilot_claw` 的接入代码是 release-safe 的，但 Flutter Copilot 的操作能力依赖 VM Service，所以真正连接和操作 App 的场景仍然发生在 debug/profile 这类可调试构建里。Release 下初始化会自动退化成普通 `WidgetsFlutterBinding.ensureInitialized()`，不会注册 Copilot 扩展，也不会产生运行时开销。
+
 
 ---
 
 ## 四、接入指南
-
 前面讲了这么多，大家最自然的一个问题就是：**这个东西到底怎么接？复杂不复杂？**
 
 我把它总结成三步，核心原则就是：**App 内加能力、App 外起桥接、Agent 侧做配置。**
 
-![【4-1-1】接入路径与提效指标示意图](./images/svg/【4-1-1】接入路径与提效指标示意图.svg)
+<image token="NEJSbwdtXoimZrxAqO8c4lAsnYd" width="900" align="center"/>
 
 这张图建议你在接入指南这里先展示上半部分，讲完三步之后，再顺势切到下半部分讲提效指标。
 
@@ -197,77 +186,62 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 你在现场可以直接强调一句：**大多数业务 App 的第一步接入成本非常低，通常只需要改入口初始化。**
 
-推荐的 `main()` 写法是这样：
+像示例工程里的 `main()`，实际就是这样接的：
 
 ```dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_copilot_claw/flutter_copilot_claw.dart';
 
 void main() {
-  FlutterCopilotBinding.captureLogs(() async {
+  if (kDebugMode) {
     FlutterCopilotBinding.ensureInitialized();
-    runApp(const MyApp());
-  });
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
+
+  runApp(const MyApp());
 }
 ```
 
-这个写法有两个好处：
-
-- `ensureInitialized()` 在 debug/profile 下安装 Copilot Binding 并注册 VM Service 扩展；在 release 下自动退化成普通 Flutter Binding。
-- `captureLogs()` 会把 `print()`、`debugPrint()` 和未捕获的异步异常收进 `get_logs`，方便 AI 在操作失败时直接拿到上下文。
-
-如果你希望日志里出现更高信号的业务标记，可以在关键流程里加：
+如果你希望 AI 还能直接抓异常和日志，也可以把启动方式换成：
 
 ```dart
-FlutterCopilotBinding.addLog('order:submit:tap');
-FlutterCopilotBinding.addLog('order:submit:error: $error', isError: true);
+void main() {
+  if (kDebugMode) {
+    FlutterCopilotBinding.ensureInitialized();
+    FlutterCopilotBinding.addLog('sss');
+  } else {
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(const MyApp());
+  }
+}
 ```
 
-如果业务里有大量自定义组件，还可以通过 `FlutterCopilotConfiguration` 扩展识别规则，比如告诉 Copilot 哪些自定义 Widget 算可交互、如何从自定义 Widget 提取显示文本、截图最大尺寸是多少、是否开启重建热点统计。
-
-所以这一部分最想传达给大家的感觉不是“接入很复杂”，而是：**它真的就是从 App 入口多改几行代码开始的，并且可以逐步增强。**
+所以这一部分最想传达给大家的感觉不是“接入很复杂”，而是：**它真的就是从 App 入口多改几行代码开始的。**
 
 ### 第二步：在 App 外启动 `flutter_copilot_mcp`
 
 第二步是把 MCP Server 起起来。
 
 它的作用不是运行在 App 里，而是运行在 App 外，负责：
-
 - 连接 VM Service
 - 查找暴露 Copilot 扩展的 isolate
 - 把 Flutter 运行时能力转换成 MCP 工具
 
 这一步可以通过：
-
 - 全局安装 `flutter_copilot_mcp`
 - 或直接在项目源码里 `dart run` 启动
-
-除了 MCP Server，本地项目也提供了 `flutter_copilot_cli`，命令叫 `fcc`。它适合两个场景：
-
-- **开发者手动调试**：不打开 AI Client，也能在终端里 `fcc tap`、`fcc get-logs`、`fcc take-screenshots`
-- **CI / 脚本化回归**：把一组操作写成 YAML playbook，让流水线或任意 shell-capable Agent 跑同一套流程
-
-这个 CLI 会自动读取当前目录或父目录里的 `.vm_service_uri`。本地仓库里的 `scripts/flutter_run.sh` 会在启动 Flutter App 时自动捕获 VM Service URI 并写入这个文件，所以终端调试可以变成：
-
-```bash
-./scripts/flutter_run.sh -d macos
-fcc doctor
-fcc get-interactive-elements
-fcc tap --text "点击"
-fcc take-screenshots -o /tmp/flutter-copilot.png
-```
 
 ### 第三步：在 Agent 侧完成 MCP 配置
 
 最后一步是让 Claude Code、Cursor 这样的 Agent 认识这个 MCP Server。
 
 比如：
-
 - Cursor 侧配置 `.cursor/mcp.json`
 - Claude Code 侧通过 `claude mcp add` 注册项目级 MCP
 
 当这一步完成之后，Agent 才真正知道：
-
 - 它有哪些工具可以调
 - 每个工具的名字是什么
 - 应该怎么传参数
@@ -276,22 +250,29 @@ fcc take-screenshots -o /tmp/flutter-copilot.png
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "flutter_copilot": {
       "type": "stdio",
-      "command": "flutter_copilot_mcp"
+      "command": "/Users/chenhui/.pub-cache/bin/flutter_copilot_mcp",
+      "args": []
+    },
+    "figma_mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--stdio"
+      ],
+      "env": {
+        "FIGMA_API_KEY": "<YOUR_FIGMA_API_KEY>"
+      }
     }
   }
 }
 ```
 
-Claude Code 也可以用项目级配置：
-
-```bash
-claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_copilot_mcp
-```
-
-如果是在这个仓库里调试源码，可以把 command 换成 `dart run ./packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST`，这样日志更细，适合开发 MCP Server 自身。
+这段配置的作用很简单：一边把 Flutter Copilot 挂给 Agent，让它能操作运行中的 Flutter App；另一边把 Figma MCP 也接进来，让它能同时读取设计信息，形成“设计 + 运行验证”一起协作的效果。
 
 ### 接入后的最佳实践
 
@@ -308,14 +289,6 @@ claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_
 3. **把它定位成开发阶段的效率工具**
    - 它特别适合调试、验证、排查
    - 但不要一开始就把它当成对测试框架或线上监控的替代品
-
-4. **自定义组件要补充识别规则**
-   - 标准 Flutter 组件已经内置支持
-   - 业务封装组件建议通过 `FlutterCopilotConfiguration` 暴露交互性和文本提取规则
-
-5. **把高频流程沉淀成脚本**
-   - 面向 AI 的流程可以沉淀成 skill
-   - 面向终端和 CI 的流程可以沉淀成 `fcc run` YAML playbook
 
 换句话说，这个项目最好的落地方式不是“大而全”，而是先找到一个高频、重复、适合被 AI 接管的小场景，把价值打出来。
 
@@ -340,17 +313,17 @@ claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_
 
 ### 2. 接入前后对比示例
 
-![【5-2-1】接入前后效率提升对比](./images/svg/【5-2-1】接入前后效率提升对比.svg)
+<image token="HhHbbFilyok9XYxhBf3cv4GBn3c" width="900" align="center"/>
 
 > 下面这组数字你后面可以替换成真实数据，我先帮你把表达方式搭好。
 
-| 指标                 | 接入前                             | 接入后                          | 预期变化         |
-| -------------------- | ---------------------------------- | ------------------------------- | ---------------- |
-| 单次表单验证耗时     | 2~3 分钟                           | 20~40 秒                        | 缩短 60%~80%     |
-| 一次日志排查耗时     | 5~10 分钟                          | 1~3 分钟                        | 缩短 50%~70%     |
-| 问题复现准备动作     | 手工打开页面、输入、截图、复制日志 | Agent 自动执行 + 自动拿日志截图 | 大幅减少人工操作 |
-| 产品确认一个核心流程 | 需要开发或测试配合回放             | Agent 可直接执行并反馈结果      | 反馈链路明显缩短 |
-| 重绘热点定位         | 手工看 DevTools + 自己分析         | 一次快照 + Agent 辅助解释       | 分析门槛下降     |
+| 指标 | 接入前 | 接入后 | 预期变化 |
+|------|--------|--------|----------|
+| 单次表单验证耗时 | 2~3 分钟 | 20~40 秒 | 缩短 60%~80% |
+| 一次日志排查耗时 | 5~10 分钟 | 1~3 分钟 | 缩短 50%~70% |
+| 问题复现准备动作 | 手工打开页面、输入、截图、复制日志 | Agent 自动执行 + 自动拿日志截图 | 大幅减少人工操作 |
+| 产品确认一个核心流程 | 需要开发或测试配合回放 | Agent 可直接执行并反馈结果 | 反馈链路明显缩短 |
+| 重绘热点定位 | 手工看 DevTools + 自己分析 | 一次快照 + Agent 辅助解释 | 分析门槛下降 |
 
 **综合来看：多角色协作效率整体提升 30%~40%。**
 
@@ -363,14 +336,13 @@ claude mcp add --scope project --transport stdio flutter_copilot_mcp -- flutter_
 
 ### 4. 全链路解决方案，开发闭环
 
-![【5-4-1】全链路开发闭环](./images/svg/【5-4-1】全链路开发闭环.svg)
+<image token="W6wzbnxbqoCptpx2dsfcmfsQnhe" width="900" align="center"/>
 
 Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码生成 → 运行验证 → 页面观察 → 问题定位 → 结果反馈”第一次变成了一条可以被 AI 串起来的完整闭环。
 
 ---
 
 ## 六、价值升华
-
 前面我讲了这个项目怎么做、能做什么、能带来多少提效。最后我想再往上收一层，讲讲这件事真正值得我们关注的价值到底是什么。
 
 ### 1. AI 的价值，不只是写代码，而是进入工作流
@@ -397,7 +369,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ### 3. 给大家真正的启发：从自己的工作场景出发
 
-![【6-3-1】我是怎么利用AI从探索到落地的](./images/svg/【6-3-1】我是怎么利用AI从探索到落地的.svg)
+<image token="U2apbYi8zoK0dZxU21kc7dUhnte" width="900" align="center"/>
 
 如果回头看这个项目，它并不是从“我要做个平台”开始的，而是从一句很具体的话开始的：
 
@@ -412,13 +384,11 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 不一定非要是 Flutter，也不一定非要从一个完整项目开始。
 
 你可以从自己的痛点出发，反过来想：
-
 - 有没有一件事是你每天都在重复做的？
 - 有没有一类问题总要靠你手工排查、手工验证、手工整理？
 - 有没有一些流程，本来很机械，却一直占着你的注意力？
 
 如果有，那你就可以开始做四件事：
-
 - **把流程沉淀成 skills**：把常用步骤变成可复用的操作模板
 - **把能力封装成 MCP**：把原来只能手工完成的动作，变成 AI 可调用的工具
 - **把经验固化成 CLI 工具**：把团队里重复出现的问题，做成自己随时可用的小工具
@@ -431,7 +401,6 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 **解决自己的真实痛点，解放双手，把注意力从重复劳动里拿回来，放到更重要的问题上。**
 
 比如：
-
 - 更重要的架构判断
 - 更重要的产品决策
 - 更重要的异常分析
@@ -445,14 +414,13 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ### 项目地址
 
-| 资源                                   | 链接                                          |
-| -------------------------------------- | --------------------------------------------- |
-| **GitHub（源码 + 文档）**              | https://github.com/dust365/flutter_copilot       |
-| **flutter_copilot_mcp**（MCP Server）  | https://pub.dev/packages/flutter_copilot_mcp     |
-| **flutter_copilot_claw**（Flutter 端） | https://pub.dev/packages/flutter_copilot_claw    |
-| **flutter_copilot_cli / fcc**（CLI）   | https://www.npmjs.com/package/flutter_copilot_cli |
+| 资源 | 链接 |
+|------|------|
+| **GitHub（源码 + 文档）** | https://github.com/dust365/flutter_copilot |
+| **flutter_copilot_mcp**（MCP Server） | https://pub.dev/packages/flutter_copilot_mcp |
+| **flutter_copilot_claw**（Flutter 端） | https://pub.dev/packages/flutter_copilot_claw |
 
-`flutter_copilot_mcp` 和 `flutter_copilot_claw` 已发布到 pub.dev；`flutter_copilot_cli` 已发布到 npm，可以直接安装使用。
+两个包都已发布到 pub.dev，可以直接安装使用。
 欢迎 Star、提 Issue、提 PR，一起把这个东西做得更好。
 
 ---
@@ -462,30 +430,15 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 ### 附录 A：MCP 官方资源与开发指引
 
 官方资源：
-
 - **官网**：https://modelcontextprotocol.io/
 - **快速开始**：https://modelcontextprotocol.io/quickstart
 - **协议规范**：https://spec.modelcontextprotocol.io/specification/
 
 各语言 SDK / 开发指引：
-
 - **TypeScript**：https://github.com/modelcontextprotocol/typescript-sdk
 - **Python**：https://github.com/modelcontextprotocol/python-sdk
 - **Java**：参考协议规范，用 JSON-RPC 库自行实现
 - **Go / Rust / 其他**：只要实现 JSON-RPC over stdio + MCP 格式即可
-
-### 附录 B：本地源码定位
-
-如果现场有人想继续看实现，可以直接从这几处开始：
-
-| 问题 | 入口文件 |
-| ---- | -------- |
-| Flutter 端如何注册 VM Service 扩展 | `packages/flutter_copilot_claw/lib/src/binding/flutter_copilot_binding.dart` |
-| MCP Server 如何注册 15 个工具 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart` |
-| MCP Server 如何连接 VM Service 并调用扩展 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_connector.dart` |
-| 元素定位 Key / Text / Type / Coordinates 如何匹配 | `packages/flutter_copilot_claw/lib/src/services/widget_matcher.dart` |
-| CLI 如何直连同一套扩展 | `packages/flutter_copilot_cli/src/vm/connector.ts` |
-| 本地自动捕获 VM Service URI | `scripts/flutter_run.sh` |
 
 ---
 

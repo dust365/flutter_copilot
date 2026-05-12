@@ -202,7 +202,11 @@ publish_cli() {
   # 捕获 publish_cli.sh 的 exit code: 0=发布成功, 75=版本已存在(跳过), 其它=真失败
   local rc
   set +e
-  "$SCRIPT_DIR/publish_cli.sh" "${args[@]}"
+  if [[ ${#args[@]} -gt 0 ]]; then
+    "$SCRIPT_DIR/publish_cli.sh" "${args[@]}"
+  else
+    "$SCRIPT_DIR/publish_cli.sh"
+  fi
   rc=$?
   set -e
 

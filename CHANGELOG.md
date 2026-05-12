@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.0.6
 
 ### Breaking changes (flutter_copilot_claw)
 
