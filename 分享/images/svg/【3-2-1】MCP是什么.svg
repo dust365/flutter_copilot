@@ -1,4 +1,4 @@
-<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
+<svg width="1500" height="820" viewBox="0 0 1500 820" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F6F9FF"/>
@@ -14,8 +14,10 @@
     <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
     </linearGradient>
-    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    <linearGradient id="busGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5B73E0"/>
+      <stop offset="50%" stop-color="#7B8DFF"/>
+      <stop offset="100%" stop-color="#4057D6"/>
     </linearGradient>
     <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
@@ -23,125 +25,155 @@
       <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
+    <marker id="arrowR" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4C63E8"/>
+    </marker>
+    <marker id="arrowR2" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#3EA8FF"/>
     </marker>
     <style>
       .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
-      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .title { font: 800 44px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
       .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
-      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
-      .quoteTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
-      .h { font: 800 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
-      .hNode { font: 800 24px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
-      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
-      .bLg { font: 600 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
-      .small { font: 500 14px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
-      .chip { font: 600 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 0.3px; }
-      .protoLabel { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
-      .analogy { font: 500 15px 'SF Mono',Menlo,monospace; fill: #5D6B8A; letter-spacing: 0.3px; }
-      .sumH { font: 800 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .quoteH { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .quoteSub { font: 500 15px 'SF Mono',Menlo,monospace; fill: #5D6B8A; letter-spacing: 0.3px; }
+      .colTitle { font: 800 13px 'SF Mono',Menlo,monospace; letter-spacing: 3px; }
+      .clientName { font: 700 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .clientHint { font: 500 12px 'SF Mono',Menlo,monospace; fill: #7383A8; }
+      .busLabel { font: 800 32px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 6px; }
+      .busSub { font: 600 13px 'SF Mono',Menlo,monospace; fill: rgba(255,255,255,0.85); letter-spacing: 2px; }
+      .verbText { font: 800 13px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 1.5px; }
     </style>
   </defs>
 
-  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
+  <rect width="1500" height="820" rx="28" fill="url(#bg)"/>
 
   <!-- header -->
-  <text x="80" y="80" class="tag">PROTOCOL · WHAT IS MCP</text>
-  <text x="80" y="130" class="title">MCP 是 AI 与工具之间的通用调用协议</text>
-  <text x="80" y="165" class="subtitle">让 Agent 用统一方式发现工具 · 调用工具 · 获取结果</text>
-  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
+  <text x="80" y="80" class="tag">PROTOCOL · MCP</text>
+  <text x="80" y="135" class="title">MCP 是什么?</text>
+  <text x="80" y="170" class="subtitle">AI 与工具之间的通用调用协议 —— 写一份 Server,所有 Agent 都能用</text>
+  <rect x="80" y="184" width="72" height="4" rx="2" fill="url(#accent)"/>
 
-  <!-- Concept panel -->
+  <!-- concept analogy ribbon (very short) -->
   <g filter="url(#softShadow)">
-    <rect x="80" y="220" width="1340" height="170" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    <rect x="80" y="222" width="1340" height="78" rx="20" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
   </g>
-  <rect x="80" y="220" width="6" height="170" rx="3" fill="url(#accent)"/>
-  <text x="110" y="254" class="quoteTag">ANALOGY · 一句话理解</text>
-  <text x="110" y="298" class="h">可以把它理解成：AI 世界里的"接口标准 + 调用约定"</text>
-  <text x="110" y="333" class="bLg">就像前后端约定 RESTful + OpenAPI，MCP 约定的是</text>
-  <text x="110" y="363" class="analogy">AI 怎么发现工具  ·  怎么传参数  ·  怎么拿结果</text>
+  <rect x="80" y="222" width="6" height="78" rx="3" fill="url(#accent)"/>
+  <text x="110" y="258" class="quoteH">类比 · AI 世界的 <tspan fill="#4C63E8" font-weight="800">RESTful + OpenAPI</tspan></text>
+  <text x="110" y="284" class="quoteSub">把"发现工具 / 调用工具 / 拿结果"统一成开放协议</text>
 
-  <!-- right side small diagram: REST ↔ MCP -->
-  <g transform="translate(1040, 240)">
-    <rect x="0" y="0" width="360" height="130" rx="16" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/>
-    <text x="20" y="30" class="chip" style="fill:#7383A8">FRONTEND  ↔  BACKEND</text>
-    <text x="20" y="56" class="small" style="fill:#1A234A">RESTful + OpenAPI</text>
-    <line x1="20" y1="74" x2="340" y2="74" stroke="#C8D4F5" stroke-dasharray="3 4"/>
-    <text x="20" y="98" class="chip">AI AGENT  ↔  TOOLS</text>
-    <text x="20" y="120" class="small" style="fill:#4C63E8; font-weight:800">MCP</text>
+  <!-- ============ Main diagram: many ↔ MCP ↔ many ============ -->
+
+  <!-- Column titles -->
+  <text x="220" y="356" class="colTitle" style="fill:#4C63E8" text-anchor="middle">▸ AI HOSTS</text>
+  <text x="750" y="356" class="colTitle" style="fill:#4057D6" text-anchor="middle">▸ MCP PROTOCOL</text>
+  <text x="1280" y="356" class="colTitle" style="fill:#2E7FAC" text-anchor="middle">▸ MCP SERVERS</text>
+
+  <!-- Left column: 3 AI hosts -->
+  <g transform="translate(100, 388)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 14px 'SF Mono'; fill:#4C63E8" text-anchor="middle">CC</text>
+    <text x="60" y="32" class="clientName">Claude Code</text>
+    <text x="60" y="52" class="clientHint">Anthropic CLI</text>
+  </g>
+  <g transform="translate(100, 478)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 14px 'SF Mono'; fill:#4C63E8" text-anchor="middle">CR</text>
+    <text x="60" y="32" class="clientName">Cursor</text>
+    <text x="60" y="52" class="clientHint">AI IDE</text>
+  </g>
+  <g transform="translate(100, 568)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5" stroke-dasharray="6 4"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 16px 'SF Mono'; fill:#4C63E8" text-anchor="middle">+</text>
+    <text x="60" y="32" class="clientName">自家 Agent</text>
+    <text x="60" y="52" class="clientHint">Custom Host</text>
   </g>
 
-  <!-- 3-node call flow -->
-  <!-- Node 1: AI Agent -->
+  <!-- Center: MCP bus -->
   <g filter="url(#softShadow)">
-    <rect x="100" y="460" width="350" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
-  </g>
-  <rect x="100" y="460" width="350" height="6" fill="url(#accent)"/>
-  <rect x="126" y="488" width="70" height="22" rx="11" fill="url(#accent)"/>
-  <text x="161" y="503" class="layerTag" text-anchor="middle">AGENT</text>
-  <text x="275" y="555" class="hNode" text-anchor="middle">AI Agent</text>
-  <text x="275" y="588" class="b" text-anchor="middle">Claude Code · Cursor</text>
-  <line x1="150" y1="610" x2="400" y2="610" stroke="#E5EBFF" stroke-width="1.5"/>
-  <text x="275" y="640" class="small" text-anchor="middle">提出需求：</text>
-  <text x="275" y="662" class="small" text-anchor="middle">截图 · 点按钮 · 读日志</text>
-
-  <!-- Node 2: MCP Protocol -->
-  <g filter="url(#softShadow)">
-    <rect x="520" y="430" width="460" height="280" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
-  </g>
-  <rect x="520" y="430" width="460" height="6" fill="url(#accent)"/>
-  <rect x="546" y="458" width="90" height="22" rx="11" fill="url(#accent)"/>
-  <text x="591" y="473" class="layerTag" text-anchor="middle">PROTOCOL</text>
-  <text x="750" y="520" class="hNode" text-anchor="middle">MCP 协议层</text>
-  <text x="750" y="552" class="b" text-anchor="middle">统一工具描述 · 参数格式 · 返回结果</text>
-
-  <!-- Sub chips showing protocol responsibilities -->
-  <g transform="translate(560, 580)">
-    <g><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">discover</text></g>
-    <g transform="translate(130,0)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">describe</text></g>
-    <g transform="translate(260,0)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">invoke</text></g>
-    <g transform="translate(65,50)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">stream</text></g>
-    <g transform="translate(195,50)"><rect width="120" height="36" rx="18" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="60" y="23" class="chip" text-anchor="middle">respond</text></g>
+    <rect x="560" y="380" width="380" height="276" rx="22" fill="url(#busGrad)"/>
   </g>
 
-  <!-- Node 3: Tools -->
-  <g filter="url(#softShadow)">
-    <rect x="1050" y="460" width="350" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  <text x="750" y="450" class="busLabel" text-anchor="middle">M C P</text>
+  <text x="750" y="478" class="busSub" text-anchor="middle">Model Context Protocol</text>
+
+  <!-- 3 verb chips inside MCP bus -->
+  <g transform="translate(595, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">DISCOVER</text>
   </g>
-  <rect x="1050" y="460" width="350" height="6" fill="url(#cyan)"/>
-  <rect x="1076" y="488" width="64" height="22" rx="11" fill="url(#cyan)"/>
-  <text x="1108" y="503" class="layerTag" text-anchor="middle">TOOLS</text>
-  <text x="1225" y="555" class="hNode" text-anchor="middle">工具服务</text>
-  <text x="1225" y="588" class="b" text-anchor="middle">本地脚本 · MCP Server</text>
-  <line x1="1100" y1="610" x2="1350" y2="610" stroke="#E5EBFF" stroke-width="1.5"/>
-  <g transform="translate(1100, 628)">
-    <g><rect width="70" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="35" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">TS</text></g>
-    <g transform="translate(80,0)"><rect width="86" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="43" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">Python</text></g>
-    <g transform="translate(176,0)"><rect width="70" height="28" rx="14" fill="#E6F6FF" stroke="#6EE7FF" stroke-width="1"/><text x="35" y="19" class="chip" text-anchor="middle" style="fill:#2E7FAC">Dart</text></g>
+  <g transform="translate(700, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">INVOKE</text>
+  </g>
+  <g transform="translate(805, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">STREAM</text>
   </g>
 
-  <!-- Arrows -->
-  <path d="M450 570 L515 570" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <path d="M985 570 L1045 570" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
-  <g filter="url(#softShadow)">
-    <rect x="447" y="538" width="70" height="22" rx="11" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1"/>
-  </g>
-  <text x="482" y="553" class="protoLabel" text-anchor="middle">REQUEST</text>
-  <g filter="url(#softShadow)">
-    <rect x="985" y="538" width="70" height="22" rx="11" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1"/>
-  </g>
-  <text x="1020" y="553" class="protoLabel" text-anchor="middle">INVOKE</text>
+  <text x="750" y="585" class="busSub" text-anchor="middle" style="font-weight:500; opacity:0.85">stdio  ·  SSE  ·  WebSocket</text>
+  <text x="750" y="618" class="busSub" text-anchor="middle" style="font-weight:600; font-size:14px; letter-spacing:1px">JSON-RPC · 开放标准</text>
 
-  <!-- Summary ribbon -->
+  <!-- Right column: 3 MCP servers -->
+  <g transform="translate(1160, 388)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#9FE0F0" stroke-width="2"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 12px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">FC</text>
+    <text x="60" y="32" class="clientName" style="font-size:15px">flutter_copilot_mcp</text>
+    <text x="60" y="52" class="clientHint" style="fill:#2E7FAC">⭐ 本项目</text>
+  </g>
+  <g transform="translate(1160, 478)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 12px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">GH</text>
+    <text x="60" y="32" class="clientName">github-mcp</text>
+    <text x="60" y="52" class="clientHint">PR · Issue</text>
+  </g>
+  <g transform="translate(1160, 568)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5" stroke-dasharray="6 4"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 16px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">+</text>
+    <text x="60" y="32" class="clientName">你的工具</text>
+    <text x="60" y="52" class="clientHint">Custom Server</text>
+  </g>
+
+  <!-- Connection lines: each host → bus -->
+  <g stroke="#4C63E8" stroke-width="2" fill="none" opacity="0.55">
+    <path d="M 340 422 L 560 470" stroke-linecap="round" marker-end="url(#arrowR)"/>
+    <path d="M 340 512 L 560 510" stroke-linecap="round" marker-end="url(#arrowR)"/>
+    <path d="M 340 602 L 560 555" stroke-linecap="round" marker-end="url(#arrowR)"/>
+  </g>
+  <g stroke="#3EA8FF" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M 940 470 L 1160 422" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+    <path d="M 940 510 L 1160 512" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+    <path d="M 940 555 L 1160 602" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+  </g>
+
+  <!-- One-line takeaway -->
   <g filter="url(#softShadow)">
-    <rect x="80" y="740" width="1340" height="110" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+    <rect x="80" y="700" width="1340" height="76" rx="20" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
   </g>
-  <rect x="80" y="740" width="6" height="110" rx="3" fill="url(#amber)"/>
-  <g transform="translate(130, 795)">
-    <circle r="22" fill="url(#amber)"/>
-    <text y="7" text-anchor="middle" style="font: 800 20px -apple-system; fill:#FFFFFF">✓</text>
-  </g>
-  <text x="170" y="786" class="sumH">一句话总结</text>
-  <text x="170" y="820" class="b">MCP 不是某个具体工具，而是一套让 AI 能稳定调用外部工具的<tspan font-weight="800" fill="#4C63E8">开放标准</tspan>。</text>
+  <rect x="80" y="700" width="6" height="76" rx="3" fill="url(#accent)"/>
+  <text x="750" y="746" class="quoteH" text-anchor="middle">一份 Server,所有遵循 MCP 的 Agent 都能直接接入  ——  N×M 适配 → 1 份标准</text>
 </svg>

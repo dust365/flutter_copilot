@@ -1,106 +1,10 @@
-# 让 AI 真正上手操作 App
-
-**Flutter Copilot 项目实践分享**
-
-![【0-0-1】让 AI 真正上手操作 App](./images/svg/【0-0-1】让AI真正上手操作App.svg)
-
-> 演讲时长：约 60 分钟（含 QA） | 受众：产品、研发、Flutter、后端、设计
-
----
-
-## 一、开场：我为什么要做这件事
-
-大家好，今天想和大家分享一个我最近做的开源项目，叫 Flutter Copilot。
-
-我做它的起点其实很简单。去年看到一些 AI 操作浏览器的案例时，我当时就在想：既然 AI 已经可以打开页面、点按钮、填表单、截图、读日志，**为什么 Flutter 不行？**
-
-因为我们今天说 AI 提效，很多时候还停留在代码层面。但真正耗时间的，往往是写完代码之后的验证和排查：
-
-- 要自己点页面确认结果
-- 要自己复现问题、截图录屏
-- 要自己获取日志贴给 AI
-- 要再把上下文转述给 AI
-- 还要自己一点点把流程重新操作一遍
-
-![【1-1-1】这也太难了](./images/svg/【1-1-1】这也太难了.svg)
-
-问题不是 AI 写代码不够快，而是它**看不到**你的 App。
-
-所以我想做的事情很明确：给 AI 装一双眼睛和一双手，让它不只是帮我写代码，还能直接进入一个运行中的 Flutter App，去看、去点、去验证。
-
-Flutter Copilot 就是从这里开始的。
-
-**一句话说清楚：它是一个桥接层，让 Claude Code、Cursor 这样的 AI，能够直接连接并操作运行中的 Flutter 应用。**
-
-接下来我先让大家看看它实际能做什么，然后再聊技术实现。
-
----
-
-## 二、效果演示
-
-### 场景 A：AI 帮你跑一遍 Demo 的核心交互
-
-> 以前的做法：改完代码 → 热重载 → 自己挨个点页面、输入文本、滑动列表、触发手势 → 出问题再翻控制台日志 → 手工截图贴给同事。一次完整回归少说 5-10 分钟。
->
-> 现在的做法：一句话告诉 AI "帮我把 Demo 的点击、输入、滚动、手势、日志走一遍"，它自己连 App、自动定位元素、依次完成操作，最后把每一步的截图和日志都交到你面前。
-
-**[演示视频：AI 一次性走完 点击 → 文本输入 → 滚动 → 手势 → 日志获取 的全流程]**
-
-_预期效果：观众看到的不是一段事先剪好的 demo，而是 AI 真的在和 App 实时对话——每一步点完、输完、划完之后，都有截图和状态变化可以验证。全程人没动鼠标，也没切应用。_
-
-<view type="2">
-  <file token="JmDXbeHjDo7srtxevWNcOyCqnQf" name="场景1.mp4"/>
-</view>
-
----
-
-### 场景 B：AI 自动发现并修复一个 UI Bug
-
-> 以前的做法：写完代码 → 自己跑一遍 App → 发现按钮颜色不对 → 改颜色 → 热重载 → 再跑一遍 → 截图对比 → 发现间距也有问题 → 再改 → 再跑 → 反复 3-5 轮才能收敛。
->
-> 现在的做法：告诉 AI "帮我检查一下 Demo 首页的 UI 细节，发现问题直接改"，AI 自动连接 App、截图、识别偏差、修改代码、热重载、再次截图验证，直到问题消失。全程人只需要最后验收那一下。
-
-**[演示视频：AI 用 flutter_copilot skill 自动连接 → 截图发现 UI 问题 → 改代码 → hot reload → 再截图验证]**
-
-<view type="2">
-  <file token="Pp9ubrQifoXAdixo4c9cz6Wlnbg" name="场景2.mp4"/>
-</view>
-
-### 场景 C：AI 自动跑一段真实业务流程
-
-> 以前的做法：业务同学或测试同学给一个流程描述，开发需要自己打开 App，找到入口，输入条件，点到目标页面，再把截图、日志、结果整理出来。
->
-> 现在的做法：把流程直接交给 AI。比如“找到自选股 BILI 并添加自选，然后下单 100 股，购买后在下单记录里找到订单，再进入订单详情查看交易信息”。AI 会按当前页面结构逐步定位元素、执行点击和输入、截图确认结果，并在失败时把日志一起带回来。
-
-**[演示视频：AI 根据自然语言提示完成 添加自选股 → 下单 → 查订单 → 看详情 的完整流程]**
-
-<view type="2">
-  <file token="LTZcbtPqjotRbgxrrGYcH7uMn9b" name="场景3.mp4"/>
-</view>
-
-这个场景不是单个按钮的自动化，而是一个跨页面、带业务语义的流程验证。它最能说明 Flutter Copilot 的价值不是“能点一下”，而是能把多个运行时动作串成一个可复用的工作流。
-
-这里的输入不是脚本命令，而是一句业务语言：
-
-> 帮我使用 flutter-copilot skills 找到自选股 BILI 并添加自选，然后下单 100 股，购买后在底下下单记录里面找到订单，然后去订单详情，查看这笔交易信息。
-
----
-
-大家可以感受到，这三个场景有一个共同点：**AI 不再只是读你的代码，它在读你的 App。**
-
-它看到的不是源码文本，而是运行中的真实状态——页面上有什么元素、点击后发生了什么、日志里输出了什么、哪些组件在反复重建。
-
-这就是从"代码助手"到"应用助手"的区别。
-
----
-
 ## 三、技术揭秘
 
 效果看完了，接下来聊聊它是怎么做到的。我尽量讲得所有人都能听懂。
 
 ### 1. 整体架构：三层，各管一件事
 
-![【3-1-1】Flutter Copilot 整体架构](./images/svg/【3-1-1】FlutterCopilot整体架构.svg)
+<image token="VtBkbiBjSoHOyJxMJ1mcYBYmnpd" width="1200" height="784" align="center"/>
 
 简单讲就是三句话：
 
@@ -126,7 +30,7 @@ MCP（Model Context Protocol）干的就是把这件事**标准化**：它定义
 - **Invoke（调用）**：用统一的 JSON-RPC 形式调用工具，底层走 stdio 还是 SSE 对调用方透明
 - **Stream（流式）**：长任务可以边执行边把进度返回，Agent 不用一直阻塞等待
 
-![【3-2-1】MCP 是什么](./images/svg/【3-2-1】MCP是什么.svg)
+<image token="T0t0bYCVjoky2ExVYFtcnMUwnSg" width="1200" height="656" align="center"/>
 
 **对 Flutter Copilot 的意义**：我们只写一个 `flutter_copilot_mcp`，Claude Code、Cursor、Continue 以及任何遵循 MCP 的 Agent 都能直接接入，不用为每家客户端单独适配。如果你自己的技术栈也想接 AI 能力，把工具包成 MCP Server 同样能吃到这层红利。
 
@@ -145,7 +49,7 @@ VM Service 是 Dart VM 在 **Debug / Profile 模式**下默认开启的官方调
 
 最后这个 Service Extension 是 Flutter Copilot 的关键齿轮。`flutter_copilot_claw` 在 App 启动时，通过 `registerExtension('ext.flutter.copilot.tap', ...)` 这类调用，把点击、输入、截图、拿日志等能力注册成自定义 Service Extension；MCP Server 拿到一个 VM Service URI 之后，就能像调 RPC 一样调这些扩展。
 
-![【3-2-2】VM Service 是什么](./images/svg/【3-2-2】VMService是什么.svg)
+<image token="EHwJbksMZoDbAix7Jc9cpxQvnUU" width="1200" height="784" align="center"/>
 
 一句话：**Flutter Copilot 不是绕过 Flutter 去 hack App，而是站在 Flutter 自己的 Debug 通道上正式接入运行时能力。**
 
@@ -155,7 +59,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 **所以整个链路是这样的：AI 说话 → MCP 翻译 → VM Service 传达 → Flutter App 执行。**
 
-![【3-3-1】MCP 协议与 VM Service 调用链路](./images/svg/【3-3-1】MCP协议与VMService调用链路.svg)
+<image token="GJXxbF5M4ovPt3xlHjdcx8ZEnrx" width="1200" height="864" align="center"/>
 
 这条链路把前面讲到的 MCP 和 VM Service 连了起来：MCP 负责标准化工具调用，VM Service 负责把调用送进正在运行的 Flutter App。
 
@@ -167,7 +71,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 给大家看一张总览图：
 
-![【3-4-1】Flutter Copilot 能力总览](./images/svg/【3-4-1】FlutterCopilot能力总览.svg)
+<image token="SKD8b6W6eojA8ixuoWacnhJPnFc" width="1200" height="824" align="center"/>
 
 这套能力最终对外体现为 15 个 MCP 工具，可以按连接、观察、交互、导航、诊断五类理解。
 
@@ -194,7 +98,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 - **MCP 入口**：供 Claude Code、Cursor 这类 Agent 调用，适合自然语言探索
 - **CLI 入口**：供工程师 / 脚本 / CI 直接调用，适合终端调试和稳定流程沉淀
 
-![【3-5-1】fcc 终端入口](./images/svg/【3-5-1】fcc终端入口.svg)
+<image token="RxDobVjT6oIJqOxZYUGcPbzunyd" width="1200" height="720" align="center"/>
 
 它最常被用在四个地方：
 
@@ -213,7 +117,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 我把它总结成三步，核心原则就是：**App 内挂能力，App 外按场景选择 MCP 或 CLI，再把高频流程沉淀下来。**
 
-![【4-4-1】接入指南](./images/svg/【4-4-1】接入指南.svg)
+<image token="O39KbSv7YobgCcxgLYVc37F7nld" width="1200" height="736" align="center"/>
 
 接入路径可以拆成三块：App 内接入 `claw`，App 外根据使用场景选择 `mcp` 或 `cli`，后续再把高频操作沉淀成可复用流程。
 
@@ -221,7 +125,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 **Flutter 跑得到的地方，Flutter Copilot 就能跑。**
 
-![【4-2-1】跨平台支持](./images/svg/【4-2-1】跨平台支持.svg)
+<image token="E4vFbwQ37og8uExCfckc3rKjnHf" width="1200" height="624" align="center"/>
 
 唯一一个边界要记住：claw 接入代码是 release-safe 的，但操作能力依赖 VM Service，所以连接和驱动 App 只发生在 debug / profile 构建里 —— release 下初始化会自动退化成普通 `WidgetsFlutterBinding.ensureInitialized()`，不注册扩展、不占开销。
 
@@ -265,7 +169,7 @@ FlutterCopilotBinding.addLog('order:submit:error: $error', isError: true);
 
 App 内接入完成之后，App 外有两条入口可以选：如果要让 Agent 操作 App，就接 MCP；如果要在终端或脚本里操作 App，就接 CLI。
 
-![【3-6-1】CLI 与 MCP 对比](./images/svg/【3-6-1】CLI与MCP对比.svg)
+<image token="CiIMb0t3HoE5B5xzPJ7cMFvUn6f" width="1200" height="608" align="center"/>
 
 选择原则很简单：
 
@@ -417,7 +321,7 @@ https://github.com/dust365/flutter_copilot/tree/v1.0.0/.claude/skills
 
 ### 2. 接入前后对比
 
-![【5-2-1】接入前后效率提升对比](./images/svg/【5-2-1】接入前后效率提升对比.svg)
+<image token="GNSMbnKQ0oGrYyx2EVZc52IBnIg" width="1200" height="720" align="center"/>
 
 > 下面这组数字你后面可以替换成真实数据，我先帮你把表达方式搭好。
 
@@ -439,7 +343,7 @@ https://github.com/dust365/flutter_copilot/tree/v1.0.0/.claude/skills
 
 ### 4. 全链路解决方案，开发闭环
 
-![【5-4-1】全链路开发闭环](./images/svg/【5-4-1】全链路开发闭环.svg)
+<image token="CPyhbHu8woVSE7xNJbIcx8z4nLg" width="1200" height="840" align="center"/>
 
 Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码生成 → 运行验证 → 页面观察 → 问题定位 → 结果反馈”第一次变成了一条可以被 AI 串起来的完整闭环。
 
@@ -461,7 +365,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 **代码生成 → 运行验证 → 页面观察 → 问题定位 → 结果反馈**
 
-![【6-1-1】AI 进入工作流](./images/svg/【6-1-1】AI进入工作流.svg)
+<image token="CxdfbSWOMolK1IxN5FgcUp38nVe" width="1200" height="760" align="center"/>
 
 左边是传统形态的 AI：”代码助手”只在第一环发挥，剩下四环都靠人手工补。右边是 Flutter Copilot 形态：”应用助手”把 5 环连成闭环，AI 全程在场。
 
@@ -477,7 +381,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ### 3. 给大家真正的启发：从自己的工作场景出发
 
-![【6-3-1】我是怎么利用AI从探索到落地的](./images/svg/【6-3-1】我是怎么利用AI从探索到落地的.svg)
+<image token="P8uSblPoQo2tVuxip9YcfxsEnve" width="1200" height="1011" align="center"/>
 
 如果回头看这个项目，它并不是从“我要做个平台”开始的，而是从一句很具体的话开始的：
 
@@ -539,7 +443,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 
 ## 七、QA
 
-![【7-1-1】QA 环节](./images/svg/【7-1-1】QA环节.svg)
+<image token="Skr8blvLZoY2BZxRK6PcRH5inQb" width="1200" height="720" align="center"/>
 
 最后留一点时间交流。前面讲的是一个具体项目，但真正值得讨论的是：这类能力怎么放进每个团队自己的研发流程里。
 

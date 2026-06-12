@@ -1,0 +1,211 @@
+<svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="cardTeal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EEFBF8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1FB6A6"/><stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <linearGradient id="tealLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BD5C7"/><stop offset="100%" stop-color="#1FB6A6"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #0D7F78; letter-spacing: 3px; }
+      .title { font: 800 42px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .panelTag { font: 700 11px 'SF Mono',Menlo,monospace; letter-spacing: 2px; }
+      .panelTitle { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+
+      .termTitle { font: 700 12px 'SF Mono',Menlo,monospace; fill: #C8D4F5; letter-spacing: 1px; }
+      .termPrompt { font: 700 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #5BD5C7; letter-spacing: 0.3px; }
+      .termCmd { font: 700 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 0.3px; }
+      .termFlag { font: 600 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #FFB86B; letter-spacing: 0.3px; }
+      .termOk { font: 600 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #A8F0B8; letter-spacing: 0.3px; }
+      .termOut { font: 500 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #C8D4F5; letter-spacing: 0.3px; }
+      .termDim { font: 500 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+      .termArrow { font: 700 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #FFB86B; letter-spacing: 0.3px; }
+
+      .useTitle { font: 800 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #0D3B36; }
+      .useDesc { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A5A56; }
+      .useNum { font: 800 14px 'SF Mono',Menlo,monospace; fill: #FFFFFF; }
+
+      .footQ { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .footHL { font: 800 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #0D7F78; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
+
+  <!-- ========== Header ========== -->
+  <text x="80" y="80" class="tag">CLI · 终端入口</text>
+  <text x="80" y="130" class="title">fcc:终端里的 Flutter Copilot</text>
+  <text x="80" y="165" class="subtitle">同一套 VM Service 扩展,既能给 AI 用,也能在终端 / 脚本 / CI 里直接跑</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#teal)"/>
+
+  <!-- top-right install hint pill -->
+  <g transform="translate(1140, 90)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="280" height="38" rx="19" fill="#FFFFFF" stroke="#1FB6A6" stroke-width="1.5"/>
+    <circle cx="22" cy="19" r="6" fill="#1FB6A6"/>
+    <text x="38" y="24" style="font: 700 13px 'SF Mono'; fill:#0D7F78">npm i -g flutter_copilot_cli</text>
+  </g>
+  <text x="1280" y="148" style="font: 600 12px 'SF Mono'; fill:#7383A8" text-anchor="middle">已发布到 npm</text>
+
+  <!-- ============ LEFT: Terminal mockup ============ -->
+  <text x="80" y="230" class="panelTag" style="fill:#0D7F78">▸ TYPICAL WORKFLOW  ·  实际跑起来长这样</text>
+
+  <g filter="url(#softShadow)">
+    <rect x="80" y="250" width="800" height="540" rx="18" fill="#0F1630"/>
+  </g>
+  <!-- terminal title bar -->
+  <rect x="80" y="250" width="800" height="40" rx="18" fill="#1A234A"/>
+  <rect x="80" y="278" width="800" height="12" fill="#1A234A"/>
+  <circle cx="106" cy="270" r="7" fill="#FF5F57"/>
+  <circle cx="128" cy="270" r="7" fill="#FEBC2E"/>
+  <circle cx="150" cy="270" r="7" fill="#28C840"/>
+  <text x="480" y="275" class="termTitle" text-anchor="middle">~/projects/my_app  —  fcc</text>
+
+  <!-- terminal content -->
+  <g transform="translate(108, 320)">
+    <!-- Step 1: launch app -->
+    <text y="0" class="termPrompt">$</text>
+    <text x="20" y="0" class="termCmd">./scripts/flutter_run.sh </text>
+    <text x="226" y="0" class="termFlag">-d macos</text>
+    <text y="22" class="termDim">[flutter] Launching lib/main.dart on macOS...</text>
+    <text y="42" class="termDim">[flutter] VM Service:  ws://127.0.0.1:54321/ws</text>
+    <text y="62" class="termOk">✓ wrote .vm_service_uri</text>
+
+    <!-- Step 2: doctor -->
+    <text y="100" class="termPrompt">$</text>
+    <text x="20" y="100" class="termCmd">fcc doctor</text>
+    <text y="122" class="termOk">✓ vm_service_uri  </text>
+    <text x="180" y="122" class="termDim">resolved from .vm_service_uri</text>
+    <text y="142" class="termOk">✓ vm connection   </text>
+    <text x="180" y="142" class="termDim">ok (Dart VM 3.5.0)</text>
+    <text y="162" class="termOk">✓ copilot ext     </text>
+    <text x="180" y="162" class="termDim">15 tools registered</text>
+    <text y="184" class="termArrow">→ ready</text>
+
+    <!-- Step 3: explore -->
+    <text y="222" class="termPrompt">$</text>
+    <text x="20" y="222" class="termCmd">fcc get-interactive-elements</text>
+    <text y="244" class="termOut">└─ Scaffold #1</text>
+    <text y="262" class="termOut">   ├─ AppBar  </text>
+    <text x="118" y="262" style="font: 600 13px 'SF Mono'; fill:#FFB86B">"首页"</text>
+    <text y="280" class="termOut">   ├─ ElevatedButton </text>
+    <text x="190" y="280" style="font: 600 13px 'SF Mono'; fill:#5BD5C7">key="login_btn"</text>
+    <text x="350" y="280" style="font: 600 13px 'SF Mono'; fill:#FFB86B">"登录"</text>
+    <text y="298" class="termOut">   └─ TextField </text>
+    <text x="148" y="298" style="font: 600 13px 'SF Mono'; fill:#5BD5C7">key="password_input"</text>
+
+    <!-- Step 4: tap -->
+    <text y="336" class="termPrompt">$</text>
+    <text x="20" y="336" class="termCmd">fcc tap </text>
+    <text x="92" y="336" class="termFlag">--key login_btn</text>
+    <text y="358" class="termOk">✓ tapped login_btn</text>
+    <text x="200" y="358" class="termDim">·  rebuild=3  ·  142ms</text>
+
+    <!-- Step 5: screenshot -->
+    <text y="396" class="termPrompt">$</text>
+    <text x="20" y="396" class="termCmd">fcc take-screenshots </text>
+    <text x="208" y="396" class="termFlag">-o /tmp/home.png</text>
+    <text y="418" class="termOk">✓ saved /tmp/home.png</text>
+    <text x="220" y="418" class="termDim">(1080 × 2400)</text>
+
+    <text y="450" class="termPrompt">$</text>
+    <text x="20" y="450" style="font: 700 14px 'SF Mono'; fill:#FFFFFF">█</text>
+  </g>
+
+  <!-- ============ RIGHT: 4 use case cards ============ -->
+  <text x="900" y="230" class="panelTag" style="fill:#0D7F78">▸ WHEN TO USE FCC  ·  4 个典型场景</text>
+
+  <!-- Card 1: 手动调试 -->
+  <g transform="translate(900, 250)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="520" height="120" rx="18" fill="url(#cardTeal)" stroke="#9FE0D5" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="120" rx="3" fill="url(#tealLight)"/>
+    <g transform="translate(28, 22)">
+      <circle r="16" fill="url(#teal)"/>
+      <text y="5" class="useNum" text-anchor="middle">01</text>
+    </g>
+    <text x="58" y="40" class="useTitle">手动调试 · 不打开 AI Client</text>
+    <text x="58" y="68" class="useDesc">想点一下、抓个日志、看眼截图,直接在终端里:</text>
+    <g transform="translate(58, 78)">
+      <rect x="0" y="0" width="430" height="28" rx="6" fill="#0F1630"/>
+      <text x="14" y="19" style="font: 600 12px 'SF Mono'; fill:#5BD5C7">$ fcc tap --text "登录"  ·  fcc get-logs  ·  fcc take-screenshots</text>
+    </g>
+  </g>
+
+  <!-- Card 2: 链路诊断 -->
+  <g transform="translate(900, 386)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="520" height="120" rx="18" fill="url(#cardTeal)" stroke="#9FE0D5" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="120" rx="3" fill="url(#tealLight)"/>
+    <g transform="translate(28, 22)">
+      <circle r="16" fill="url(#teal)"/>
+      <text y="5" class="useNum" text-anchor="middle">02</text>
+    </g>
+    <text x="58" y="40" class="useTitle">链路诊断 · MCP 跑不通时的兜底</text>
+    <text x="58" y="68" class="useDesc">Agent 调用失败,不知道是 VM Service 还是扩展的问题:</text>
+    <g transform="translate(58, 78)">
+      <rect x="0" y="0" width="280" height="28" rx="6" fill="#0F1630"/>
+      <text x="14" y="19" style="font: 600 12px 'SF Mono'; fill:#5BD5C7">$ fcc doctor</text>
+      <text x="120" y="19" style="font: 600 12px 'SF Mono'; fill:#A8F0B8">→ 一键定位</text>
+    </g>
+  </g>
+
+  <!-- Card 3: 脚本沉淀 -->
+  <g transform="translate(900, 522)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="520" height="120" rx="18" fill="url(#cardTeal)" stroke="#9FE0D5" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="120" rx="3" fill="url(#tealLight)"/>
+    <g transform="translate(28, 22)">
+      <circle r="16" fill="url(#teal)"/>
+      <text y="5" class="useNum" text-anchor="middle">03</text>
+    </g>
+    <text x="58" y="40" class="useTitle">脚本沉淀 · 把 AI 跑通的流程固化</text>
+    <text x="58" y="68" class="useDesc">写成 shell / yaml,放进 CI 或本地 task,可重试可版本化:</text>
+    <g transform="translate(58, 78)">
+      <rect x="0" y="0" width="430" height="28" rx="6" fill="#0F1630"/>
+      <text x="14" y="19" style="font: 600 12px 'SF Mono'; fill:#5BD5C7">$ fcc run smoke.yaml  ·  CI 里串起 build → run → fcc</text>
+    </g>
+  </g>
+
+  <!-- Card 4: 团队复用 -->
+  <g transform="translate(900, 658)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="520" height="120" rx="18" fill="url(#cardTeal)" stroke="#9FE0D5" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="120" rx="3" fill="url(#tealLight)"/>
+    <g transform="translate(28, 22)">
+      <circle r="16" fill="url(#teal)"/>
+      <text y="5" class="useNum" text-anchor="middle">04</text>
+    </g>
+    <text x="58" y="40" class="useTitle">团队复用 · 没装 AI Client 也能用</text>
+    <text x="58" y="68" class="useDesc">QA / 产品同学拉一份脚本就能跑流程,门槛 = 装 npm 包:</text>
+    <g transform="translate(58, 78)">
+      <rect x="0" y="0" width="380" height="28" rx="6" fill="#0F1630"/>
+      <text x="14" y="19" style="font: 600 12px 'SF Mono'; fill:#5BD5C7">$ npm i -g flutter_copilot_cli  ·  fcc --version</text>
+    </g>
+  </g>
+
+  <!-- ============ Bottom takeaway ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="820" width="1340" height="58" rx="22" fill="#FFFFFF" stroke="#9FE0D5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="820" width="6" height="58" rx="3" fill="url(#teal)"/>
+  <text x="115" y="855" class="footQ">MCP = 给 AI 用的入口  ·  <tspan class="footHL">fcc = 给开发者 / 脚本 / CI 用的入口</tspan>  ——  共用同一套 VM Service 扩展,能力对齐</text>
+</svg>

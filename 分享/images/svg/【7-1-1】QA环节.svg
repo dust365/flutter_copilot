@@ -1,89 +1,182 @@
 <svg width="1500" height="900" viewBox="0 0 1500 900" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F8FAFF"/>
-      <stop offset="100%" stop-color="#EEF3FF"/>
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
     </linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#182241"/>
-      <stop offset="100%" stop-color="#0F1732"/>
-    </linearGradient>
+    <radialGradient id="glowLeft" cx="18%" cy="22%" r="62%">
+      <stop offset="0%" stop-color="#C8D4FF" stop-opacity="0.52"/>
+      <stop offset="100%" stop-color="#C8D4FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="84%" cy="66%" r="56%">
+      <stop offset="0%" stop-color="#B9EDFF" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#B9EDFF" stop-opacity="0"/>
+    </radialGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6476FF"/>
-      <stop offset="100%" stop-color="#3E55D8"/>
+      <stop offset="0%" stop-color="#7B8DFF"/>
+      <stop offset="100%" stop-color="#4057D6"/>
     </linearGradient>
-    <filter id="softShadow" x="-20%" y="-25%" width="140%" height="150%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
-      <feOffset dx="0" dy="14"/>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#65E8FF"/>
+      <stop offset="100%" stop-color="#2EA7FF"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#63DEC9"/>
+      <stop offset="100%" stop-color="#10A196"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD18A"/>
+      <stop offset="100%" stop-color="#F08A35"/>
+    </linearGradient>
+    <linearGradient id="darkPanel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#182449"/>
+      <stop offset="100%" stop-color="#0D1531"/>
+    </linearGradient>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <filter id="softShadow" x="-18%" y="-20%" width="136%" height="146%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="8" result="off"/>
       <feComponentTransfer>
-        <feFuncA type="linear" slope="0.13"/>
+        <feFuncA type="linear" slope="0.15"/>
       </feComponentTransfer>
       <feMerge>
         <feMergeNode/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
+    <filter id="deepShadow" x="-22%" y="-24%" width="144%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="16" result="off"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.22"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
+    </marker>
     <style>
       text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; letter-spacing: 0; }
       .mono { font-family: "SF Mono", Menlo, Consolas, monospace; }
-      .ink { fill: #111A3A; }
-      .muted { fill: #4A5878; }
+      .tag { font: 800 15px "SF Mono", Menlo, Consolas, monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 900 74px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; fill: #151E3F; }
+      .subtitle { font: 600 25px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; fill: #4F5E7E; }
+      .panelTag { font: 800 13px "SF Mono", Menlo, Consolas, monospace; letter-spacing: 2.5px; }
+      .small { font: 600 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif; fill: #6B7898; }
+      .ink { fill: #151E3F; }
+      .muted { fill: #5D6B8A; }
       .white { fill: #FFFFFF; }
-      .blue { fill: #465EEA; }
     </style>
   </defs>
 
   <rect width="1500" height="900" rx="28" fill="url(#bg)"/>
+  <rect width="1500" height="900" rx="28" fill="url(#glowLeft)"/>
+  <rect width="1500" height="900" rx="28" fill="url(#glowRight)"/>
 
-  <g transform="translate(96 96)">
-    <text class="mono blue" x="0" y="0" font-size="16" font-weight="800">OPEN DISCUSSION</text>
-    <text class="ink" x="0" y="92" font-size="92" font-weight="900">QA 环节</text>
-    <text class="muted" x="4" y="148" font-size="30" font-weight="700">把问题放回真实业务场景</text>
-    <rect x="4" y="186" width="112" height="7" rx="3.5" fill="url(#accent)"/>
+  <g opacity="0.45">
+    <circle cx="118" cy="760" r="2" fill="#4C63E8"/>
+    <circle cx="220" cy="112" r="1.8" fill="#6EE7FF"/>
+    <circle cx="1372" cy="118" r="2.2" fill="#4C63E8"/>
+    <circle cx="1326" cy="782" r="1.8" fill="#2EA7FF"/>
+    <path d="M1258 132 L1268 142 M1258 142 L1268 132" stroke="#7B8DFF" stroke-width="2" stroke-linecap="round"/>
+    <path d="M108 696 L118 706 M108 706 L118 696" stroke="#2EA7FF" stroke-width="2" stroke-linecap="round"/>
   </g>
 
-  <g transform="translate(810 88)" filter="url(#softShadow)">
-    <path d="M38 0 H526 C550 0 570 20 570 44 V90 C570 114 550 134 526 134 H152 L112 172 L124 134 H38 C14 134 -6 114 -6 90 V44 C-6 20 14 0 38 0 Z" fill="#FFFFFF" stroke="#C8D2FF" stroke-width="2"/>
-    <text class="ink" x="282" y="79" font-size="32" font-weight="900" text-anchor="middle">AI 干活，我的情绪价值呢？</text>
+  <!-- Header -->
+  <g transform="translate(80 76)">
+    <text class="tag" x="0" y="0">OPEN DISCUSSION · FLUTTER COPILOT</text>
+    <text class="title" x="0" y="86">QA 环节</text>
+    <text class="subtitle" x="4" y="130">把问题放回真实业务场景，一起判断哪些流程值得交给 AI</text>
+    <rect x="4" y="154" width="96" height="5" rx="2.5" fill="url(#accent)"/>
   </g>
 
-  <g transform="translate(96 320)" filter="url(#softShadow)">
-    <rect x="0" y="0" width="610" height="388" rx="34" fill="url(#panel)"/>
-    <text class="white" x="58" y="110" font-size="48" font-weight="900">哪些流程</text>
-    <text class="white" x="58" y="176" font-size="48" font-weight="900">值得交给 AI？</text>
-    <text x="58" y="240" font-size="24" font-weight="700" fill="#BFC9FF">从一个真实高频动作开始</text>
-    <rect x="58" y="292" width="172" height="54" rx="27" fill="url(#accent)"/>
-    <text class="white" x="144" y="327" font-size="22" font-weight="800" text-anchor="middle">欢迎提问</text>
-    <text x="448" y="292" font-size="220" font-weight="900" fill="#6476FF" opacity="0.42">?</text>
+  <!-- Main dark question stage -->
+  <g transform="translate(80 266)" filter="url(#deepShadow)">
+    <rect x="0" y="0" width="650" height="532" rx="28" fill="url(#darkPanel)"/>
+    <rect x="0" y="0" width="650" height="74" rx="28" fill="#202D59"/>
+    <rect x="0" y="52" width="650" height="22" fill="#202D59"/>
+    <circle cx="42" cy="37" r="7" fill="#FF6B79"/>
+    <circle cx="66" cy="37" r="7" fill="#FFD166"/>
+    <circle cx="90" cy="37" r="7" fill="#63DEC9"/>
+    <text x="126" y="43" class="panelTag" fill="#BFC9FF">LIVE QUESTION BOARD</text>
+
+    <g transform="translate(52 116)">
+      <rect x="0" y="0" width="546" height="160" rx="24" fill="#FFFFFF" fill-opacity="0.08" stroke="#7B8DFF" stroke-opacity="0.45"/>
+      <path d="M38 26 H508 C520 26 530 36 530 48 V103 C530 115 520 125 508 125 H162 L121 158 L134 125 H38 C26 125 16 115 16 103 V48 C16 36 26 26 38 26 Z" fill="#FFFFFF" stroke="#BFC9FF" stroke-width="2"/>
+      <text x="273" y="84" font-size="33" font-weight="900" fill="#151E3F" text-anchor="middle">AI 干活，我的情绪价值呢？</text>
+    </g>
+
+    <text x="56" y="360" font-size="48" font-weight="900" fill="#FFFFFF">哪些流程值得交给 AI？</text>
+    <text x="56" y="405" font-size="23" font-weight="700" fill="#BFC9FF">从一个真实、高频、可验证的动作开始</text>
+
+    <g transform="translate(56 454)">
+      <rect x="0" y="0" width="192" height="54" rx="27" fill="url(#accent)"/>
+      <text x="96" y="35" font-size="21" font-weight="900" fill="#FFFFFF" text-anchor="middle">欢迎提问</text>
+      <rect x="218" y="0" width="238" height="54" rx="27" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.18"/>
+      <text x="337" y="34" font-size="19" font-weight="800" fill="#E6EAFF" text-anchor="middle">业务场景优先</text>
+    </g>
+
+    <text x="512" y="438" font-size="220" font-weight="900" fill="#7B8DFF" opacity="0.20">?</text>
   </g>
 
-  <g transform="translate(790 318)">
-    <path d="M0 52 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
-    <path d="M0 194 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
-    <path d="M0 336 H72" stroke="#9BA9D5" stroke-width="3" stroke-linecap="round"/>
-
+  <!-- Right discussion map -->
+  <g transform="translate(785 266)">
     <g filter="url(#softShadow)">
-      <rect x="72" y="0" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#D8DFFC"/>
+      <rect x="0" y="0" width="635" height="532" rx="28" fill="url(#surface)" stroke="#C7D3FF" stroke-width="1.5"/>
     </g>
-    <rect x="104" y="32" width="40" height="40" rx="12" fill="#E8ECFF"/>
-    <text class="blue" x="124" y="60" font-size="26" font-weight="900" text-anchor="middle">1</text>
-    <text class="ink" x="170" y="48" font-size="30" font-weight="900">痛点</text>
-    <text class="muted" x="170" y="82" font-size="22" font-weight="700">各种难受，太烦、头大</text>
+    <rect x="0" y="0" width="635" height="74" rx="28" fill="#F2F5FF"/>
+    <rect x="0" y="52" width="635" height="22" fill="#F2F5FF"/>
+    <text x="32" y="43" class="panelTag" fill="#4C63E8">DISCUSSION MAP</text>
+    <text x="468" y="43" font-size="15" font-weight="800" fill="#7383A8">ASK · ALIGN · LAND</text>
 
-    <g filter="url(#softShadow)">
-      <rect x="72" y="142" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#D5E6E2"/>
-    </g>
-    <rect x="104" y="174" width="40" height="40" rx="12" fill="#E3F6F3"/>
-    <text x="124" y="202" font-size="26" font-weight="900" text-anchor="middle" fill="#14A99C">2</text>
-    <text class="ink" x="170" y="190" font-size="30" font-weight="900">需求分析</text>
-    <text class="muted" x="170" y="224" font-size="22" font-weight="700">各种折腾，尝试</text>
+    <path d="M86 142 C116 142 128 142 154 142" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.65"/>
+    <path d="M86 285 C116 285 128 285 154 285" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.65"/>
+    <path d="M86 428 C116 428 128 428 154 428" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.65"/>
 
-    <g filter="url(#softShadow)">
-      <rect x="72" y="284" width="510" height="104" rx="24" fill="#FFFFFF" stroke="#F1D9BF"/>
+    <g transform="translate(32 100)">
+      <circle cx="28" cy="42" r="28" fill="#EEF2FF"/>
+      <text x="28" y="51" font-size="25" font-weight="900" fill="#4C63E8" text-anchor="middle">1</text>
+      <g filter="url(#softShadow)">
+        <rect x="122" y="0" width="448" height="84" rx="20" fill="#FFFFFF" stroke="#D7DFFF"/>
+      </g>
+      <rect x="122" y="0" width="7" height="84" rx="3.5" fill="url(#accent)"/>
+      <text x="154" y="34" font-size="27" font-weight="900" fill="#151E3F">痛点</text>
+      <text x="154" y="63" font-size="19" font-weight="700" fill="#5D6B8A">各种难受、太烦、头大，先把真实阻塞说清楚</text>
     </g>
-    <rect x="104" y="316" width="40" height="40" rx="12" fill="#FFF0E4"/>
-    <text x="124" y="344" font-size="26" font-weight="900" text-anchor="middle" fill="#F28A36">3</text>
-    <text class="ink" x="170" y="332" font-size="30" font-weight="900">工具落地</text>
-    <text class="muted" x="170" y="366" font-size="22" font-weight="700">爽，happy</text>
+
+    <g transform="translate(32 243)">
+      <circle cx="28" cy="42" r="28" fill="#E8FAF7"/>
+      <text x="28" y="51" font-size="25" font-weight="900" fill="#10A196" text-anchor="middle">2</text>
+      <g filter="url(#softShadow)">
+        <rect x="122" y="0" width="448" height="84" rx="20" fill="#FFFFFF" stroke="#CBEDEA"/>
+      </g>
+      <rect x="122" y="0" width="7" height="84" rx="3.5" fill="url(#teal)"/>
+      <text x="154" y="34" font-size="27" font-weight="900" fill="#151E3F">需求分析</text>
+      <text x="154" y="63" font-size="19" font-weight="700" fill="#5D6B8A">哪些动作高频、可观察、能被工具稳定接管</text>
+    </g>
+
+    <g transform="translate(32 386)">
+      <circle cx="28" cy="42" r="28" fill="#FFF3E5"/>
+      <text x="28" y="51" font-size="25" font-weight="900" fill="#F08A35" text-anchor="middle">3</text>
+      <g filter="url(#softShadow)">
+        <rect x="122" y="0" width="448" height="84" rx="20" fill="#FFFFFF" stroke="#F2D9BE"/>
+      </g>
+      <rect x="122" y="0" width="7" height="84" rx="3.5" fill="url(#amber)"/>
+      <text x="154" y="34" font-size="27" font-weight="900" fill="#151E3F">工具落地</text>
+      <text x="154" y="63" font-size="19" font-weight="700" fill="#5D6B8A">接入 MCP / VM Service / skills，让结果真的跑起来</text>
+    </g>
+  </g>
+
+  <!-- Bottom strip -->
+  <g transform="translate(80 828)">
+    <rect x="0" y="0" width="1340" height="42" rx="21" fill="#FFFFFF" fill-opacity="0.72" stroke="#D8E0FF"/>
+    <text x="30" y="27" class="mono" font-size="15" font-weight="800" fill="#4C63E8">PROMPT</text>
+    <text x="118" y="27" font-size="18" font-weight="700" fill="#3A466B">别只问“AI 能不能做”，先问“这个动作是否稳定、重复、可验证”。</text>
   </g>
 </svg>

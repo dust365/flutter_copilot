@@ -1,0 +1,249 @@
+<svg width="1500" height="950" viewBox="0 0 1500 950" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="gCode" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="gRun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="gObserve" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFB86B"/><stop offset="100%" stop-color="#F0802D"/>
+    </linearGradient>
+    <linearGradient id="gDiag" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF92B8"/><stop offset="100%" stop-color="#E25D8F"/>
+    </linearGradient>
+    <linearGradient id="gFeedback" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BD5C7"/><stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <linearGradient id="manual" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F2F4F8"/>
+      <stop offset="100%" stop-color="#E5E9F0"/>
+    </linearGradient>
+    <radialGradient id="loopGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7B8DFF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#7B8DFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowGrey" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#9AA5BD"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto">
+      <path d="M0,0 L11,5.5 L0,11 Z" fill="#4C63E8"/>
+    </marker>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 42px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .panelTag { font: 700 12px 'SF Mono',Menlo,monospace; letter-spacing: 3px; }
+      .panelTitle { font: 800 28px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; letter-spacing: 1px; }
+      .panelSub { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .agentBadge { font: 800 11px 'SF Mono',Menlo,monospace; letter-spacing: 1.5px; }
+
+      .nodeTitle { font: 800 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; }
+      .nodeDesc { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .manualLabel { font: 700 11px 'SF Mono',Menlo,monospace; fill: #9AA5BD; letter-spacing: 2px; }
+
+      .loopNodeText { font: 800 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; }
+      .loopNodeStep { font: 700 11px 'SF Mono',Menlo,monospace; fill: rgba(255,255,255,0.75); letter-spacing: 1.5px; }
+
+      .quoteTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .quote { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .quoteHL { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #4C63E8; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="950" rx="28" fill="url(#bg)"/>
+
+  <!-- ========== Header ========== -->
+  <text x="80" y="80" class="tag">VALUE · 从代码助手到应用助手</text>
+  <text x="80" y="130" class="title">不要只让 AI 写代码,让它进入完整工作流</text>
+  <text x="80" y="165" class="subtitle">AI 真正的价值不在"回答问题",而在"参与执行" —— 把 5 环链路串起来才是协作者</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- ============ LEFT PANEL: 代码助手 ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="640" height="620" rx="22" fill="#FFFFFF" stroke="#D5DDF5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="220" width="640" height="56" rx="22" fill="#F2F4F8"/>
+  <rect x="80" y="262" width="640" height="14" fill="#F2F4F8"/>
+  <text x="106" y="252" class="panelTag" style="fill:#7383A8">▸ TRADITIONAL</text>
+  <text x="106" y="306" class="panelTitle" style="fill:#3A466B">代码助手  ·  传统形态</text>
+  <text x="106" y="332" class="panelSub">AI 只参与"代码生成",其余环节都靠人手工补全</text>
+
+  <!-- AI node (only stage AI is active) -->
+  <g transform="translate(190, 360)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="420" height="92" rx="18" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+    <rect x="0" y="0" width="6" height="92" rx="3" fill="url(#gCode)"/>
+    <g transform="translate(28, 28)">
+      <rect x="0" y="0" width="58" height="22" rx="11" fill="url(#accent)"/>
+      <text x="29" y="15" class="agentBadge" style="fill:#FFFFFF" text-anchor="middle">🤖 AI</text>
+    </g>
+    <text x="28" y="78" class="nodeTitle" style="fill:#1A234A">代码生成</text>
+    <text x="155" y="78" class="nodeDesc">写函数 / 改 bug / 重构 —— AI 唯一发挥的环节</text>
+  </g>
+
+  <!-- Hand-off divider -->
+  <g transform="translate(140, 484)">
+    <line x1="0" y1="0" x2="520" y2="0" stroke="#9AA5BD" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <rect x="200" y="-14" width="120" height="28" rx="14" fill="#FFFFFF" stroke="#9AA5BD" stroke-width="1.5"/>
+    <text x="260" y="6" class="manualLabel" text-anchor="middle">▼ 抛给人</text>
+  </g>
+
+  <!-- 4 manual steps stacked -->
+  <g transform="translate(120, 520)">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="560" height="64" rx="14" fill="url(#manual)" stroke="#D5DDF5" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="58" height="22" rx="11" fill="#9AA5BD"/>
+        <text x="29" y="15" class="agentBadge" style="fill:#FFFFFF" text-anchor="middle">👤 人</text>
+      </g>
+      <text x="100" y="40" class="nodeTitle" style="fill:#5D6B8A; font-size:16px">运行验证</text>
+      <text x="220" y="40" class="nodeDesc">人手工跑应用、点页面、复现路径</text>
+    </g>
+    <g transform="translate(0, 76)">
+      <rect x="0" y="0" width="560" height="64" rx="14" fill="url(#manual)" stroke="#D5DDF5" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="58" height="22" rx="11" fill="#9AA5BD"/>
+        <text x="29" y="15" class="agentBadge" style="fill:#FFFFFF" text-anchor="middle">👤 人</text>
+      </g>
+      <text x="100" y="40" class="nodeTitle" style="fill:#5D6B8A; font-size:16px">页面观察</text>
+      <text x="220" y="40" class="nodeDesc">人看屏幕、对比效果、自己截图</text>
+    </g>
+    <g transform="translate(0, 152)">
+      <rect x="0" y="0" width="560" height="64" rx="14" fill="url(#manual)" stroke="#D5DDF5" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="58" height="22" rx="11" fill="#9AA5BD"/>
+        <text x="29" y="15" class="agentBadge" style="fill:#FFFFFF" text-anchor="middle">👤 人</text>
+      </g>
+      <text x="100" y="40" class="nodeTitle" style="fill:#5D6B8A; font-size:16px">问题定位</text>
+      <text x="220" y="40" class="nodeDesc">人翻日志、查 DevTools、自己分析</text>
+    </g>
+    <g transform="translate(0, 228)">
+      <rect x="0" y="0" width="560" height="64" rx="14" fill="url(#manual)" stroke="#D5DDF5" stroke-width="1.5"/>
+      <g transform="translate(20, 20)">
+        <rect x="0" y="0" width="58" height="22" rx="11" fill="#9AA5BD"/>
+        <text x="29" y="15" class="agentBadge" style="fill:#FFFFFF" text-anchor="middle">👤 人</text>
+      </g>
+      <text x="100" y="40" class="nodeTitle" style="fill:#5D6B8A; font-size:16px">结果反馈</text>
+      <text x="220" y="40" class="nodeDesc">人转述现象、贴截图、人肉描述</text>
+    </g>
+  </g>
+
+  <!-- Bottom note -->
+  <g transform="translate(106, 808)">
+    <text x="0" y="0" style="font: 600 14px -apple-system; fill:#9AA5BD">AI 没看到运行时,只能在终点等人喂二手信息</text>
+  </g>
+
+  <!-- ============ RIGHT PANEL: 应用助手 ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="780" y="220" width="640" height="620" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+  </g>
+  <rect x="780" y="220" width="640" height="56" rx="22" fill="url(#accent)"/>
+  <rect x="780" y="262" width="640" height="14" fill="url(#accent)"/>
+  <text x="806" y="252" class="panelTag" style="fill:#FFFFFF">▸ FLUTTER COPILOT</text>
+  <text x="806" y="306" class="panelTitle" style="fill:#1A234A">应用助手  ·  闭合工作流</text>
+  <text x="806" y="332" class="panelSub">AI 真正进入运行时,5 个环节连成闭环 —— 改完代码就能验证</text>
+
+  <!-- 5-stage closed loop (pentagon) -->
+  <!-- Center: (1100, 580), radius for nodes ~165 -->
+  <g transform="translate(1100, 580)">
+    <!-- soft glow -->
+    <circle r="240" fill="url(#loopGlow)"/>
+
+    <!-- Center label -->
+    <g>
+      <text y="-6" style="font: 800 18px -apple-system; fill:#4C63E8" text-anchor="middle">AI 全程在场</text>
+      <text y="18" style="font: 600 13px 'SF Mono'; fill:#7383A8; letter-spacing:1px" text-anchor="middle">closed agentic loop</text>
+    </g>
+
+    <!-- Pentagon nodes
+         Node positions (pentagonal, radius=170):
+         Top (0): (0, -170)
+         Right-top (1): (162, -52)
+         Right-bottom (2): (100, 137)
+         Left-bottom (3): (-100, 137)
+         Left-top (4): (-162, -52)
+    -->
+
+    <!-- Connecting arrows (clockwise) - drawn first so nodes overlap -->
+    <g fill="none" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" opacity="0.55">
+      <!-- 0 → 1 -->
+      <path d="M 48 -163 A 170 170 0 0 1 156 -82" marker-end="url(#arrowBlue)"/>
+      <!-- 1 → 2 -->
+      <path d="M 168 -16 A 170 170 0 0 1 124 124" marker-end="url(#arrowBlue)"/>
+      <!-- 2 → 3 -->
+      <path d="M 70 161 A 170 170 0 0 1 -70 161" marker-end="url(#arrowBlue)"/>
+      <!-- 3 → 4 -->
+      <path d="M -124 124 A 170 170 0 0 1 -168 -16" marker-end="url(#arrowBlue)"/>
+      <!-- 4 → 0 -->
+      <path d="M -156 -82 A 170 170 0 0 1 -48 -163" marker-end="url(#arrowBlue)"/>
+    </g>
+
+    <!-- Node 0: 代码生成 (top) -->
+    <g transform="translate(0, -170)">
+      <circle r="60" fill="url(#gCode)" filter="url(#softShadow)"/>
+      <text y="-8" class="loopNodeStep" text-anchor="middle">STEP 01</text>
+      <text y="14" class="loopNodeText" text-anchor="middle">代码</text>
+      <text y="34" class="loopNodeText" text-anchor="middle">生成</text>
+    </g>
+    <!-- Node 1: 运行验证 (top-right) -->
+    <g transform="translate(162, -52)">
+      <circle r="60" fill="url(#gRun)" filter="url(#softShadow)"/>
+      <text y="-8" class="loopNodeStep" text-anchor="middle">STEP 02</text>
+      <text y="14" class="loopNodeText" text-anchor="middle">运行</text>
+      <text y="34" class="loopNodeText" text-anchor="middle">验证</text>
+    </g>
+    <!-- Node 2: 页面观察 (bottom-right) -->
+    <g transform="translate(100, 137)">
+      <circle r="60" fill="url(#gObserve)" filter="url(#softShadow)"/>
+      <text y="-8" class="loopNodeStep" text-anchor="middle">STEP 03</text>
+      <text y="14" class="loopNodeText" text-anchor="middle">页面</text>
+      <text y="34" class="loopNodeText" text-anchor="middle">观察</text>
+    </g>
+    <!-- Node 3: 问题定位 (bottom-left) -->
+    <g transform="translate(-100, 137)">
+      <circle r="60" fill="url(#gDiag)" filter="url(#softShadow)"/>
+      <text y="-8" class="loopNodeStep" text-anchor="middle">STEP 04</text>
+      <text y="14" class="loopNodeText" text-anchor="middle">问题</text>
+      <text y="34" class="loopNodeText" text-anchor="middle">定位</text>
+    </g>
+    <!-- Node 4: 结果反馈 (top-left) -->
+    <g transform="translate(-162, -52)">
+      <circle r="60" fill="url(#gFeedback)" filter="url(#softShadow)"/>
+      <text y="-8" class="loopNodeStep" text-anchor="middle">STEP 05</text>
+      <text y="14" class="loopNodeText" text-anchor="middle">结果</text>
+      <text y="34" class="loopNodeText" text-anchor="middle">反馈</text>
+    </g>
+  </g>
+
+  <!-- Bottom note -->
+  <g transform="translate(806, 808)">
+    <text x="0" y="0" style="font: 600 14px -apple-system; fill:#4C63E8">AI 看到运行时 · 操作运行时 · 拿到一手数据 —— 5 环全部由它驱动</text>
+  </g>
+
+  <!-- ============ Bottom takeaway ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="868" width="1340" height="58" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="868" width="6" height="58" rx="3" fill="url(#accent)"/>
+  <text x="115" y="903" class="quote">从  「<tspan fill="#9AA5BD">回答问题的助手</tspan>」  →  <tspan class="quoteHL">「参与执行的协作者」</tspan>  ——  AI 终于不只是聊天窗口,而是工作系统的一部分</text>
+</svg>
