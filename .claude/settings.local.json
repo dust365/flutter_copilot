@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.google.com)",
+      "Bash(wc -l /Users/chenhui/flutterProjects/mcp_flutter_dev/marionette_mcp/packages/marionette_mcp/lib/src/video/*.dart)",
+      "Bash(npx fcc:*)"
+    ]
+  }
+}

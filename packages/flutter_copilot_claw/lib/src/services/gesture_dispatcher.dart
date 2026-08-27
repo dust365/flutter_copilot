@@ -6,8 +6,14 @@ import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
 /// Dispatches gesture events to simulate user interactions.
 class GestureDispatcher {
+  GestureDispatcher({this.onTapAt});
+
   static const kMaxDelta = 40.0;
   static const kDelay = Duration(milliseconds: 10);
+
+  /// Called after a tap/longPress/doubleTap is dispatched, with the global position.
+  /// Used to show a feedback dot (e.g. [TapFeedbackController.showAt]).
+  final void Function(Offset)? onTapAt;
 
   int _nextPointerId = 1;
 
@@ -53,17 +59,23 @@ class GestureDispatcher {
     await _dispatchTapAtPosition(globalPosition);
   }
 
+  /// Delay between showing tap feedback and dispatching the actual pointer events (ms).
+  static const int kTapFeedbackDelayMs = 300;
+
   Future<void> _dispatchTapAtPosition(Offset globalPosition) async {
     final pointerId = _nextPointerId++;
 
+    // Show feedback first, then wait before executing the tap
+    onTapAt?.call(globalPosition);
+    await Future<void>.delayed(
+        const Duration(milliseconds: kTapFeedbackDelayMs));
+
     // Build the event records
     final records = [
-      // Pointer down immediately
       [
         PointerAddedEvent(position: globalPosition),
         PointerDownEvent(pointer: pointerId, position: globalPosition),
       ],
-      // Pointer up after a short delay
       [PointerUpEvent(pointer: pointerId, position: globalPosition)],
     ];
 
@@ -251,6 +263,10 @@ class GestureDispatcher {
     Offset globalPosition,
     Duration duration,
   ) async {
+    onTapAt?.call(globalPosition);
+    await Future<void>.delayed(
+        const Duration(milliseconds: kTapFeedbackDelayMs));
+
     final pointerId = _nextPointerId++;
 
     // Build the event records

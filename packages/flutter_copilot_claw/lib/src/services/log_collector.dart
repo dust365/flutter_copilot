@@ -1,10 +1,9 @@
 import 'dart:collection';
 
-// Temporarily disabled: logging package import
-// Uncomment if you want to capture logging package logs:
-// import 'package:logging/logging.dart';
-
 /// Collects and stores Flutter logs for retrieval via VM service extension.
+/// Logs are collected via [FlutterCopilotBinding.captureLogs] (print +
+/// uncaught errors) and custom entries via
+/// [LogCollector.addConsoleLogStatic] / [FlutterCopilotBinding.addLog].
 class LogCollector {
   final _logs = Queue<String>();
   static const _maxLogs = 1000;
@@ -14,20 +13,14 @@ class LogCollector {
   /// Gets the singleton instance of LogCollector.
   static LogCollector? get instance => _instance;
 
-  /// Initializes the log collector to start capturing logs.
+  /// Initializes the log collector. No logging package is used; collection
+  /// is done by Zone in [FlutterCopilotBinding.captureLogs] and custom logs
+  /// via [addConsoleLog] / [addConsoleLogStatic].
   void initialize() {
     if (_initialized) {
       return;
     }
-
     _instance = this;
-
-    // Temporarily disabled: Capture logging package logs
-    // Uncomment the following code if you want to capture logging package logs:
-    // Logger.root.onRecord.listen((record) {
-    //   _addLog(_formatLogRecord(record));
-    // });
-
     _initialized = true;
   }
 
@@ -77,36 +70,6 @@ class LogCollector {
     _initialized = false;
     _instance = null;
   }
-
-  // Temporarily disabled: Format logging package log records
-  // Uncomment this method if you want to capture logging package logs:
-  // String _formatLogRecord(LogRecord record) {
-  //   final buffer = StringBuffer()
-  //     ..write('[')
-  //     ..write(_formatTime(record.time))
-  //     ..write('][')
-  //     ..write(record.level.name.toUpperCase())
-  //     ..write('][')
-  //     ..write(record.loggerName)
-  //     ..write('] ')
-  //     ..write(record.message);
-  //
-  //   if (record.error != null) {
-  //     buffer.write('\n  Error: ${record.error}');
-  //   }
-  //
-  //   if (record.stackTrace != null) {
-  //     buffer.write('\n  Stack trace:\n');
-  //     final stackLines = record.stackTrace.toString().split('\n');
-  //     for (final line in stackLines) {
-  //       if (line.isNotEmpty) {
-  //         buffer.write('    $line\n');
-  //       }
-  //     }
-  //   }
-  //
-  //   return buffer.toString();
-  // }
 
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:'

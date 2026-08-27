@@ -1,0 +1,204 @@
+<svg width="1500" height="780" viewBox="0 0 1500 780" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FAFCFF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="mobile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="web" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="desktop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BD5C7"/><stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <linearGradient id="okBadge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A8F0B8"/><stop offset="100%" stop-color="#3BAA5C"/>
+    </linearGradient>
+    <linearGradient id="partialBadge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <clipPath id="clipAndroid"><rect x="90" y="260" width="420" height="190" rx="20"/></clipPath>
+    <clipPath id="clipIOS"><rect x="540" y="260" width="420" height="190" rx="20"/></clipPath>
+    <clipPath id="clipWeb"><rect x="990" y="260" width="420" height="190" rx="20"/></clipPath>
+    <clipPath id="clipMac"><rect x="90" y="480" width="420" height="190" rx="20"/></clipPath>
+    <clipPath id="clipWin"><rect x="540" y="480" width="420" height="190" rx="20"/></clipPath>
+    <clipPath id="clipLinux"><rect x="990" y="480" width="420" height="190" rx="20"/></clipPath>
+
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 4px; }
+      .title { font: 800 50px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 2px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .heroLine { font: 700 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+
+      .icon { font: 36px -apple-system,BlinkMacSystemFont,'Segoe UI Emoji'; }
+      .platName { font: 800 28px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 0.5px; }
+      .platDesc { font: 500 14px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .badgeText { font: 800 12px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 1px; }
+      .catChip { font: 800 11px 'SF Mono',Menlo,monospace; letter-spacing: 2px; }
+      .star { font: 800 14px -apple-system; fill: #F0A03D; }
+
+      .footTag { font: 700 12px 'SF Mono',Menlo,monospace; letter-spacing: 2px; }
+      .footH { font: 800 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .footB { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="780" rx="28" fill="url(#bg)"/>
+
+  <!-- ========== Header ========== -->
+  <text x="80" y="80" class="tag">CROSS-PLATFORM SUPPORT</text>
+  <text x="80" y="142" class="title">跨平台支持</text>
+  <text x="80" y="182" class="heroLine">Flutter 跑得到的地方,Flutter Copilot 就能跑  ——  6 个平台共享同一套 VM Service 扩展</text>
+  <rect x="80" y="200" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- top-right summary -->
+  <g transform="translate(1280, 90)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="140" height="80" rx="18" fill="url(#accent)"/>
+    <text x="70" y="32" class="badgeText" text-anchor="middle">PLATFORMS</text>
+    <text x="70" y="68" style="font: 900 36px -apple-system; fill:#FFFFFF" text-anchor="middle">6</text>
+  </g>
+
+  <!-- ============ ROW 1: Android · iOS · Web ============ -->
+
+  <!-- Android tile -->
+  <g filter="url(#softShadow)">
+    <rect x="90" y="260" width="420" height="190" rx="20" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="90" y="260" width="420" height="6" fill="url(#mobile)" clip-path="url(#clipAndroid)"/>
+  <text x="120" y="320" class="icon">🤖</text>
+  <text x="170" y="318" class="platName">Android</text>
+  <!-- support badge -->
+  <g transform="translate(360, 282)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#okBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 完整支持</text>
+  </g>
+  <text x="120" y="362" class="platDesc">真机 / 模拟器均可</text>
+  <text x="120" y="384" class="platDesc">连接 debug 模式下的 VM Service</text>
+  <!-- category chip -->
+  <g transform="translate(120, 408)">
+    <rect x="0" y="0" width="92" height="26" rx="13" fill="#EEF3FF" stroke="#5B73E0" stroke-width="1"/>
+    <text x="46" y="18" class="catChip" style="fill:#4057D6" text-anchor="middle">📱 MOBILE</text>
+  </g>
+
+  <!-- iOS tile -->
+  <g filter="url(#softShadow)">
+    <rect x="540" y="260" width="420" height="190" rx="20" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="540" y="260" width="420" height="6" fill="url(#mobile)" clip-path="url(#clipIOS)"/>
+  <text x="570" y="320" class="icon">🍎</text>
+  <text x="620" y="318" class="platName">iOS</text>
+  <g transform="translate(810, 282)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#okBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 完整支持</text>
+  </g>
+  <text x="570" y="362" class="platDesc">真机 / 模拟器均可</text>
+  <text x="570" y="384" class="platDesc">真机需要调试连接权限</text>
+  <g transform="translate(570, 408)">
+    <rect x="0" y="0" width="92" height="26" rx="13" fill="#EEF3FF" stroke="#5B73E0" stroke-width="1"/>
+    <text x="46" y="18" class="catChip" style="fill:#4057D6" text-anchor="middle">📱 MOBILE</text>
+  </g>
+
+  <!-- Web tile (special: partial support) -->
+  <g filter="url(#softShadow)">
+    <rect x="990" y="260" width="420" height="190" rx="20" fill="url(#card)" stroke="#9FE0F0" stroke-width="2"/>
+  </g>
+  <rect x="990" y="260" width="420" height="6" fill="url(#web)" clip-path="url(#clipWeb)"/>
+  <text x="1020" y="320" class="icon">🌐</text>
+  <text x="1070" y="318" class="platName">Web</text>
+  <g transform="translate(1260, 282)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#partialBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 主要交互</text>
+  </g>
+  <text x="1020" y="362" class="platDesc">截图 / 元素 / 日志均可用</text>
+  <text x="1020" y="384" class="platDesc">重建热点快照为空 <tspan fill="#F0A03D" font-weight="800">*</tspan></text>
+  <g transform="translate(1020, 408)">
+    <rect x="0" y="0" width="62" height="26" rx="13" fill="#E6F6FF" stroke="#3EA8FF" stroke-width="1"/>
+    <text x="31" y="18" class="catChip" style="fill:#2E7FAC" text-anchor="middle">🌐 WEB</text>
+  </g>
+  <text x="1100" y="425" style="font: 500 11px 'SF Mono'; fill:#9AA5BD">* Web 无法注入 BuildOwner hook</text>
+
+  <!-- ============ ROW 2: macOS · Windows · Linux ============ -->
+
+  <!-- macOS tile -->
+  <g filter="url(#softShadow)">
+    <rect x="90" y="480" width="420" height="190" rx="20" fill="url(#card)" stroke="#9FE0D5" stroke-width="1.5"/>
+  </g>
+  <rect x="90" y="480" width="420" height="6" fill="url(#desktop)" clip-path="url(#clipMac)"/>
+  <text x="120" y="540" class="icon">💻</text>
+  <text x="170" y="538" class="platName">macOS</text>
+  <g transform="translate(360, 502)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#okBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 完整支持</text>
+  </g>
+  <text x="120" y="582" class="platDesc">Desktop debug build</text>
+  <text x="120" y="604" class="platDesc">原生窗口 · 触控板手势</text>
+  <g transform="translate(120, 628)">
+    <rect x="0" y="0" width="100" height="26" rx="13" fill="#EEFBF8" stroke="#0D7F78" stroke-width="1"/>
+    <text x="50" y="18" class="catChip" style="fill:#0D7F78" text-anchor="middle">🖥️ DESKTOP</text>
+  </g>
+
+  <!-- Windows tile -->
+  <g filter="url(#softShadow)">
+    <rect x="540" y="480" width="420" height="190" rx="20" fill="url(#card)" stroke="#9FE0D5" stroke-width="1.5"/>
+  </g>
+  <rect x="540" y="480" width="420" height="6" fill="url(#desktop)" clip-path="url(#clipWin)"/>
+  <text x="570" y="540" class="icon">🪟</text>
+  <text x="620" y="538" class="platName">Windows</text>
+  <g transform="translate(810, 502)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#okBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 完整支持</text>
+  </g>
+  <text x="570" y="582" class="platDesc">Desktop debug build</text>
+  <text x="570" y="604" class="platDesc">Win32 原生窗口</text>
+  <g transform="translate(570, 628)">
+    <rect x="0" y="0" width="100" height="26" rx="13" fill="#EEFBF8" stroke="#0D7F78" stroke-width="1"/>
+    <text x="50" y="18" class="catChip" style="fill:#0D7F78" text-anchor="middle">🖥️ DESKTOP</text>
+  </g>
+
+  <!-- Linux tile -->
+  <g filter="url(#softShadow)">
+    <rect x="990" y="480" width="420" height="190" rx="20" fill="url(#card)" stroke="#9FE0D5" stroke-width="1.5"/>
+  </g>
+  <rect x="990" y="480" width="420" height="6" fill="url(#desktop)" clip-path="url(#clipLinux)"/>
+  <text x="1020" y="540" class="icon">🐧</text>
+  <text x="1070" y="538" class="platName">Linux</text>
+  <g transform="translate(1260, 502)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="url(#okBadge)"/>
+    <text x="60" y="18" class="badgeText" text-anchor="middle">✓ 完整支持</text>
+  </g>
+  <text x="1020" y="582" class="platDesc">Desktop debug build</text>
+  <text x="1020" y="604" class="platDesc">GTK 接入</text>
+  <g transform="translate(1020, 628)">
+    <rect x="0" y="0" width="100" height="26" rx="13" fill="#EEFBF8" stroke="#0D7F78" stroke-width="1"/>
+    <text x="50" y="18" class="catChip" style="fill:#0D7F78" text-anchor="middle">🖥️ DESKTOP</text>
+  </g>
+
+  <!-- ============ Bottom: release-safe boundary ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="700" width="1340" height="60" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="700" width="6" height="60" rx="3" fill="url(#accent)"/>
+
+  <g transform="translate(115, 718)">
+    <rect x="0" y="0" width="130" height="26" rx="13" fill="#EEF3FF" stroke="#4C63E8" stroke-width="1"/>
+    <text x="65" y="18" class="footTag" style="fill:#4C63E8" text-anchor="middle">🔒 RELEASE-SAFE</text>
+  </g>
+  <text x="265" y="736" class="footH">claw 接入代码在 release 下自动退化为普通 Binding</text>
+  <text x="800" y="736" class="footB">·  不注册 Copilot 扩展  ·  不占运行时开销  ·  操作能力本身依赖 debug / profile 下的 VM Service</text>
+</svg>

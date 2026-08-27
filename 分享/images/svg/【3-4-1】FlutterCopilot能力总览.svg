@@ -1,0 +1,304 @@
+<svg width="1500" height="1030" viewBox="0 0 1500 1030" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="gConnect" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="gObserve" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="gInteract" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFB86B"/><stop offset="100%" stop-color="#F0802D"/>
+    </linearGradient>
+    <linearGradient id="gDiagnose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF92B8"/><stop offset="100%" stop-color="#E25D8F"/>
+    </linearGradient>
+    <linearGradient id="gDevLoop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BD5C7"/><stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <linearGradient id="gKey" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A8F0B8"/><stop offset="100%" stop-color="#3BAA5C"/>
+    </linearGradient>
+    <linearGradient id="gText" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B8C6FF"/><stop offset="100%" stop-color="#6B7FE8"/>
+    </linearGradient>
+    <linearGradient id="gType" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D4B5FF"/><stop offset="100%" stop-color="#8E5EE8"/>
+    </linearGradient>
+    <linearGradient id="gCoord" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFE0A0"/><stop offset="100%" stop-color="#E89B3D"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="loopArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
+    </marker>
+
+    <!-- clipPaths so the colored top stripes follow the card's rounded corners -->
+    <clipPath id="clipConnect"><rect x="80" y="220" width="328" height="220" rx="22"/></clipPath>
+    <clipPath id="clipObserve"><rect x="428" y="220" width="328" height="220" rx="22"/></clipPath>
+    <clipPath id="clipDiagnose"><rect x="776" y="220" width="328" height="220" rx="22"/></clipPath>
+    <clipPath id="clipDevLoop"><rect x="1124" y="220" width="328" height="220" rx="22"/></clipPath>
+    <clipPath id="clipInteract"><rect x="80" y="460" width="1372" height="240" rx="22"/></clipPath>
+
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .catLabel { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .catName { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .catCount { font: 800 42px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+      .catUnit { font: 500 14px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #7383A8; }
+      .catDesc { font: 500 14px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .tool { font: 600 14px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #1A234A; letter-spacing: 0.3px; }
+      .toolSm { font: 600 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #1A234A; letter-spacing: 0.3px; }
+      .toolSub { font: 500 11px 'SF Mono',Menlo,monospace; fill: #7383A8; }
+      .totalTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 3px; }
+      .totalNum { font: 900 72px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #FFFFFF; letter-spacing: 2px; }
+      .totalUnit { font: 500 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #C8D4F5; letter-spacing: 1px; }
+      .footH { font: 700 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .chainTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .matchHeader { font: 700 13px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .matchName { font: 800 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .matchDesc { font: 500 12px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .nodeText { font: 800 14px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; }
+      .nodeHint { font: 500 12px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="1030" rx="28" fill="url(#bg)"/>
+
+  <!-- header -->
+  <text x="80" y="80" class="tag">CAPABILITY · 15 MCP TOOLS · 5 CATEGORIES</text>
+  <text x="80" y="130" class="title">Flutter Copilot 能力总览</text>
+  <text x="80" y="165" class="subtitle">15 个工具 · 5 类能力 · 4 种元素匹配 —— 闭合"观察 → 操作 → 诊断 → 开发闭环"协作链路</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- Big total badge (top-right) -->
+  <g filter="url(#softShadow)">
+    <rect x="1220" y="60" width="220" height="130" rx="22" fill="url(#accent)"/>
+  </g>
+  <text x="1330" y="100" class="totalTag" text-anchor="middle">TOTAL TOOLS</text>
+  <text x="1330" y="160" class="totalNum" text-anchor="middle">15</text>
+  <text x="1330" y="182" class="totalUnit" text-anchor="middle">MCP capabilities</text>
+
+  <!-- ============ Row 1: 4 small category cards (each 2 tools) ============ -->
+  <!-- Connect -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="220" width="328" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="220" width="328" height="6" fill="url(#gConnect)" clip-path="url(#clipConnect)"/>
+  <rect x="102" y="248" width="82" height="22" rx="11" fill="url(#gConnect)"/>
+  <text x="143" y="263" class="catLabel" text-anchor="middle">CONNECT</text>
+  <text x="102" y="305" class="catName">连接</text>
+  <text x="102" y="350" class="catCount" style="fill:#5B73E0">2</text>
+  <text x="140" y="350" class="catUnit">tools</text>
+  <line x1="102" y1="368" x2="386" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="102" y="396" class="toolSm">connect</text>
+  <text x="102" y="421" class="toolSm">disconnect</text>
+
+  <!-- Observe -->
+  <g filter="url(#softShadow)">
+    <rect x="428" y="220" width="328" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="428" y="220" width="328" height="6" fill="url(#gObserve)" clip-path="url(#clipObserve)"/>
+  <rect x="450" y="248" width="82" height="22" rx="11" fill="url(#gObserve)"/>
+  <text x="491" y="263" class="catLabel" text-anchor="middle">OBSERVE</text>
+  <text x="450" y="305" class="catName">观察</text>
+  <text x="450" y="350" class="catCount" style="fill:#3EA8FF">2</text>
+  <text x="488" y="350" class="catUnit">tools</text>
+  <line x1="450" y1="368" x2="734" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="450" y="396" class="toolSm">get_interactive_elements</text>
+  <text x="450" y="421" class="toolSm">take_screenshots</text>
+
+  <!-- Diagnose -->
+  <g filter="url(#softShadow)">
+    <rect x="776" y="220" width="328" height="220" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="776" y="220" width="328" height="6" fill="url(#gDiagnose)" clip-path="url(#clipDiagnose)"/>
+  <rect x="798" y="248" width="82" height="22" rx="11" fill="url(#gDiagnose)"/>
+  <text x="839" y="263" class="catLabel" text-anchor="middle">DIAGNOSE</text>
+  <text x="798" y="305" class="catName">诊断</text>
+  <text x="798" y="350" class="catCount" style="fill:#E25D8F">2</text>
+  <text x="836" y="350" class="catUnit">tools</text>
+  <line x1="798" y1="368" x2="1082" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="798" y="396" class="toolSm">get_logs</text>
+  <text x="798" y="421" class="toolSm">get_rebuild_snapshot</text>
+
+  <!-- Dev Loop -->
+  <g filter="url(#softShadow)">
+    <rect x="1124" y="220" width="328" height="220" rx="22" fill="url(#card)" stroke="#9FE0D5" stroke-width="1.5"/>
+  </g>
+  <rect x="1124" y="220" width="328" height="6" fill="url(#gDevLoop)" clip-path="url(#clipDevLoop)"/>
+  <rect x="1146" y="248" width="92" height="22" rx="11" fill="url(#gDevLoop)"/>
+  <text x="1192" y="263" class="catLabel" text-anchor="middle">DEV LOOP</text>
+  <text x="1146" y="305" class="catName">开发闭环</text>
+  <text x="1146" y="350" class="catCount" style="fill:#0D7F78">2</text>
+  <text x="1184" y="350" class="catUnit">tools</text>
+  <line x1="1146" y1="368" x2="1430" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
+  <text x="1146" y="396" class="toolSm">hot_reload</text>
+  <text x="1146" y="421" class="toolSm">navigate  ·  5 ops</text>
+
+  <!-- ============ Row 2: Interact wide card (7 tools) ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="460" width="1372" height="240" rx="22" fill="url(#card)" stroke="#F0A560" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="460" width="1372" height="6" fill="url(#gInteract)" clip-path="url(#clipInteract)"/>
+  <rect x="102" y="488" width="90" height="22" rx="11" fill="url(#gInteract)"/>
+  <text x="147" y="503" class="catLabel" text-anchor="middle">INTERACT</text>
+  <text x="102" y="546" class="catName">交互</text>
+  <text x="102" y="588" class="catCount" style="fill:#F0802D">7</text>
+  <text x="140" y="588" class="catUnit">tools — 覆盖主流手势与输入</text>
+  <text x="102" y="616" class="catDesc">通过 Key · 文本 · Widget 类型 · 屏幕坐标 四种方式定位元素后派发手势</text>
+
+  <!-- 7 tool pills -->
+  <g transform="translate(102, 638)">
+    <g>
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">tap</text>
+    </g>
+    <g transform="translate(193, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">long_press</text>
+    </g>
+    <g transform="translate(386, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">double_tap</text>
+    </g>
+    <g transform="translate(579, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">enter_text</text>
+    </g>
+    <g transform="translate(772, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">scroll_to</text>
+    </g>
+    <g transform="translate(965, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">drag</text>
+    </g>
+    <g transform="translate(1158, 0)">
+      <rect x="0" y="0" width="178" height="46" rx="12" fill="#FFF3E0" stroke="#F0A560" stroke-width="1.5"/>
+      <circle cx="22" cy="23" r="6" fill="#F0802D"/>
+      <text x="38" y="28" class="tool">swipe</text>
+    </g>
+  </g>
+
+  <!-- ============ Row 3: 4 element matching methods + workflow loop ============ -->
+
+  <!-- Matching panel (left, 4 ways) -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="720" width="820" height="290" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="720" width="6" height="290" rx="3" fill="url(#accent)"/>
+  <text x="115" y="752" class="chainTag">ELEMENT MATCHING · 4 WAYS</text>
+  <text x="115" y="784" class="footH">4 种元素定位方式 —— Key 最稳定,坐标兜底</text>
+
+  <!-- 4 matching pills (2x2) -->
+  <g transform="translate(115, 808)">
+    <!-- Key -->
+    <g>
+      <rect x="0" y="0" width="380" height="80" rx="14" fill="#F2FBF4" stroke="#3BAA5C" stroke-width="1.5"/>
+      <rect x="0" y="0" width="80" height="80" rx="14" fill="url(#gKey)"/>
+      <text x="40" y="34" class="matchHeader" text-anchor="middle">KEY</text>
+      <text x="40" y="58" class="matchHeader" text-anchor="middle" style="font-size:11px">⭐ BEST</text>
+      <text x="100" y="34" class="matchName">Key（最推荐）</text>
+      <text x="100" y="58" class="matchDesc">ValueKey&lt;String&gt;,</text>
+      <text x="100" y="74" class="matchDesc">界面变动也不会失效</text>
+    </g>
+    <!-- Text -->
+    <g transform="translate(400, 0)">
+      <rect x="0" y="0" width="380" height="80" rx="14" fill="#F0F4FF" stroke="#6B7FE8" stroke-width="1.5"/>
+      <rect x="0" y="0" width="80" height="80" rx="14" fill="url(#gText)"/>
+      <text x="40" y="46" class="matchHeader" text-anchor="middle">TEXT</text>
+      <text x="100" y="34" class="matchName">文本内容</text>
+      <text x="100" y="58" class="matchDesc">按显示文案 / 标签匹配</text>
+      <text x="100" y="74" class="matchDesc">直观但受文案变动影响</text>
+    </g>
+    <!-- Type -->
+    <g transform="translate(0, 96)">
+      <rect x="0" y="0" width="380" height="80" rx="14" fill="#F8F2FF" stroke="#8E5EE8" stroke-width="1.5"/>
+      <rect x="0" y="0" width="80" height="80" rx="14" fill="url(#gType)"/>
+      <text x="40" y="46" class="matchHeader" text-anchor="middle">TYPE</text>
+      <text x="100" y="34" class="matchName">Widget 类型</text>
+      <text x="100" y="58" class="matchDesc">按 runtimeType 匹配</text>
+      <text x="100" y="74" class="matchDesc">适合通用控件类组件</text>
+    </g>
+    <!-- Coordinate -->
+    <g transform="translate(400, 96)">
+      <rect x="0" y="0" width="380" height="80" rx="14" fill="#FFF8EB" stroke="#E89B3D" stroke-width="1.5"/>
+      <rect x="0" y="0" width="80" height="80" rx="14" fill="url(#gCoord)"/>
+      <text x="40" y="46" class="matchHeader" text-anchor="middle">XY</text>
+      <text x="100" y="34" class="matchName">屏幕坐标（兜底）</text>
+      <text x="100" y="58" class="matchDesc">兜底方案,适合验证</text>
+      <text x="100" y="74" class="matchDesc">不适合稳定脚本</text>
+    </g>
+  </g>
+
+  <!-- Workflow Loop (right) -->
+  <g filter="url(#softShadow)">
+    <rect x="920" y="720" width="532" height="290" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="920" y="720" width="6" height="290" rx="3" fill="url(#accent)"/>
+  <text x="955" y="752" class="chainTag">RUNTIME COLLABORATION LOOP</text>
+  <text x="955" y="784" class="footH">闭合协作链路 —— 改了代码,下一秒就能验证</text>
+
+  <!-- Loop diagram (translate puts top of 观察 at y=800, bottom of 诊断 at y=996, all inside card y=720-1010) -->
+  <g transform="translate(940, 800)">
+    <!-- Center label -->
+    <text x="246" y="98" class="nodeHint" text-anchor="middle" style="font-weight:700; fill:#4C63E8">闭环</text>
+    <text x="246" y="115" class="nodeHint" text-anchor="middle" style="font-size:11px; fill:#7383A8">Closed Loop</text>
+
+    <!-- Top: 观察 -->
+    <g transform="translate(216, 0)">
+      <circle cx="30" cy="30" r="28" fill="url(#gObserve)"/>
+      <text x="30" y="35" class="nodeText" text-anchor="middle">观察</text>
+    </g>
+    <!-- Right: 操作 -->
+    <g transform="translate(384, 70)">
+      <circle cx="30" cy="30" r="28" fill="url(#gInteract)"/>
+      <text x="30" y="35" class="nodeText" text-anchor="middle">操作</text>
+    </g>
+    <!-- Bottom: 诊断 -->
+    <g transform="translate(216, 140)">
+      <circle cx="30" cy="30" r="28" fill="url(#gDiagnose)"/>
+      <text x="30" y="35" class="nodeText" text-anchor="middle">诊断</text>
+    </g>
+    <!-- Left: 开发闭环 -->
+    <g transform="translate(48, 70)">
+      <circle cx="30" cy="30" r="28" fill="url(#gDevLoop)"/>
+      <text x="30" y="32" class="nodeText" text-anchor="middle" style="font-size:11px">开发</text>
+      <text x="30" y="46" class="nodeText" text-anchor="middle" style="font-size:11px">闭环</text>
+    </g>
+
+    <!-- Arrows clockwise -->
+    <!-- 观察 → 操作 -->
+    <path d="M 274 36 Q 350 50 388 84" stroke="#4C63E8" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#loopArrow)"/>
+    <!-- 操作 → 诊断 -->
+    <path d="M 388 116 Q 350 150 274 164" stroke="#4C63E8" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#loopArrow)"/>
+    <!-- 诊断 → 开发闭环 -->
+    <path d="M 218 164 Q 142 150 104 116" stroke="#4C63E8" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#loopArrow)"/>
+    <!-- 开发闭环 → 观察 -->
+    <path d="M 104 84 Q 142 50 218 36" stroke="#4C63E8" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#loopArrow)"/>
+  </g>
+</svg>

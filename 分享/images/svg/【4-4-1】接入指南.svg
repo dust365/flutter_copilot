@@ -1,0 +1,226 @@
+<svg width="1500" height="920" viewBox="0 0 1500 920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="step1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="step2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B49AFF"/><stop offset="100%" stop-color="#7A5EE8"/>
+    </linearGradient>
+    <linearGradient id="step3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD180"/><stop offset="100%" stop-color="#F0A03D"/>
+    </linearGradient>
+    <linearGradient id="mcpGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6C7CFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cliGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1FB6A6"/><stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="flowArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 L2,4.5 Z" fill="#7A5EE8"/>
+    </marker>
+
+    <clipPath id="clip1"><rect x="60" y="270" width="440" height="600" rx="22"/></clipPath>
+    <clipPath id="clip2"><rect x="530" y="270" width="440" height="600" rx="22"/></clipPath>
+    <clipPath id="clip3"><rect x="1000" y="270" width="440" height="600" rx="22"/></clipPath>
+
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 4px; }
+      .title { font: 800 52px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 2px; }
+      .subtitle { font: 500 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .stepNum { font: 900 30px 'SF Mono',Menlo,monospace; fill: #FFFFFF; }
+      .stepTag { font: 700 12px 'SF Mono',Menlo,monospace; letter-spacing: 3px; }
+      .stepTitle { font: 800 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; letter-spacing: 0.5px; }
+      .stepSub { font: 500 14px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .pkgName { font: 700 16px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #1A234A; letter-spacing: 0.3px; }
+      .pkgHint { font: 500 13px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .codeBlock { font: 600 13px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #C8D4F5; }
+      .codeKey { fill: #7B8DFF; font-weight: 700; }
+      .codeStr { fill: #FFB86B; }
+      .codeFn { fill: #5BD5C7; }
+      .codeCmnt { fill: #7383A8; }
+
+      .pill { font: 700 12px 'SF Mono',Menlo,monospace; letter-spacing: 1.5px; }
+      .subCardTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .subCardName { font: 800 20px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 0.5px; }
+      .subCardCmd { font: 600 12px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 0; }
+      .subCardDesc { font: 500 12px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: rgba(255,255,255,0.85); }
+    </style>
+  </defs>
+
+  <rect width="1500" height="920" rx="28" fill="url(#bg)"/>
+
+  <!-- ========== Header ========== -->
+  <text x="80" y="80" class="tag">ONBOARDING GUIDE  ·  接入指南</text>
+  <text x="80" y="148" class="title">三步上手 Flutter Copilot</text>
+  <text x="80" y="190" class="subtitle">App 内挂能力  →  App 外按场景挑入口(MCP / CLI)→  把跑通的流程沉淀下来</text>
+  <rect x="80" y="208" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- ============ STEP 1: App 内接入 ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="60" y="270" width="440" height="600" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="60" y="270" width="440" height="6" fill="url(#step1)" clip-path="url(#clip1)"/>
+
+  <!-- big number badge -->
+  <g transform="translate(110, 340)">
+    <circle r="36" fill="url(#step1)" filter="url(#softShadow)"/>
+    <text y="11" class="stepNum" text-anchor="middle">1</text>
+  </g>
+  <text x="170" y="328" class="stepTag" style="fill:#5B73E0">STEP ONE</text>
+  <text x="170" y="358" class="stepTitle">App 内接入</text>
+  <rect x="170" y="372" width="240" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/>
+  <text x="180" y="390" class="pkgName" style="font-size:13px">flutter_copilot_claw</text>
+
+  <!-- Code block (the recommended main() snippet) -->
+  <g transform="translate(90, 440)">
+    <rect x="0" y="0" width="380" height="290" rx="14" fill="#0F1630"/>
+    <rect x="0" y="0" width="380" height="36" rx="14" fill="#1A234A"/>
+    <rect x="0" y="22" width="380" height="14" fill="#1A234A"/>
+    <circle cx="20" cy="18" r="5.5" fill="#FF5F57"/>
+    <circle cx="38" cy="18" r="5.5" fill="#FEBC2E"/>
+    <circle cx="56" cy="18" r="5.5" fill="#28C840"/>
+    <text x="190" y="22" style="font: 600 12px 'SF Mono'; fill:#7383A8" text-anchor="middle">lib/main.dart</text>
+
+    <g transform="translate(20, 66)" class="codeBlock">
+      <text y="0"><tspan class="codeKey">void</tspan> <tspan class="codeFn">main</tspan>() {</text>
+      <text y="26">  FlutterCopilotBinding.<tspan class="codeFn">captureLogs</tspan>(() <tspan class="codeKey">async</tspan> {</text>
+      <text y="52">    FlutterCopilotBinding.<tspan class="codeFn">ensureInitialized</tspan>();</text>
+      <text y="78">    <tspan class="codeFn">runApp</tspan>(<tspan class="codeKey">const</tspan> MyApp());</text>
+      <text y="104">  });</text>
+      <text y="130">}</text>
+      <text y="170" class="codeCmnt">// release 下自动退化为</text>
+      <text y="192" class="codeCmnt">// WidgetsFlutterBinding.ensureInitialized()</text>
+    </g>
+  </g>
+
+  <!-- bottom pill: release-safe -->
+  <g transform="translate(90, 770)">
+    <rect x="0" y="0" width="170" height="34" rx="17" fill="#EEF3FF" stroke="#5B73E0" stroke-width="1.5"/>
+    <text x="85" y="23" class="pill" style="fill:#4057D6" text-anchor="middle">🔒 RELEASE-SAFE</text>
+  </g>
+  <text x="90" y="838" class="pkgHint" style="font-size:13px">通常只需改入口初始化,逐步增强</text>
+
+  <!-- ============ STEP 2: App 外接入 (MCP + CLI) ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="530" y="270" width="440" height="600" rx="22" fill="url(#card)" stroke="#C9B8F5" stroke-width="1.5"/>
+  </g>
+  <rect x="530" y="270" width="440" height="6" fill="url(#step2)" clip-path="url(#clip2)"/>
+
+  <!-- number badge -->
+  <g transform="translate(580, 340)">
+    <circle r="36" fill="url(#step2)" filter="url(#softShadow)"/>
+    <text y="11" class="stepNum" text-anchor="middle">2</text>
+  </g>
+  <text x="640" y="328" class="stepTag" style="fill:#7A5EE8">STEP TWO</text>
+  <text x="640" y="358" class="stepTitle">App 外接入</text>
+  <text x="640" y="386" class="stepSub">按场景挑入口  ·  MCP / CLI 二选一或都装</text>
+
+  <!-- MCP sub-card -->
+  <g transform="translate(560, 430)">
+    <rect x="0" y="0" width="380" height="170" rx="16" fill="url(#mcpGrad)"/>
+    <rect x="0" y="0" width="380" height="38" rx="16" fill="rgba(255,255,255,0.12)"/>
+    <rect x="0" y="22" width="380" height="16" fill="rgba(255,255,255,0.12)"/>
+    <text x="22" y="24" class="subCardTag">▸ AI CLIENT ENTRY  ·  给 AI Agent 用</text>
+    <text x="22" y="78" class="subCardName">flutter_copilot_mcp</text>
+    <text x="22" y="104" class="subCardDesc">供 Claude Code · Cursor · Continue 调用</text>
+    <g transform="translate(18, 120)">
+      <rect x="0" y="0" width="344" height="34" rx="8" fill="rgba(0,0,0,0.32)"/>
+      <text x="14" y="22" class="subCardCmd">$ dart pub global activate flutter_copilot_mcp</text>
+    </g>
+  </g>
+
+  <!-- CLI sub-card -->
+  <g transform="translate(560, 622)">
+    <rect x="0" y="0" width="380" height="170" rx="16" fill="url(#cliGrad)"/>
+    <rect x="0" y="0" width="380" height="38" rx="16" fill="rgba(255,255,255,0.12)"/>
+    <rect x="0" y="22" width="380" height="16" fill="rgba(255,255,255,0.12)"/>
+    <text x="22" y="24" class="subCardTag">▸ TERMINAL / CI ENTRY  ·  给脚本 / 终端用</text>
+    <text x="22" y="78" class="subCardName">flutter_copilot_cli  ·  fcc</text>
+    <text x="22" y="104" class="subCardDesc">供开发者 / shell 脚本 / CI 流水线调用</text>
+    <g transform="translate(18, 120)">
+      <rect x="0" y="0" width="344" height="34" rx="8" fill="rgba(0,0,0,0.32)"/>
+      <text x="14" y="22" class="subCardCmd">$ npm install -g flutter_copilot_cli</text>
+    </g>
+  </g>
+
+  <!-- "共用 VM Service 扩展" small note at bottom -->
+  <text x="750" y="838" class="pkgHint" style="font-size:13px; fill:#7A5EE8" text-anchor="middle">▾ 两条入口共用同一套 VM Service 扩展</text>
+
+  <!-- ============ STEP 3: 流程沉淀 ============ -->
+  <g filter="url(#softShadow)">
+    <rect x="1000" y="270" width="440" height="600" rx="22" fill="url(#card)" stroke="#F0CB8E" stroke-width="1.5"/>
+  </g>
+  <rect x="1000" y="270" width="440" height="6" fill="url(#step3)" clip-path="url(#clip3)"/>
+
+  <!-- number badge -->
+  <g transform="translate(1050, 340)">
+    <circle r="36" fill="url(#step3)" filter="url(#softShadow)"/>
+    <text y="11" class="stepNum" text-anchor="middle">3</text>
+  </g>
+  <text x="1110" y="328" class="stepTag" style="fill:#F0802D">STEP THREE</text>
+  <text x="1110" y="358" class="stepTitle">流程沉淀</text>
+  <text x="1110" y="386" class="stepSub">把跑通的高频流程固化下来,团队复用</text>
+
+  <!-- Skill card -->
+  <g transform="translate(1030, 430)">
+    <rect x="0" y="0" width="380" height="130" rx="16" fill="#FFFFFF" stroke="#F0CB8E" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="130" rx="3" fill="url(#step3)"/>
+    <g transform="translate(28, 24)">
+      <rect x="0" y="0" width="68" height="24" rx="12" fill="url(#step3)"/>
+      <text x="34" y="16" class="subCardTag" text-anchor="middle">SKILL</text>
+    </g>
+    <text x="108" y="42" class="pkgName">flutter-copilot.yaml</text>
+    <text x="28" y="80" class="pkgHint">把多步操作编排成 AI 可调用的 skill 模板,</text>
+    <text x="28" y="100" class="pkgHint">统一团队"AI 跑流程"的方式</text>
+  </g>
+
+  <!-- Script card -->
+  <g transform="translate(1030, 590)">
+    <rect x="0" y="0" width="380" height="130" rx="16" fill="#FFFFFF" stroke="#F0CB8E" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="130" rx="3" fill="url(#step3)"/>
+    <g transform="translate(28, 24)">
+      <rect x="0" y="0" width="68" height="24" rx="12" fill="url(#step3)"/>
+      <text x="34" y="16" class="subCardTag" text-anchor="middle">SHELL</text>
+    </g>
+    <text x="108" y="42" class="pkgName">scripts / *.sh  ·  CI</text>
+    <text x="28" y="80" class="pkgHint">稳定动作沉淀成 fcc 命令脚本,</text>
+    <text x="28" y="100" class="pkgHint">可重试 / 可版本化 / 可放进流水线</text>
+  </g>
+
+  <!-- bottom pill: 团队复用 -->
+  <g transform="translate(1030, 770)">
+    <rect x="0" y="0" width="170" height="34" rx="17" fill="#FFF8EB" stroke="#F0802D" stroke-width="1.5"/>
+    <text x="85" y="23" class="pill" style="fill:#F0802D" text-anchor="middle">♻ 团队复用</text>
+  </g>
+  <text x="1030" y="838" class="pkgHint" style="font-size:13px">从"AI 探索"沉淀为"团队工程能力"</text>
+
+  <!-- ============ Connectors ============ -->
+  <!-- Step 1 → Step 2 (refined: longer thin shaft + small notched arrowhead) -->
+  <g transform="translate(503, 570)">
+    <line x1="0" y1="0" x2="22" y2="0" stroke="#7A5EE8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#flowArrow)"/>
+  </g>
+  <!-- Step 2 → Step 3 -->
+  <g transform="translate(973, 570)">
+    <line x1="0" y1="0" x2="22" y2="0" stroke="#7A5EE8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#flowArrow)"/>
+  </g>
+</svg>

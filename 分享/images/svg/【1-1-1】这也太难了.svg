@@ -1,0 +1,166 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#FFD5CE" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFD5CE" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="crashFace" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF8B6B"/>
+      <stop offset="100%" stop-color="#E85B52"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="chipBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F2F6FF"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="faceShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.28"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="redArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#E85B52"/>
+    </marker>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #E85B52; letter-spacing: 3px; }
+      .title { font: 800 56px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; letter-spacing: 2px; }
+      .subtitle { font: 500 20px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .stepText { font: 700 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .stepNum { font: 800 12px 'SF Mono',Menlo,monospace; fill: #E85B52; letter-spacing: 1.5px; }
+      .crashText { font: 900 32px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; letter-spacing: 3px; }
+      .painH { font: 700 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .painB { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .quote { font: 500 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; font-style: italic; }
+      .highlight { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #E85B52; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+
+  <!-- header -->
+  <text x="90" y="90" class="tag">PAIN · WHY WE NEED THIS</text>
+  <text x="90" y="160" class="title">这也太难了</text>
+  <text x="90" y="198" class="subtitle">一次"简单"的验证，背后全是手工活</text>
+  <rect x="90" y="214" width="80" height="4" rx="2" fill="#E85B52"/>
+
+  <!-- Circular workflow -->
+  <g transform="translate(540, 500)">
+    <!-- soft glow -->
+    <circle r="280" fill="url(#centerGlow)"/>
+
+    <!-- Step chips at r=200 -->
+    <g filter="url(#softShadow)">
+      <g transform="translate(0,-200)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 01</text>
+        <text x="-82" y="22" class="stepText">手动点页面</text>
+      </g>
+      <g transform="translate(173,-100)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 02</text>
+        <text x="-82" y="22" class="stepText">复现问题</text>
+      </g>
+      <g transform="translate(173,100)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 03</text>
+        <text x="-82" y="22" class="stepText">截图 / 录屏</text>
+      </g>
+      <g transform="translate(0,200)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 04</text>
+        <text x="-82" y="22" class="stepText">抓取日志</text>
+      </g>
+      <g transform="translate(-173,100)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 05</text>
+        <text x="-82" y="22" class="stepText">转述上下文</text>
+      </g>
+      <g transform="translate(-173,-100)">
+        <rect x="-110" y="-34" width="220" height="68" rx="34" fill="url(#chipBg)" stroke="#B8C6F5" stroke-width="1.5"/>
+        <text x="-82" y="-8" class="stepNum">STEP 06</text>
+        <text x="-82" y="22" class="stepText">再试一次</text>
+      </g>
+    </g>
+
+    <!-- Loop arc arrows OUTSIDE chips at r=320 -->
+    <g fill="none" stroke="#E85B52" stroke-width="2.5" opacity="0.7" stroke-linecap="round">
+      <path d="M 83 -309 A 320 320 0 0 1 226 -226" marker-end="url(#redArrow)"/>
+      <path d="M 309 -83 A 320 320 0 0 1 309 83" marker-end="url(#redArrow)"/>
+      <path d="M 226 226 A 320 320 0 0 1 83 309" marker-end="url(#redArrow)"/>
+      <path d="M -83 309 A 320 320 0 0 1 -226 226" marker-end="url(#redArrow)"/>
+      <path d="M -309 83 A 320 320 0 0 1 -309 -83" marker-end="url(#redArrow)"/>
+      <path d="M -226 -226 A 320 320 0 0 1 -83 -309" marker-end="url(#redArrow)"/>
+    </g>
+
+    <!-- central crash face -->
+    <g filter="url(#faceShadow)">
+      <circle r="78" fill="url(#crashFace)"/>
+      <circle r="78" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="2"/>
+    </g>
+    <g stroke="#FFFFFF" stroke-width="5" stroke-linecap="round">
+      <line x1="-30" y1="-18" x2="-18" y2="-6"/>
+      <line x1="-18" y1="-18" x2="-30" y2="-6"/>
+      <line x1="18" y1="-18" x2="30" y2="-6"/>
+      <line x1="30" y1="-18" x2="18" y2="-6"/>
+    </g>
+    <path d="M -22 24 Q 0 6 22 24" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- "要崩溃了" floating bubble (upper-right, clear of arcs) -->
+  <g transform="translate(920, 250) rotate(-6)" filter="url(#softShadow)">
+    <rect x="-130" y="-34" width="260" height="68" rx="34" fill="#E85B52"/>
+    <text y="10" class="crashText" text-anchor="middle">要崩溃了！</text>
+    <path d="M -70 28 L -96 56 L -46 40 Z" fill="#E85B52"/>
+  </g>
+
+  <!-- Right side: 3 pain points -->
+  <g transform="translate(1080, 320)">
+    <text y="0" class="tag" style="fill:#4C63E8">THREE REAL FRUSTRATIONS</text>
+
+    <g transform="translate(0, 40)" filter="url(#softShadow)">
+      <rect x="0" y="0" width="420" height="100" rx="18" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+      <rect x="0" y="0" width="6" height="100" rx="3" fill="#E85B52"/>
+      <text x="30" y="38" class="painH">信息是断开的</text>
+      <text x="30" y="66" class="painB">页面、日志、上下文分散在三个地方，</text>
+      <text x="30" y="88" class="painB">每次都要你亲自把它们拼起来。</text>
+    </g>
+
+    <g transform="translate(0, 160)" filter="url(#softShadow)">
+      <rect x="0" y="0" width="420" height="100" rx="18" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+      <rect x="0" y="0" width="6" height="100" rx="3" fill="#F0A03D"/>
+      <text x="30" y="38" class="painH">动作是手工的</text>
+      <text x="30" y="66" class="painB">点、截、复制、描述 —— 一个都跑不掉，</text>
+      <text x="30" y="88" class="painB">AI 只是坐在终点等你喂信息。</text>
+    </g>
+
+    <g transform="translate(0, 280)" filter="url(#softShadow)">
+      <rect x="0" y="0" width="420" height="100" rx="18" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+      <rect x="0" y="0" width="6" height="100" rx="3" fill="#4C63E8"/>
+      <text x="30" y="38" class="painH">AI 看不到运行时</text>
+      <text x="30" y="66" class="painB">它只能看你转述的二手信息，</text>
+      <text x="30" y="88" class="painB">猜页面、猜数据、猜状态。</text>
+    </g>
+  </g>
+
+  <!-- Bottom takeaway -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="820" width="1445" height="58" rx="22" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <circle cx="118" cy="849" r="10" fill="#E85B52"/>
+  <text x="118" y="854" class="crashText" style="fill:#FFFFFF; font-size:14px" text-anchor="middle">!</text>
+  <text x="148" y="857" class="quote">问题不是 AI 不够聪明 ——</text>
+  <text x="478" y="857" class="highlight">而是它根本没进到运行时里。</text>
+</svg>

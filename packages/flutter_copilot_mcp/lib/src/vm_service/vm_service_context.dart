@@ -139,8 +139,7 @@ final class VmServiceContext {
                   'Screen coordinates to tap at. Use this to tap at a specific position on the screen.',
               properties: {
                 'x': JsonSchema.number(
-                  description:
-                      'The x coordinate (horizontal position from left).',
+                  description: 'The x coordinate (horizontal position from left).',
                 ),
                 'y': JsonSchema.number(
                   description: 'The y coordinate (vertical position from top).',
@@ -224,8 +223,7 @@ final class VmServiceContext {
                   'The key of the element to scroll to. You can get the key of an element by calling get_interactive_elements.',
             ),
             'text': JsonSchema.string(
-              description:
-                  'The visible text content of the element to scroll to.',
+              description: 'The visible text content of the element to scroll to.',
             ),
           },
         ),
@@ -299,6 +297,119 @@ final class VmServiceContext {
           }
         },
       )
+      // Get rebuild snapshot (repaint monitoring)
+      ..registerTool(
+        'get_rebuild_snapshot',
+        description:
+            'Retrieves the current rebuild/repaint snapshot from the Flutter app, including: frame count, total rebuild count, average rebuilds per frame, and a ranked list of top widgets by rebuild count (重绘热点). Each entry shows widget type, key (if any), rebuild count, and percentage. Use this to locate which widgets are being rebuilt most frequently and identify unnecessary setState/rebuild hotspots in the code. Requires an active connection and that the app was started with enableGlobalRebuildHook (e.g. FlutterCopilotConfiguration(enableGlobalRebuildHook: true)). On Web platform, total and top will always be empty because BuildOwner hook cannot be injected. If tracking is not enabled, returns a message explaining how to enable it.',
+        annotations: const ToolAnnotations(
+          title: 'Get Rebuild Snapshot',
+          readOnlyHint: true,
+        ),
+        inputSchema: ToolInputSchema(
+          properties: {
+            'topLimit': JsonSchema.integer(
+              description: 'Maximum number of top-rebuild widgets to return (default: 20).',
+            ),
+          },
+        ),
+        callback: (args, extra) async {
+          _logger.info('Getting rebuild snapshot');
+
+          try {
+            final topLimit = args['topLimit'] is int
+                ? args['topLimit'] as int
+                : (args['topLimit'] is num ? (args['topLimit'] as num).toInt() : null) ?? 20;
+            final response = await connector.getRebuildSnapshot(topLimit: topLimit);
+
+            if (response['status'] != 'Success') {
+              return CallToolResult(
+                isError: true,
+                content: [
+                  TextContent(
+                    text: response['error']?.toString() ?? 'Unknown error',
+                  ),
+                ],
+              );
+            }
+
+            final enabled = response['enabled'] as bool? ?? false;
+            if (!enabled) {
+              return CallToolResult(
+                content: [
+                  TextContent(
+                    text: response['message']?.toString() ??
+                        'Rebuild tracking is not enabled (enableGlobalRebuildHook is false).',
+                  ),
+                ],
+              );
+            }
+
+            final frame = response['frame'] as int? ?? 0;
+            final total = response['total'] as int? ?? 0;
+            final top = response['top'] as List<dynamic>? ?? [];
+            final avgPerFrame = frame > 0 ? (total / frame).toStringAsFixed(1) : '0.0';
+
+            final buffer = StringBuffer()
+              ..writeln('=== 重绘快照 (Rebuild Snapshot) ===')
+              ..writeln('')
+              ..writeln('帧数 (frames): $frame')
+              ..writeln('总重建次数 (total rebuilds): $total')
+              ..writeln('平均每帧重建 (avg rebuilds/frame): $avgPerFrame')
+              ..writeln('');
+
+            if (top.isEmpty) {
+              buffer.writeln(
+                '暂无重建数据。可能原因：\n'
+                '  - 应用刚启动，尚未产生足够重建\n'
+                '  - 当前为 Web 平台，不支持 BuildOwner hook\n'
+                '  - enableGlobalRebuildHook 未开启',
+              );
+            } else {
+              buffer.writeln(
+                '--- 重绘热点排行 (Top ${top.length} Rebuild Hotspots) ---',
+              );
+              buffer.writeln(
+                '排名  组件                                    重建次数   占比',
+              );
+              buffer.writeln(
+                '----  ------                                  --------   ----',
+              );
+
+              for (var i = 0; i < top.length; i++) {
+                final map = top[i] as Map<String, dynamic>;
+                final type = map['type'] as String? ?? '?';
+                final key = map['key'] as String?;
+                final count = map['count'] as int? ?? 0;
+                final percent = map['percent'] as String? ?? '0.0';
+                final keyPart = key != null && key.isNotEmpty ? '#$key' : '';
+                final widget = '$type$keyPart';
+                // Pad for alignment
+                final rank = '#${i + 1}'.padRight(6);
+                final widgetPad =
+                    widget.length > 40 ? widget.substring(0, 37) + '...' : widget.padRight(40);
+                final countPad = count.toString().padLeft(8);
+                final pctPad = '$percent%'.padLeft(6);
+                buffer.writeln('$rank$widgetPad$countPad $pctPad');
+              }
+
+              buffer.writeln('');
+              buffer.writeln('提示：排名靠前的组件即为重绘热点，建议优先在代码中检查对应 Widget 的 setState 调用，'
+                  '考虑拆分粒度、使用 const 构造、或将频繁变化的状态下移到子 Widget。');
+            }
+
+            return CallToolResult(
+              content: [TextContent(text: buffer.toString())],
+            );
+          } catch (err) {
+            _logger.warning('Failed to get rebuild snapshot', err);
+            return CallToolResult(
+              isError: true,
+              content: [TextContent(text: err.toString())],
+            );
+          }
+        },
+      )
       // Take screenshots
       ..registerTool(
         'take_screenshots',
@@ -314,8 +425,7 @@ final class VmServiceContext {
 
           try {
             final response = await connector.takeScreenshots();
-            final screenshots =
-                (response['screenshots'] as List<dynamic>).cast<String>();
+            final screenshots = (response['screenshots'] as List<dynamic>).cast<String>();
 
             if (screenshots.isEmpty) {
               return CallToolResult(
@@ -325,8 +435,7 @@ final class VmServiceContext {
               return CallToolResult(
                 content: screenshots
                     .map(
-                      (screenshot) =>
-                          ImageContent(data: screenshot, mimeType: 'image/png'),
+                      (screenshot) => ImageContent(data: screenshot, mimeType: 'image/png'),
                     )
                     .toList(),
               );
@@ -403,8 +512,7 @@ final class VmServiceContext {
                   'Screen coordinates to start drag from. Use this with deltaX/deltaY for relative drag from a specific position.',
               properties: {
                 'x': JsonSchema.number(
-                  description:
-                      'The x coordinate (horizontal position from left).',
+                  description: 'The x coordinate (horizontal position from left).',
                 ),
                 'y': JsonSchema.number(
                   description: 'The y coordinate (vertical position from top).',
@@ -446,13 +554,11 @@ final class VmServiceContext {
           },
         ),
         callback: (args, extra) async {
-          _logger
-              .info('[flutter-copilot-mcp] Drag tool called with args: $args');
+          _logger.info('[flutter-copilot-mcp] Drag tool called with args: $args');
 
           // Handle compatibility parameters: from_uid -> key
           if (args.containsKey('from_uid') && !args.containsKey('key')) {
-            _logger.info(
-                '[flutter-copilot-mcp] Converting from_uid to key: ${args['from_uid']}');
+            _logger.info('[flutter-copilot-mcp] Converting from_uid to key: ${args['from_uid']}');
             args['key'] = args['from_uid'];
           }
 
@@ -461,8 +567,7 @@ final class VmServiceContext {
               args.containsKey('text') ||
               args.containsKey('type') ||
               args.containsKey('coordinates');
-          final hasDelta =
-              args.containsKey('deltaX') || args.containsKey('deltaY');
+          final hasDelta = args.containsKey('deltaX') || args.containsKey('deltaY');
           final hasFrom = args.containsKey('from');
           final hasTo = args.containsKey('to');
 
@@ -537,29 +642,23 @@ final class VmServiceContext {
             params['toY'] = to['y'];
           }
 
-          _logger.info(
-              '[flutter-copilot-mcp] Dragging with matcher: $matcher, params: $params');
+          _logger.info('[flutter-copilot-mcp] Dragging with matcher: $matcher, params: $params');
 
           try {
             final response = await connector.drag(matcher, params);
             final message = response['message'] as String?;
 
-            _logger.info(
-                '[flutter-copilot-mcp] Drag completed successfully: $message');
+            _logger.info('[flutter-copilot-mcp] Drag completed successfully: $message');
             return CallToolResult(
               content: [
-                TextContent(
-                    text:
-                        '[flutter-copilot-mcp] ${message ?? 'Successfully dragged'}')
+                TextContent(text: '[flutter-copilot-mcp] ${message ?? 'Successfully dragged'}')
               ],
             );
           } catch (err) {
             _logger.warning('[flutter-copilot-mcp] Failed to drag', err);
             return CallToolResult(
               isError: true,
-              content: [
-                TextContent(text: '[flutter-copilot-mcp] Drag failed: $err')
-              ],
+              content: [TextContent(text: '[flutter-copilot-mcp] Drag failed: $err')],
             );
           }
         },
@@ -588,8 +687,7 @@ final class VmServiceContext {
                   'Screen coordinates to swipe from. Use this to swipe from a specific position.',
               properties: {
                 'x': JsonSchema.number(
-                  description:
-                      'The x coordinate (horizontal position from left).',
+                  description: 'The x coordinate (horizontal position from left).',
                 ),
                 'y': JsonSchema.number(
                   description: 'The y coordinate (vertical position from top).',
@@ -598,27 +696,23 @@ final class VmServiceContext {
               required: ['x', 'y'],
             ),
             'direction': JsonSchema.string(
-              description:
-                  'The swipe direction. Must be one of: left, right, up, down.',
+              description: 'The swipe direction. Must be one of: left, right, up, down.',
             ),
             'distance': JsonSchema.number(
-              description:
-                  'The swipe distance in pixels. Default is 200 pixels.',
+              description: 'The swipe distance in pixels. Default is 200 pixels.',
             ),
           },
           required: ['direction'],
         ),
         callback: (args, extra) async {
           final matcher = _buildMatcher(args);
-          final direction =
-              args['direction'] is String ? args['direction'] as String : null;
+          final direction = args['direction'] is String ? args['direction'] as String : null;
           if (direction == null) {
             return CallToolResult(
               isError: true,
               content: [
                 TextContent(
-                  text:
-                      '[flutter-copilot-mcp] Error: Missing required parameter: direction',
+                  text: '[flutter-copilot-mcp] Error: Missing required parameter: direction',
                 ),
               ],
             );
@@ -630,8 +724,7 @@ final class VmServiceContext {
           );
 
           try {
-            final response =
-                await connector.swipe(matcher, direction, distance);
+            final response = await connector.swipe(matcher, direction, distance);
             final message = response['message'] as String?;
 
             return CallToolResult(
@@ -661,8 +754,7 @@ final class VmServiceContext {
                   'The key of the element to long press. You can get the key of an element by calling get_interactive_elements.',
             ),
             'text': JsonSchema.string(
-              description:
-                  'The visible text content of the element to long press.',
+              description: 'The visible text content of the element to long press.',
             ),
             'type': JsonSchema.string(
               description: 'The widget type name of the element to long press.',
@@ -672,8 +764,7 @@ final class VmServiceContext {
                   'Screen coordinates to long press at. Use this to long press at a specific position.',
               properties: {
                 'x': JsonSchema.number(
-                  description:
-                      'The x coordinate (horizontal position from left).',
+                  description: 'The x coordinate (horizontal position from left).',
                 ),
                 'y': JsonSchema.number(
                   description: 'The y coordinate (vertical position from top).',
@@ -682,16 +773,14 @@ final class VmServiceContext {
               required: ['x', 'y'],
             ),
             'duration': JsonSchema.number(
-              description:
-                  'The duration of the long press in milliseconds. Default is 500ms.',
+              description: 'The duration of the long press in milliseconds. Default is 500ms.',
             ),
           },
         ),
         callback: (args, extra) async {
           final matcher = _buildMatcher(args);
           final duration = (args['duration'] as num?)?.toInt();
-          _logger.info(
-              'Long pressing with matcher: $matcher, duration: $duration');
+          _logger.info('Long pressing with matcher: $matcher, duration: $duration');
 
           try {
             final response = await connector.longPress(matcher, duration);
@@ -724,8 +813,7 @@ final class VmServiceContext {
                   'The key of the element to double tap. You can get the key of an element by calling get_interactive_elements.',
             ),
             'text': JsonSchema.string(
-              description:
-                  'The visible text content of the element to double tap.',
+              description: 'The visible text content of the element to double tap.',
             ),
             'type': JsonSchema.string(
               description: 'The widget type name of the element to double tap.',
@@ -735,8 +823,7 @@ final class VmServiceContext {
                   'Screen coordinates to double tap at. Use this to double tap at a specific position.',
               properties: {
                 'x': JsonSchema.number(
-                  description:
-                      'The x coordinate (horizontal position from left).',
+                  description: 'The x coordinate (horizontal position from left).',
                 ),
                 'y': JsonSchema.number(
                   description: 'The y coordinate (vertical position from top).',
@@ -806,8 +893,7 @@ final class VmServiceContext {
 
             return CallToolResult(
               content: [
-                TextContent(
-                    text: message ?? 'Navigation completed successfully'),
+                TextContent(text: message ?? 'Navigation completed successfully'),
               ],
             );
           } catch (err) {

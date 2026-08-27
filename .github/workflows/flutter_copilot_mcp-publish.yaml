@@ -40,9 +40,9 @@ jobs:
 
       - name: Validate version.g.dart
         run: |
-          dart tool/generate_version.dart
+          dart tool/version.dart
           if ! git diff --exit-code packages/flutter_copilot_mcp/lib/src/version.g.dart; then
-            echo "ERROR: version.g.dart is out of sync. Please run 'dart tool/generate_version.dart' and commit the changes."
+            echo "ERROR: version.g.dart is out of sync. Please run 'dart tool/version.dart' and commit the changes."
             exit 1
           fi
 

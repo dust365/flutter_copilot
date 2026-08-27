@@ -1,0 +1,179 @@
+<svg width="1500" height="820" viewBox="0 0 1500 820" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="busGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5B73E0"/>
+      <stop offset="50%" stop-color="#7B8DFF"/>
+      <stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowR" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4C63E8"/>
+    </marker>
+    <marker id="arrowR2" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#3EA8FF"/>
+    </marker>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 44px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .quoteH { font: 800 22px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .quoteSub { font: 500 15px 'SF Mono',Menlo,monospace; fill: #5D6B8A; letter-spacing: 0.3px; }
+      .colTitle { font: 800 13px 'SF Mono',Menlo,monospace; letter-spacing: 3px; }
+      .clientName { font: 700 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .clientHint { font: 500 12px 'SF Mono',Menlo,monospace; fill: #7383A8; }
+      .busLabel { font: 800 32px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 6px; }
+      .busSub { font: 600 13px 'SF Mono',Menlo,monospace; fill: rgba(255,255,255,0.85); letter-spacing: 2px; }
+      .verbText { font: 800 13px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 1.5px; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="820" rx="28" fill="url(#bg)"/>
+
+  <!-- header -->
+  <text x="80" y="80" class="tag">PROTOCOL · MCP</text>
+  <text x="80" y="135" class="title">MCP 是什么?</text>
+  <text x="80" y="170" class="subtitle">AI 与工具之间的通用调用协议 —— 写一份 Server,所有 Agent 都能用</text>
+  <rect x="80" y="184" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- concept analogy ribbon (very short) -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="222" width="1340" height="78" rx="20" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="222" width="6" height="78" rx="3" fill="url(#accent)"/>
+  <text x="110" y="258" class="quoteH">类比 · AI 世界的 <tspan fill="#4C63E8" font-weight="800">RESTful + OpenAPI</tspan></text>
+  <text x="110" y="284" class="quoteSub">把"发现工具 / 调用工具 / 拿结果"统一成开放协议</text>
+
+  <!-- ============ Main diagram: many ↔ MCP ↔ many ============ -->
+
+  <!-- Column titles -->
+  <text x="220" y="356" class="colTitle" style="fill:#4C63E8" text-anchor="middle">▸ AI HOSTS</text>
+  <text x="750" y="356" class="colTitle" style="fill:#4057D6" text-anchor="middle">▸ MCP PROTOCOL</text>
+  <text x="1280" y="356" class="colTitle" style="fill:#2E7FAC" text-anchor="middle">▸ MCP SERVERS</text>
+
+  <!-- Left column: 3 AI hosts -->
+  <g transform="translate(100, 388)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 14px 'SF Mono'; fill:#4C63E8" text-anchor="middle">CC</text>
+    <text x="60" y="32" class="clientName">Claude Code</text>
+    <text x="60" y="52" class="clientHint">Anthropic CLI</text>
+  </g>
+  <g transform="translate(100, 478)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 14px 'SF Mono'; fill:#4C63E8" text-anchor="middle">CR</text>
+    <text x="60" y="32" class="clientName">Cursor</text>
+    <text x="60" y="52" class="clientHint">AI IDE</text>
+  </g>
+  <g transform="translate(100, 568)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5" stroke-dasharray="6 4"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#accent)"/>
+    <circle cx="34" cy="34" r="16" fill="#EEF3FF"/>
+    <text x="34" y="40" style="font: 800 16px 'SF Mono'; fill:#4C63E8" text-anchor="middle">+</text>
+    <text x="60" y="32" class="clientName">自家 Agent</text>
+    <text x="60" y="52" class="clientHint">Custom Host</text>
+  </g>
+
+  <!-- Center: MCP bus -->
+  <g filter="url(#softShadow)">
+    <rect x="560" y="380" width="380" height="276" rx="22" fill="url(#busGrad)"/>
+  </g>
+
+  <text x="750" y="450" class="busLabel" text-anchor="middle">M C P</text>
+  <text x="750" y="478" class="busSub" text-anchor="middle">Model Context Protocol</text>
+
+  <!-- 3 verb chips inside MCP bus -->
+  <g transform="translate(595, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">DISCOVER</text>
+  </g>
+  <g transform="translate(700, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">INVOKE</text>
+  </g>
+  <g transform="translate(805, 510)">
+    <rect x="0" y="0" width="100" height="34" rx="17" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+    <text x="50" y="22" class="verbText" text-anchor="middle">STREAM</text>
+  </g>
+
+  <text x="750" y="585" class="busSub" text-anchor="middle" style="font-weight:500; opacity:0.85">stdio  ·  SSE  ·  WebSocket</text>
+  <text x="750" y="618" class="busSub" text-anchor="middle" style="font-weight:600; font-size:14px; letter-spacing:1px">JSON-RPC · 开放标准</text>
+
+  <!-- Right column: 3 MCP servers -->
+  <g transform="translate(1160, 388)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#9FE0F0" stroke-width="2"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 12px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">FC</text>
+    <text x="60" y="32" class="clientName" style="font-size:15px">flutter_copilot_mcp</text>
+    <text x="60" y="52" class="clientHint" style="fill:#2E7FAC">⭐ 本项目</text>
+  </g>
+  <g transform="translate(1160, 478)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 12px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">GH</text>
+    <text x="60" y="32" class="clientName">github-mcp</text>
+    <text x="60" y="52" class="clientHint">PR · Issue</text>
+  </g>
+  <g transform="translate(1160, 568)">
+    <g filter="url(#softShadow)">
+      <rect x="0" y="0" width="240" height="68" rx="14" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5" stroke-dasharray="6 4"/>
+    </g>
+    <rect x="0" y="0" width="6" height="68" rx="3" fill="url(#cyan)"/>
+    <circle cx="34" cy="34" r="16" fill="#E6F6FF"/>
+    <text x="34" y="40" style="font: 800 16px 'SF Mono'; fill:#2E7FAC" text-anchor="middle">+</text>
+    <text x="60" y="32" class="clientName">你的工具</text>
+    <text x="60" y="52" class="clientHint">Custom Server</text>
+  </g>
+
+  <!-- Connection lines: each host → bus -->
+  <g stroke="#4C63E8" stroke-width="2" fill="none" opacity="0.55">
+    <path d="M 340 422 L 560 470" stroke-linecap="round" marker-end="url(#arrowR)"/>
+    <path d="M 340 512 L 560 510" stroke-linecap="round" marker-end="url(#arrowR)"/>
+    <path d="M 340 602 L 560 555" stroke-linecap="round" marker-end="url(#arrowR)"/>
+  </g>
+  <g stroke="#3EA8FF" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M 940 470 L 1160 422" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+    <path d="M 940 510 L 1160 512" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+    <path d="M 940 555 L 1160 602" stroke-linecap="round" marker-end="url(#arrowR2)"/>
+  </g>
+
+  <!-- One-line takeaway -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="700" width="1340" height="76" rx="20" fill="#FFFFFF" stroke="#E5EBFF" stroke-width="1.5"/>
+  </g>
+  <rect x="80" y="700" width="6" height="76" rx="3" fill="url(#accent)"/>
+  <text x="750" y="746" class="quoteH" text-anchor="middle">一份 Server,所有遵循 MCP 的 Agent 都能直接接入  ——  N×M 适配 → 1 份标准</text>
+</svg>

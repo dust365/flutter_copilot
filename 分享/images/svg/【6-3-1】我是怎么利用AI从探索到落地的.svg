@@ -1,0 +1,132 @@
+<svg width="1400" height="1180" viewBox="0 0 1400 1180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFF"/>
+      <stop offset="100%" stop-color="#ECF1FF"/>
+    </linearGradient>
+    <linearGradient id="step1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFF7E4"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="step2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFECEC"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="step3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#EDF2FF"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="step4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E1E9FF"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="badge1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC86E"/><stop offset="100%" stop-color="#F19A3D"/>
+    </linearGradient>
+    <linearGradient id="badge2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF8F8F"/><stop offset="100%" stop-color="#E36464"/>
+    </linearGradient>
+    <linearGradient id="badge3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8DA5FF"/><stop offset="100%" stop-color="#5B78E8"/>
+    </linearGradient>
+    <linearGradient id="badge4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6E86FF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#4C63E8"/>
+    </marker>
+    <style>
+      .title { font: 700 36px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; letter-spacing: 0.5px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .h { font: 700 24px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+      .b { font: 500 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .small { font: 400 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #7383A8; font-style: italic; }
+      .stepLabel { font: 700 15px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #FFFFFF; letter-spacing: 0.5px; }
+      .stepNum { font: 800 28px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; fill: #FFFFFF; }
+      .callout { font: 700 17px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3657C7; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="1180" rx="28" fill="url(#bg)"/>
+
+  <text x="80" y="88" class="title">我是怎么利用 AI，从探索到落地的</text>
+  <text x="80" y="122" class="subtitle">从真实痛点出发，经历方案不满、技术突破，到工程化落地</text>
+  <rect x="80" y="138" width="68" height="4" rx="2" fill="#4C63E8"/>
+
+  <!-- Timeline vertical line -->
+  <line x1="180" y1="230" x2="180" y2="1020" stroke="#D7DFF5" stroke-width="3" stroke-dasharray="2 6"/>
+
+  <!-- Step 1 -->
+  <g filter="url(#softShadow)">
+    <rect x="230" y="190" width="1050" height="150" rx="22" fill="url(#step1)" stroke="#F0B863" stroke-width="2"/>
+  </g>
+  <circle cx="180" cy="265" r="38" fill="url(#badge1)"/>
+  <circle cx="180" cy="265" r="38" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="180" y="275" class="stepNum" text-anchor="middle">1</text>
+  <rect x="260" y="212" width="110" height="30" rx="15" fill="#FFE5B8"/>
+  <text x="280" y="233" class="callout" style="font-size:14px">痛点 PAIN</text>
+  <text x="260" y="280" class="h">我想让 AI 像操作浏览器一样，直接帮我操作 App</text>
+  <text x="260" y="312" class="b">验收流程、获取报错日志、对比修改前后的 UI，而不是每次都要我手工跑一遍。</text>
+
+  <!-- Arrow 1→2 -->
+  <path d="M180 310 L180 400" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.8"/>
+
+  <!-- Step 2 -->
+  <g filter="url(#softShadow)">
+    <rect x="230" y="400" width="1050" height="170" rx="22" fill="url(#step2)" stroke="#E47979" stroke-width="2"/>
+  </g>
+  <circle cx="180" cy="485" r="38" fill="url(#badge2)"/>
+  <circle cx="180" cy="485" r="38" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="180" y="495" class="stepNum" text-anchor="middle">2</text>
+  <rect x="260" y="422" width="150" height="30" rx="15" fill="#FFD6D6"/>
+  <text x="280" y="443" class="callout" style="font-size:14px; fill:#B24545">不满 FRICTION</text>
+  <text x="260" y="490" class="h">传统流程太痛苦：adb 截图、pull 到电脑、再发给 AI</text>
+  <text x="260" y="522" class="b">我每次都要等待重启、自己操作、截图、拷贝、补上下文，整个过程又慢又割裂。</text>
+  <text x="260" y="553" class="small">这让我越来越确定：问题不是 AI 不够聪明，而是它根本没进到运行时里。</text>
+
+  <!-- Arrow 2→3 -->
+  <path d="M180 540 L180 630" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.8"/>
+
+  <!-- Step 3 -->
+  <g filter="url(#softShadow)">
+    <rect x="230" y="630" width="1050" height="180" rx="22" fill="url(#step3)" stroke="#8EA3FF" stroke-width="2"/>
+  </g>
+  <circle cx="180" cy="720" r="38" fill="url(#badge3)"/>
+  <circle cx="180" cy="720" r="38" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="180" y="730" class="stepNum" text-anchor="middle">3</text>
+  <rect x="260" y="652" width="150" height="30" rx="15" fill="#DCE5FF"/>
+  <text x="280" y="673" class="callout" style="font-size:14px">探索 EXPLORE</text>
+  <text x="260" y="720" class="h">研究过脚本控制、AutoGLM-For-Android 等路线，但都不满意</text>
+  <text x="260" y="752" class="b">它们大多还是"看屏幕、猜位置、点大概"，依赖视觉识别，不够稳定，也不够语义化。</text>
+  <text x="260" y="783" class="small">我真正想要的是：拿到真实节点，理解它是什么，再去操作它。</text>
+
+  <!-- Arrow 3→4 -->
+  <path d="M180 780 L180 870" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)" opacity="0.8"/>
+
+  <!-- Step 4 -->
+  <g filter="url(#softShadow)">
+    <rect x="230" y="870" width="1050" height="180" rx="22" fill="url(#step4)" stroke="#5B78E8" stroke-width="2.5"/>
+  </g>
+  <circle cx="180" cy="960" r="40" fill="url(#badge4)"/>
+  <circle cx="180" cy="960" r="40" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="180" y="970" class="stepNum" text-anchor="middle">4</text>
+  <rect x="260" y="892" width="200" height="30" rx="15" fill="#CBD6FF"/>
+  <text x="280" y="913" class="callout" style="font-size:14px">突破 &amp; 落地 BREAKTHROUGH</text>
+  <text x="260" y="960" class="h">从 Flutter 自动化 → VM Service → 接入 MCP → 补齐截图/日志/滚动</text>
+  <text x="260" y="992" class="b">一边啃大模型多轮工具调用，一边理解 VM Service 和 MCP 协议，再让 Cursor 优化结构，最终补出今天这套可用 API。</text>
+  <text x="260" y="1023" class="small">核心转折点：从"视觉层自动化"切到"运行时语义化操作"。</text>
+
+  <!-- Bottom callout -->
+  <g filter="url(#softShadow)">
+    <rect x="120" y="1090" width="1160" height="60" rx="22" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <circle cx="160" cy="1120" r="14" fill="#4C63E8"/>
+  <text x="160" y="1126" class="stepNum" text-anchor="middle" style="font-size:16px">★</text>
+  <text x="188" y="1127" class="callout">关键启发：真正驱动工具诞生的，不是技术热点，而是你对真实痛点的不满足。</text>
+</svg>

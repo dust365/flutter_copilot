@@ -1,0 +1,134 @@
+<svg width="1500" height="760" viewBox="0 0 1500 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="mcp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6C7CFF"/>
+      <stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cli" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1FB6A6"/>
+      <stop offset="100%" stop-color="#0D7F78"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="5"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 4px; }
+      .title { font: 800 56px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 2px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+
+      .cardName { font: 800 28px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 1px; }
+      .cardTag { font: 700 12px 'SF Mono',Menlo,monospace; fill: rgba(255,255,255,0.85); letter-spacing: 3px; }
+
+      .dimLabel { font: 700 11px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 2px; }
+      .dimAnswer { font: 700 19px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #1A234A; }
+
+      .termPrompt { font: 700 16px 'SF Mono','JetBrains Mono',Menlo,monospace; }
+      .termCmd { font: 600 15px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #FFFFFF; }
+      .termHint { font: 500 12px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 0.3px; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="760" rx="28" fill="url(#bg)"/>
+
+  <!-- ========== Header ========== -->
+  <text x="80" y="80" class="tag">TWO ENTRIES · ONE RUNTIME</text>
+  <text x="80" y="142" class="title">MCP &amp; CLI</text>
+  <text x="80" y="178" class="subtitle">两条入口,共用同一套 VM Service 扩展 —— 按场景挑,不是二选一</text>
+  <rect x="80" y="194" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- ============ LEFT: MCP card ============ -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="230" width="680" height="500" rx="22" fill="#FFFFFF" stroke="#C4CEF2" stroke-width="1.5"/>
+  </g>
+  <!-- header banner with rounded top, straight bottom -->
+  <path d="M 60 252 Q 60 230 82 230 L 718 230 Q 740 230 740 252 L 740 330 L 60 330 Z" fill="url(#mcp)"/>
+  <text x="90" y="270" class="cardTag">▸ AI CLIENT ENTRY</text>
+  <text x="90" y="312" class="cardName">flutter_copilot_mcp</text>
+  <!-- chip top-right -->
+  <g transform="translate(620, 254)">
+    <rect x="0" y="0" width="100" height="32" rx="16" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+    <text x="50" y="21" style="font: 800 13px 'SF Mono'; fill:#FFFFFF; letter-spacing:1.5px" text-anchor="middle">探索 · 修复</text>
+  </g>
+
+  <!-- 4 dimension rows (translate gives clean offsets) -->
+  <g transform="translate(90, 360)">
+    <!-- Row 1: 谁在用 -->
+    <text y="0" class="dimLabel">谁在用</text>
+    <text y="30" class="dimAnswer">🤖  AI Agent · Claude Code / Cursor</text>
+    <line x1="-10" y1="55" x2="630" y2="55" stroke="#E5EBFF"/>
+
+    <!-- Row 2: 怎么用 -->
+    <text y="80" class="dimLabel">怎么用</text>
+    <text y="110" class="dimAnswer">💬  自然语言 → tool call</text>
+    <line x1="-10" y1="135" x2="630" y2="135" stroke="#E5EBFF"/>
+
+    <!-- Row 3: 输出 -->
+    <text y="160" class="dimLabel">输出</text>
+    <text y="190" class="dimAnswer">📦  结构化 JSON · 供 Agent 续推</text>
+    <line x1="-10" y1="215" x2="630" y2="215" stroke="#E5EBFF"/>
+
+    <!-- Row 4: 最适合 -->
+    <text y="240" class="dimLabel">最适合</text>
+    <text y="270" class="dimAnswer">🎯  开放式探索 · 复杂任务拆解</text>
+  </g>
+
+  <!-- terminal-style example -->
+  <g transform="translate(90, 690)">
+    <rect x="-10" y="-30" width="640" height="46" rx="10" fill="#0F1630"/>
+    <text x="6" y="0" class="termPrompt" style="fill:#7B8DFF">›</text>
+    <text x="28" y="0" class="termCmd">"帮我点击登录按钮并检查日志"</text>
+  </g>
+
+  <!-- ============ RIGHT: CLI card ============ -->
+  <g filter="url(#shadow)">
+    <rect x="760" y="230" width="680" height="500" rx="22" fill="#FFFFFF" stroke="#B8DCD8" stroke-width="1.5"/>
+  </g>
+  <!-- header banner -->
+  <path d="M 760 252 Q 760 230 782 230 L 1418 230 Q 1440 230 1440 252 L 1440 330 L 760 330 Z" fill="url(#cli)"/>
+  <text x="790" y="270" class="cardTag">▸ TERMINAL / CI ENTRY</text>
+  <text x="790" y="312" class="cardName">flutter_copilot_cli  ·  fcc</text>
+  <!-- chip top-right -->
+  <g transform="translate(1320, 254)">
+    <rect x="0" y="0" width="100" height="32" rx="16" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+    <text x="50" y="21" style="font: 800 13px 'SF Mono'; fill:#FFFFFF; letter-spacing:1.5px" text-anchor="middle">固化 · 复用</text>
+  </g>
+
+  <!-- 4 dimension rows -->
+  <g transform="translate(790, 360)">
+    <!-- Row 1: 谁在用 -->
+    <text y="0" class="dimLabel">谁在用</text>
+    <text y="30" class="dimAnswer">👤  开发者 · 脚本 · CI 流水线</text>
+    <line x1="-10" y1="55" x2="630" y2="55" stroke="#E5EBFF"/>
+
+    <!-- Row 2: 怎么用 -->
+    <text y="80" class="dimLabel">怎么用</text>
+    <text y="110" class="dimAnswer">💻  命令行参数 · YAML playbook</text>
+    <line x1="-10" y1="135" x2="630" y2="135" stroke="#E5EBFF"/>
+
+    <!-- Row 3: 输出 -->
+    <text y="160" class="dimLabel">输出</text>
+    <text y="190" class="dimAnswer">📤  stdout + exit code · 易管道化</text>
+    <line x1="-10" y1="215" x2="630" y2="215" stroke="#E5EBFF"/>
+
+    <!-- Row 4: 最适合 -->
+    <text y="240" class="dimLabel">最适合</text>
+    <text y="270" class="dimAnswer">🎯  稳定流程固化 · 可重试 / 可版本化</text>
+  </g>
+
+  <!-- terminal-style example -->
+  <g transform="translate(790, 690)">
+    <rect x="-10" y="-30" width="640" height="46" rx="10" fill="#0F1630"/>
+    <text x="6" y="0" class="termPrompt" style="fill:#5BD5C7">$</text>
+    <text x="28" y="0" class="termCmd">fcc tap --key login_btn &amp;&amp; fcc get-logs</text>
+  </g>
+</svg>

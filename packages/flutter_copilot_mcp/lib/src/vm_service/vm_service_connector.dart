@@ -238,6 +238,20 @@ class VmServiceConnector {
     return _callExtension('flutter_copilot.getLogs', {});
   }
 
+  /// Gets the current rebuild snapshot (frame, total rebuilds, top widgets by rebuild count).
+  ///
+  /// Requires the app to have [enableGlobalRebuildHook] enabled. Returns [enabled]: false
+  /// when rebuild tracking is not enabled.
+  /// [topLimit] limits how many top-rebuild widgets are returned (default 20).
+  ///
+  /// Throws [NotConnectedException] if not connected.
+  Future<Map<String, dynamic>> getRebuildSnapshot({int topLimit = 20}) {
+    return _callExtension(
+      'flutter_copilot.rebuild.snapshot',
+      <String, dynamic>{'topLimit': topLimit},
+    );
+  }
+
   /// Takes screenshots of all views in the app.
   ///
   /// Returns a list of base64-encoded PNG images.

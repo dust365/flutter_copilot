@@ -1,0 +1,196 @@
+<svg width="1500" height="1080" viewBox="0 0 1500 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6F9FF"/>
+      <stop offset="100%" stop-color="#E9EFFF"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F7FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7B8DFF"/><stop offset="100%" stop-color="#4057D6"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7FF"/><stop offset="100%" stop-color="#3EA8FF"/>
+    </linearGradient>
+    <linearGradient id="indigo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8EA7FF"/><stop offset="100%" stop-color="#5B73E0"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B49AFF"/><stop offset="100%" stop-color="#7A5EE8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="4" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.14"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowDown" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#4C63E8"/>
+    </marker>
+    <marker id="arrowUp" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#6EE7FF"/>
+    </marker>
+    <style>
+      .tag { font: 700 13px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 3px; }
+      .title { font: 800 40px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; letter-spacing: 1px; }
+      .subtitle { font: 500 18px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #5D6B8A; }
+      .layerTag { font: 700 11px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 2px; }
+      .stepNum { font: 900 14px 'SF Mono',Menlo,monospace; fill: #FFFFFF; letter-spacing: 1px; }
+      .h { font: 800 26px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #151E3F; }
+      .hSub { font: 500 16px -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; fill: #3A466B; }
+      .code { font: 600 15px 'SF Mono','JetBrains Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 0.3px; }
+      .codeCyan { font: 600 15px 'SF Mono',Menlo,monospace; fill: #2E7FAC; letter-spacing: 0.3px; }
+      .arrowLabel { font: 700 12px 'SF Mono',Menlo,monospace; fill: #4C63E8; letter-spacing: 2px; }
+      .arrowLabelCyan { font: 700 12px 'SF Mono',Menlo,monospace; fill: #2E7FAC; letter-spacing: 2px; }
+      .returnLabel { font: 600 12px 'SF Mono',Menlo,monospace; fill: #7383A8; letter-spacing: 1px; }
+    </style>
+  </defs>
+
+  <rect width="1500" height="1080" rx="28" fill="url(#bg)"/>
+
+  <!-- header -->
+  <text x="80" y="80" class="tag">CALL CHAIN · REQUEST / RESPONSE</text>
+  <text x="80" y="130" class="title">MCP 协议与 VM Service 调用链路</text>
+  <text x="80" y="165" class="subtitle">AI 发起工具调用  →  MCP 翻译  →  VM Service 传递  →  Flutter App 执行</text>
+  <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
+
+  <!-- Down arrow legend (left) -->
+  <g transform="translate(150, 235)">
+    <rect width="180" height="32" rx="16" fill="#EEF3FF" stroke="#4C63E8" stroke-width="1.5"/>
+    <circle cx="16" cy="16" r="5" fill="#4C63E8"/>
+    <text x="30" y="21" class="arrowLabel">REQUEST · 向下调用</text>
+  </g>
+  <!-- Up arrow legend (right) -->
+  <g transform="translate(1170, 235)">
+    <rect width="180" height="32" rx="16" fill="#E6F6FF" stroke="#3EA8FF" stroke-width="1.5"/>
+    <circle cx="16" cy="16" r="5" fill="#3EA8FF"/>
+    <text x="30" y="21" class="arrowLabelCyan">RESPONSE · 向上返回</text>
+  </g>
+
+  <!-- Layer 1: AI Agent -->
+  <g filter="url(#softShadow)">
+    <rect x="380" y="310" width="740" height="140" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="380" y="310" width="740" height="6" fill="url(#accent)"/>
+  <circle cx="414" cy="344" r="16" fill="url(#accent)"/>
+  <text x="414" y="349" class="stepNum" text-anchor="middle">1</text>
+  <rect x="440" y="332" width="70" height="22" rx="11" fill="url(#accent)"/>
+  <text x="475" y="347" class="layerTag" text-anchor="middle">AGENT</text>
+  <text x="750" y="390" class="h" text-anchor="middle">AI Agent</text>
+  <text x="750" y="420" class="hSub" text-anchor="middle">Claude Code · Cursor</text>
+  <g transform="translate(630, 430)">
+    <rect width="240" height="16" rx="8" fill="#EEF3FF"/>
+    <text x="120" y="12" class="code" style="font-size:12px" text-anchor="middle">tap(login_button)</text>
+  </g>
+
+  <!-- Down & Up arrows between L1 & L2 -->
+  <g>
+    <line x1="720" y1="470" x2="720" y2="530" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowDown)"/>
+    <line x1="780" y1="530" x2="780" y2="470" stroke="#6EE7FF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4" marker-end="url(#arrowUp)"/>
+  </g>
+  <g transform="translate(560, 485)" filter="url(#softShadow)">
+    <rect width="140" height="26" rx="13" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1.5"/>
+    <text x="70" y="18" class="arrowLabel" text-anchor="middle">MCP tool call</text>
+  </g>
+  <text x="880" y="500" class="returnLabel">result</text>
+
+  <!-- Layer 2: MCP Server -->
+  <g filter="url(#softShadow)">
+    <rect x="380" y="550" width="740" height="140" rx="22" fill="url(#card)" stroke="#7B8DFF" stroke-width="2"/>
+  </g>
+  <rect x="380" y="550" width="740" height="6" fill="url(#indigo)"/>
+  <circle cx="414" cy="584" r="16" fill="url(#indigo)"/>
+  <text x="414" y="589" class="stepNum" text-anchor="middle">2</text>
+  <rect x="440" y="572" width="100" height="22" rx="11" fill="url(#indigo)"/>
+  <text x="490" y="587" class="layerTag" text-anchor="middle">MCP SERVER</text>
+  <text x="750" y="628" class="h" text-anchor="middle">flutter_copilot_mcp</text>
+  <text x="750" y="658" class="hSub" text-anchor="middle">工具路由  ·  参数校验  ·  结果返回</text>
+
+  <!-- Arrows L2 → L3 -->
+  <g>
+    <line x1="720" y1="710" x2="720" y2="770" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowDown)"/>
+    <line x1="780" y1="770" x2="780" y2="710" stroke="#6EE7FF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4" marker-end="url(#arrowUp)"/>
+  </g>
+  <g transform="translate(500, 725)" filter="url(#softShadow)">
+    <rect width="200" height="26" rx="13" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1.5"/>
+    <text x="100" y="18" class="arrowLabel" text-anchor="middle">callServiceExtension</text>
+  </g>
+  <text x="880" y="740" class="returnLabel">response json</text>
+
+  <!-- Layer 3: VM Service -->
+  <g filter="url(#softShadow)">
+    <rect x="380" y="790" width="740" height="140" rx="22" fill="url(#card)" stroke="#B8C6F5" stroke-width="1.5"/>
+  </g>
+  <rect x="380" y="790" width="740" height="6" fill="url(#violet)"/>
+  <circle cx="414" cy="824" r="16" fill="url(#violet)"/>
+  <text x="414" y="829" class="stepNum" text-anchor="middle">3</text>
+  <rect x="440" y="812" width="100" height="22" rx="11" fill="url(#violet)"/>
+  <text x="490" y="827" class="layerTag" text-anchor="middle">VM SERVICE</text>
+  <text x="750" y="868" class="h" text-anchor="middle">VM Service</text>
+  <text x="750" y="898" class="hSub" text-anchor="middle">Dart / Flutter Runtime Debug API  —  调用 Service Extension</text>
+
+  <!-- Arrows L3 → L4 -->
+  <g>
+    <line x1="720" y1="950" x2="720" y2="1010" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowDown)"/>
+    <line x1="780" y1="1010" x2="780" y2="950" stroke="#6EE7FF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 4" marker-end="url(#arrowUp)"/>
+  </g>
+  <g transform="translate(500, 965)" filter="url(#softShadow)">
+    <rect width="200" height="26" rx="13" fill="#FFFFFF" stroke="#4C63E8" stroke-width="1.5"/>
+    <text x="100" y="18" class="arrowLabel" text-anchor="middle">runtime execution</text>
+  </g>
+  <text x="880" y="980" class="returnLabel">data / status</text>
+
+  <!-- Layer 4: Flutter App -->
+  <g filter="url(#softShadow)">
+    <rect x="380" y="1030" width="740" height="30" rx="15" fill="url(#cyan)"/>
+  </g>
+  <text x="750" y="1051" class="layerTag" style="font-size:13px" text-anchor="middle">▼  FLUTTER APP  ·  Binding · Widget Tree · 执行点击 / 输入 / 截图 / 日志  ▼</text>
+
+  <!-- Left annotation (what happens at each step) -->
+  <g transform="translate(80, 340)">
+    <rect x="0" y="0" width="280" height="110" rx="14" fill="#FFFFFF" fill-opacity="0.6" stroke="#D5DDF5" stroke-width="1"/>
+    <text x="20" y="28" class="arrowLabel">STEP 1</text>
+    <text x="20" y="58" class="hSub" style="font-weight:700">AI 语义化意图</text>
+    <text x="20" y="82" class="hSub" style="font-size:14px; fill:#5D6B8A">想要点某个按钮 / 截图 /</text>
+    <text x="20" y="100" class="hSub" style="font-size:14px; fill:#5D6B8A">抓日志</text>
+  </g>
+  <g transform="translate(80, 580)">
+    <rect x="0" y="0" width="280" height="110" rx="14" fill="#FFFFFF" fill-opacity="0.6" stroke="#D5DDF5" stroke-width="1"/>
+    <text x="20" y="28" class="arrowLabel">STEP 2</text>
+    <text x="20" y="58" class="hSub" style="font-weight:700">MCP 翻译为工具调用</text>
+    <text x="20" y="82" class="hSub" style="font-size:14px; fill:#5D6B8A">路由 + 参数校验 +</text>
+    <text x="20" y="100" class="hSub" style="font-size:14px; fill:#5D6B8A">结构化返回</text>
+  </g>
+  <g transform="translate(80, 820)">
+    <rect x="0" y="0" width="280" height="110" rx="14" fill="#FFFFFF" fill-opacity="0.6" stroke="#D5DDF5" stroke-width="1"/>
+    <text x="20" y="28" class="arrowLabel">STEP 3</text>
+    <text x="20" y="58" class="hSub" style="font-weight:700">VM Service 下发</text>
+    <text x="20" y="82" class="hSub" style="font-size:14px; fill:#5D6B8A">调用已注册的</text>
+    <text x="20" y="100" class="hSub" style="font-size:14px; fill:#5D6B8A">Service Extension</text>
+  </g>
+
+  <!-- Right annotation: return sample -->
+  <g transform="translate(1140, 340)">
+    <rect x="0" y="0" width="280" height="590" rx="14" fill="#0F1630"/>
+    <rect x="0" y="0" width="280" height="32" rx="14" fill="#0F1630"/>
+    <text x="20" y="22" class="arrowLabel" style="fill:#6EE7FF">RESPONSE SAMPLE</text>
+    <g transform="translate(20, 60)" fill="#C8D4F5" style="font: 500 13px 'SF Mono',Menlo,monospace">
+      <text y="0">{</text>
+      <text y="24">  "tool": "tap",</text>
+      <text y="48">  "args": {</text>
+      <text y="72" style="fill:#6EE7FF">    "key": "login_btn"</text>
+      <text y="96">  },</text>
+      <text y="120">  "status": <tspan fill="#A8F0B8">"ok"</tspan>,</text>
+      <text y="144">  "rebuild": 3,</text>
+      <text y="168">  "elapsedMs": 142,</text>
+      <text y="192">  "screenshot":</text>
+      <text y="216" style="fill:#FFB86B">    "data:image/png;"</text>
+      <text y="240">  "logs": [ ... ]</text>
+      <text y="264">}</text>
+      <text y="310" style="fill:#7383A8">// 返回给 Agent，</text>
+      <text y="334" style="fill:#7383A8">// Agent 据此决定下一步</text>
+    </g>
+  </g>
+</svg>

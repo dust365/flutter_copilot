@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(git status*)",
+      "Bash(flutter analyze example/lib/main.dart)",
+      "Bash(cd example && flutter analyze *)",
+      "Bash(cd example && flutter test *)",
+      "Bash(cd example && flutter run *)",
+      "Bash(cd packages/flutter_copilot_mcp && dart analyze *)",
+      "Bash(cd packages/flutter_copilot_mcp && dart run bin/flutter_copilot_mcp.dart *)",
+      "Bash(cd packages/flutter_copilot_claw && flutter analyze *)",
+      "Bash(cd packages/flutter_copilot_claw && flutter test *)",
+      "Bash(cd packages/flutter_copilot_claw/example && flutter test *)",
+      "Bash(cd packages/flutter_copilot_mcp/example && flutter test *)",
+      "Bash(cd tool && dart analyze *)",
+      "Bash(cd tool && dart format *)",
+      "Bash(dart tool/version.dart)",
+      "Bash(dart pub get)",
+      "Bash(flutter pub get)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git reset --hard*)",
+      "Bash(git checkout -- *)",
+      "Bash(git push --force*)"
+    ]
+  },
+  "respectGitignore": true
+}

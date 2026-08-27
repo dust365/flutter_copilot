@@ -35,8 +35,7 @@ ArgParser buildParser() {
 
 void printUsage(ArgParser argParser) {
   stderr
-    ..writeln(
-        'Flutter Copilot MCP Server - Flutter app interaction for AI agents')
+    ..writeln('Flutter Copilot MCP Server - Flutter app interaction for AI agents')
     ..writeln()
     ..writeln('Usage: flutter_copilot_mcp [options]')
     ..writeln()
@@ -80,7 +79,8 @@ Usage:
 3. Use "get_interactive_elements" to discover available UI elements.
 4. Interact with elements using "tap", "enter_text", or "scroll_to" tools.
 5. Use "take_screenshots" to see the current app state and "get_logs" to debug issues.
-6. Use "hot_reload" after making code changes to reload the app without losing state.
+6. Use "get_rebuild_snapshot" to get repaint/rebuild stats (frame, total rebuilds, top widgets) when the app has enableGlobalRebuildHook enabled.
+7. Use "hot_reload" after making code changes to reload the app without losing state.
 
 Important: Elements are matched by their key (ValueKey<String>) or text content. Keys are more reliable. If you cannot locate a widget, you may need to add a ValueKey to it in the Flutter source code. For example: `ElevatedButton(key: ValueKey('submit_button'), ...)`.
 ''',

@@ -23,9 +23,9 @@ class HomePage extends StatelessWidget {
   // 定义测试页面列表
   static final List<DemoPageInfo> demoPages = [
     const DemoPageInfo(
-      title: '基础交互',
-      description: '测试 tap 工具 - 点击各种按钮和交互元素',
-      route: '/basic-interaction-demo',
+      title: '点击',
+      description: '测试 tap 工具 - 触发按钮、卡片、图标按钮等真实业务操作',
+      route: '/tap-demo',
       icon: Icons.touch_app,
       color: Colors.blue,
     ),
@@ -58,11 +58,18 @@ class HomePage extends StatelessWidget {
       color: Colors.teal,
     ),
     const DemoPageInfo(
-      title: '调试与监控',
-      description: '测试 get_logs 工具 - 获取应用日志和监控功能',
+      title: '日志获取',
+      description: '测试 get_logs 工具 - 获取应用日志',
       route: '/debug-monitor-demo',
       icon: Icons.monitor,
       color: Colors.indigo,
+    ),
+    const DemoPageInfo(
+      title: '重绘监测',
+      description: 'BuildOwner Hook + rebuild.snapshot - 查看重建统计与热点',
+      route: '/rebuild-demo',
+      icon: Icons.auto_awesome_motion,
+      color: Colors.deepPurple,
     ),
   ];
 
