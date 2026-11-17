@@ -1,90 +1,65 @@
 ---
 name: flutter-copilot
-description: 连接 Flutter Copilot MCP，支持自动读取 VM Service URI、截图、交互、热重载，以及需要重启时自动调用脚本重连
+description: 连接 Flutter Copilot MCP，支持通过 DTD 发现多台设备、冷启动、截图、交互和热重载
 ---
 
 # Flutter Copilot MCP 连接 Skill
 
-自动连接 Flutter Copilot MCP，提供截图、UI 交互、热重载等能力。
+通过 Flutter Copilot MCP 发现、启动并操作一台或多台正在 debug 运行的 Flutter 应用。连接状态在 MCP 进程里，不读 `.vm_service_uri`。
 
 ## When to Use
 
-- 需要通过 MCP 查看 Flutter 应用当前页面截图
-- 需要通过 MCP 与 Flutter 应用交互（点击、滑动、输入等）
-- 需要热重载后验证 UI 修改效果
-- 需要重启 Flutter 应用后重新连接 MCP
-- 其他 skill（如 theme_switch）需要 MCP 验收时，作为前置步骤
+- 需要查看或操作一台正在运行的 Flutter 应用
+- 同一个对话里要同时操作多台设备
+- 应用还没启动，需要 MCP 自己拉起
+- 应用从 IDE 重新 Run 之后要继续操作
+- 需要热重载后验证 UI
 
 ## Instructions
 
-### 1. 连接 MCP
+### 1. 接上已经在跑的 App
 
-从项目根目录的 `.vm_service_uri` 文件读取 VM Service URI，然后调用 `flutter_copilot connect`：
+1. 调用 `list_dtds`。
+2. 从结果里选本机的 `ws://` DTD 地址，调用 `connect_dtd`。IDE 启动的 App 通常在 IDE 那个长期 DTD 上；终端里的 `flutter run` 各自带一个 DTD。
+3. 调用 `list_apps`。只有一台时，后面的工具可以不传 `app`。有多台时，每次操作都传 `app`（id、设备 id 或 URI）。
 
-```bash
-# 读取 URI
-cat .vm_service_uri
-```
+`connect` 只在已经拿到 DDS 的 `ws://` 地址、周围没有 DTD 时使用。它是往表里追加一台，不会拆掉别的会话。
 
-```
-# 连接（使用读取到的实际 URI）
-flutter_copilot connect uri=<读取到的URI>
-```
+### 2. 一台都没跑
 
-**注意**：`.vm_service_uri` 由 `scripts/flutter_run.sh` 在 `flutter run` 启动时自动写入，通过 VS Code 的 `YouFi (Copilot)` launch 配置或终端手动运行脚本均可。
+1. 调用 `list_devices`。
+2. 对每台设备调用一次 `launch_app`，传入 `deviceId`、Flutter 工程 `directory`，以及一个稳定的 `name`。不同系统可以并行调用。同一系统（两台安卓、两台 iOS，或两个相同的桌面系统）要等上一次 `launch_app` 返回后再调下一次。服务端也会按系统排队，避免两台设备同时改同一个安装包；调用方自己排队，是为了不让还在排队的调用被客户端超时掐掉。
+3. 返回时该设备已经在表里，直接用 `name` 作为 `app` 操作。
 
-### 2. 重启并重连
+`stop_app` 只结束电脑上的 `flutter run`。手机上的 App 还在前台。
 
-当需要重启 Flutter 应用时（如全量代码变更、hot reload 不生效），执行以下步骤：
+### 3. 重启之后
 
-1. **断开当前连接**：调用 `flutter_copilot disconnect`
-2. **终止旧进程并重启**：在终端执行脚本重启
-   ```bash
-   # 终止当前 flutter run 进程
-   pkill -f "flutter.*run" || true
-   # 等待进程退出
-   sleep 3
-   # 重新启动（后台运行）
-   ./scripts/flutter_run.sh &
-   ```
-3. **等待 URI 就绪**（30 秒）：
-   ```bash
-   # 等待 .vm_service_uri 文件被写入（最多等 30 秒）
-   for i in $(seq 1 30); do
-     if [ -f .vm_service_uri ] && [ -s .vm_service_uri ]; then
-       echo "URI ready: $(cat .vm_service_uri)"
-       break
-     fi
-     sleep 1
-   done
-   ```
-4. **重新读取 URI 并连接**：
-   ```bash
-   cat .vm_service_uri
-   ```
-   然后调用 `flutter_copilot connect` 连接新的 URI。
+- 从 IDE 重新 Run：不要再连接。原来的 `app` 名字会接到新的 DDS。直接截图或点击。
+- 热重启之后同样直接操作。
+- 在终端里重新 `flutter run`：旧 DTD 消失。工具报错里会带上当前 DTD 列表，再 `connect_dtd` 一次。
 
-### 3. 常用操作
+### 4. 常用操作
 
 | 操作 | MCP 工具 | 说明 |
 |------|----------|------|
-| 截图 | `flutter_copilot take_screenshots` | 查看当前页面 |
-| 点击 | `flutter_copilot tap` | 通过 text/key/type/coordinates 点击元素 |
-| 滚动到 | `flutter_copilot scroll_to` | 滚动到指定文本或 key 的元素 |
-| 输入文字 | `flutter_copilot enter_text` | 在输入框中输入文本 |
-| 获取元素 | `flutter_copilot get_interactive_elements` | 列出所有可交互元素 |
-| 热重载 | `flutter_copilot hot_reload` | 代码修改后热重载 |
-| 导航 | `flutter_copilot navigate` | push/pop/replace 路由导航 |
-| 获取日志 | `flutter_copilot get_logs` | 获取应用日志 |
-
-### 4. 连接失败排查
-
-- **文件不存在**：确认是否通过 `YouFi (Copilot)` 启动或手动运行了 `scripts/flutter_run.sh`
-- **连接超时**：URI 可能已过期（应用重启后 URI 会变），重新读取 `.vm_service_uri`
-- **进程未运行**：执行重启流程（见上方第 2 节）
+| 列出 DTD | `list_dtds` | 发现本机有哪些 DTD |
+| 连接 DTD | `connect_dtd` | 接上该 DTD 上所有已初始化 Copilot 的 App |
+| 列出会话 | `list_apps` | 拿到 `app` 参数 |
+| 列出设备 | `list_devices` | 冷启动前选择 deviceId |
+| 启动 | `launch_app` | 拉起一台并连上。同一系统排队，不同系统可并行 |
+| 停止 | `stop_app` | 结束对应的 flutter run |
+| 截图 | `take_screenshots` | 多台时传 `app` |
+| 点击 | `tap` | 优先用 key |
+| 滚动到 | `scroll_to` | 滚动到文本或 key |
+| 输入文字 | `enter_text` | 写入输入框 |
+| 获取元素 | `get_interactive_elements` | 列出可交互元素 |
+| 热重载 | `hot_reload` | 代码修改后热重载 |
+| 导航 | `navigate` | push/pop/replace |
+| 应用内日志 | `get_logs` | App 里截获的日志 |
+| 启动日志 | `get_app_logs` | launch_app 拉起的 flutter run 输出 |
 
 ## Key Files
 
-- `scripts/flutter_run.sh` — 包装 `flutter run`，自动捕获 VM Service URI 写入 `.vm_service_uri`
-- `.vm_service_uri` — 存储当前 VM Service WebSocket 地址（gitignore 已忽略）
-- `.vscode/launch.json` — `"YouFi (Copilot)"` 配置通过 `customTool` 调用脚本
+- `packages/flutter_copilot_mcp` — 连接表、DTD 订阅和 `launch_app` 都在这个进程里
+- `scripts/flutter_run.sh` 和 `.vm_service_uri` — 仍给单次 `fcc` 命令用，MCP 不读这个文件

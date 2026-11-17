@@ -35,7 +35,8 @@ ArgParser buildParser() {
 
 void printUsage(ArgParser argParser) {
   stderr
-    ..writeln('Flutter Copilot MCP Server - Flutter app interaction for AI agents')
+    ..writeln(
+        'Flutter Copilot MCP Server - Flutter app interaction for AI agents')
     ..writeln()
     ..writeln('Usage: flutter_copilot_mcp [options]')
     ..writeln()
@@ -71,18 +72,18 @@ Future<int> main(List<String> arguments) async {
       options: const McpServerOptions(
         capabilities: ServerCapabilities(tools: ServerCapabilitiesTools()),
         instructions: '''
-Flutter Copilot MCP enables AI agents to interact with Flutter apps running in debug mode. It provides tools to inspect UI elements, tap buttons, enter text, scroll, take screenshots, retrieve logs, and perform hot reloads.
+Flutter Copilot MCP drives Flutter apps that include flutter_copilot_claw and are running in debug mode. One server holds every connected device.
 
-Usage:
-1. Start the Flutter app in debug mode and note the VM service URI (e.g., ws://127.0.0.1:8181/ws).
-2. Use the "connect" tool with the VM service URI to establish a connection.
-3. Use "get_interactive_elements" to discover available UI elements.
-4. Interact with elements using "tap", "enter_text", or "scroll_to" tools.
-5. Use "take_screenshots" to see the current app state and "get_logs" to debug issues.
-6. Use "get_rebuild_snapshot" to get repaint/rebuild stats (frame, total rebuilds, top widgets) when the app has enableGlobalRebuildHook enabled.
-7. Use "hot_reload" after making code changes to reload the app without losing state.
+Find apps:
+1. Call list_dtds, then connect_dtd with a local ws:// URI from that list. Every registered app that initialized Flutter Copilot is connected. Apps that appear later on the same DTD are connected automatically, and a restarted app keeps its name.
+2. Or call list_devices, then launch_app. launch_app starts flutter run and connects that device before it returns. Call it once per device. Same-target devices (two Android, two iOS, or two of the same desktop OS) must be launched one after another; different targets can be launched together.
+3. connect is only for a ws:// DDS address you already have. It adds a session and does not replace the others.
 
-Important: Elements are matched by their key (ValueKey<String>) or text content. Keys are more reliable. If you cannot locate a widget, you may need to add a ValueKey to it in the Flutter source code. For example: `ElevatedButton(key: ValueKey('submit_button'), ...)`.
+Call list_apps to see ids. When more than one app is connected, pass app on every other tool. When only one app is connected, app can be omitted.
+
+stop_app ends a flutter run this server started. The app on the device stays open. disconnect only drops the session.
+
+Use get_interactive_elements before tapping. Prefer a ValueKey. After code changes, call hot_reload on that app.
 ''',
       ),
     );
@@ -90,9 +91,9 @@ Important: Elements are matched by their key (ValueKey<String>) or text content.
     vmService.registerTools(server);
 
     if (ssePort != null) {
-      return await runSseServer(server, ssePort);
+      return await runSseServer(server, vmService, ssePort);
     } else {
-      return await runStdioServer(server);
+      return await runStdioServer(server, vmService);
     }
   } on FormatException catch (e) {
     stderr
@@ -137,7 +138,7 @@ String _formatTime(DateTime time) {
       '${time.second.toString().padLeft(2, '0')}';
 }
 
-Future<int> runStdioServer(McpServer server) async {
+Future<int> runStdioServer(McpServer server, VmServiceContext vmService) async {
   final logger = logging.Logger('main');
 
   // Use a stdio transport with small compatibility fixes for clients like Copilot.
@@ -155,13 +156,18 @@ Future<int> runStdioServer(McpServer server) async {
   final signal = await _ExitSignal().wait;
   logger.info('Received ${signal.name}, stopping');
 
+  await vmService.close();
   await server.close();
   await transport.close();
   logger.info('Stopped');
   return 0;
 }
 
-Future<int> runSseServer(McpServer server, int ssePort) async {
+Future<int> runSseServer(
+  McpServer server,
+  VmServiceContext vmService,
+  int ssePort,
+) async {
   final logger = logging.Logger('main');
   final sseServerManager = SseServerManager(server);
   try {
@@ -182,6 +188,7 @@ Future<int> runSseServer(McpServer server, int ssePort) async {
     }
 
     logger.info('Stopping');
+    await vmService.close();
     await server.close();
   } catch (e, st) {
     logger.severe('Error when waiting for MCP client connection', e, st);

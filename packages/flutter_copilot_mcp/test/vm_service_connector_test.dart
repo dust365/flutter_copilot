@@ -73,6 +73,31 @@ void main() {
       });
     });
 
+    test('waits for the Copilot extension to appear', () async {
+      await connector.disconnect();
+      server.hideExtensionForCalls = 2;
+
+      final waiting = VmServiceConnector();
+      await waiting.connect(
+        server.wsUri,
+        waitForExtension: const Duration(seconds: 2),
+      );
+      addTearDown(waiting.disconnect);
+
+      expect(waiting.isConnected, isTrue);
+      expect(server.hideExtensionForCalls, 0);
+    });
+
+    test('uses the isolate advertised by the latest getVM', () async {
+      server.isolateId = 'isolates/2';
+
+      await connector.navigate('pop', null, null);
+
+      final call = server.lastCallTo('ext.flutter.flutter_copilot.navigate');
+      expect(call, isNotNull);
+      expect(call!.params['isolateId'], 'isolates/2');
+    });
+
     test('omits the arguments field when caller passes null', () async {
       await connector.navigate('pop', null, null);
 

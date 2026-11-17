@@ -31,6 +31,12 @@ class MockVmServer {
   /// All requests received, in arrival order.
   final List<RecordedRequest> requests = [];
 
+  /// Isolate id advertised by `getVM`. Tests change this to simulate a hot restart.
+  String isolateId = 'isolates/1';
+
+  /// How many `getIsolate` lookups should pretend the Copilot extension is absent.
+  int hideExtensionForCalls = 0;
+
   /// Starts the server on loopback with an OS-assigned port.
   static Future<MockVmServer> start() async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -88,7 +94,7 @@ class MockVmServer {
           'isolates': [
             {
               'type': '@Isolate',
-              'id': 'isolates/1',
+              'id': isolateId,
               'name': 'main',
               'number': '1',
               'isSystemIsolate': false,
@@ -99,13 +105,20 @@ class MockVmServer {
           'systemIsolateGroups': <dynamic>[],
         };
       case 'getIsolate':
+        final requested = params['isolateId'] as String? ?? isolateId;
+        var current = requested == isolateId;
+        if (current && hideExtensionForCalls > 0) {
+          hideExtensionForCalls--;
+          current = false;
+        }
         return {
           'type': 'Isolate',
-          'id': 'isolates/1',
+          'id': requested,
           'name': 'main',
           'number': '1',
           'isSystemIsolate': false,
-          'extensionRPCs': ['ext.flutter.flutter_copilot.getLogs'],
+          'extensionRPCs':
+              current ? ['ext.flutter.flutter_copilot.getLogs'] : <String>[],
         };
       case 'streamListen':
         return {'type': 'Success'};

@@ -10,7 +10,21 @@ class NotConnectedException implements Exception {
 
   @override
   String toString() =>
-      'Not connected to any app. Use app.connect tool first with the VM service URI.';
+      'Not connected to any app. Call list_dtds and connect_dtd, or launch_app.';
+}
+
+/// The VM is up, but this isolate set has no Flutter Copilot extensions.
+class NoCopilotExtensionException implements Exception {
+  const NoCopilotExtensionException(this.uri);
+
+  final String? uri;
+
+  @override
+  String toString() {
+    final where = uri == null ? '' : ' at $uri';
+    return 'No isolate found with ext.flutter.flutter_copilot.getLogs$where. '
+        'Make sure the Flutter app has flutter_copilot_claw initialized.';
+  }
 }
 
 /// Exception thrown when a VM service extension call fails.
@@ -41,29 +55,47 @@ class VmServiceConnector {
 
   final logging.Logger _logger;
   VmService? _service;
-  String? _isolateId;
   StreamSubscription<Event>? _serviceEventSubscription;
+  int _generation = 0;
+
+  /// Called when the remote side closes the socket.
+  ///
+  /// Not called for [disconnect]. The directory uses this to drop the session.
+  void Function()? onDisconnected;
 
   final Map<String, String?> _registeredServices = {};
   final Map<String, List<Completer<String?>>> _pendingServiceRequests = {};
 
+  /// WebSocket URI of the current DDS connection.
+  String? connectedUri;
+
   /// Returns true if currently connected to a VM service.
-  bool get isConnected => _service != null && _isolateId != null;
+  bool get isConnected => _service != null;
 
   /// Connects to a VM service at the given URI.
   ///
+  /// When [waitForExtension] is set, discovery of the Copilot isolate is
+  /// retried until the duration elapses. `flutter run` publishes the VM
+  /// service before `FlutterCopilotBinding` has registered its extensions.
+  ///
   /// Throws an exception if connection fails.
-  Future<void> connect(String uri) async {
-    if (isConnected) {
+  Future<void> connect(
+    String uri, {
+    Duration? waitForExtension,
+  }) async {
+    if (_service != null) {
       _logger.warning('Already connected, disconnecting first');
       await disconnect();
     }
 
     _logger.info('Connecting to VM service at $uri');
+    final generation = _generation;
 
     try {
-      _service = await vmServiceConnectUri(uri);
-      _serviceEventSubscription = _service!.onServiceEvent.listen((e) {
+      final service = await vmServiceConnectUri(uri);
+      _service = service;
+      connectedUri = uri;
+      _serviceEventSubscription = service.onServiceEvent.listen((e) {
         switch (e.kind) {
           case EventKind.kServiceRegistered:
             final serviceName = e.service!;
@@ -82,13 +114,34 @@ class VmServiceConnector {
             _logger.info('Service event: $e');
         }
       });
-      await _service!.streamListen(EventStreams.kService);
+      await service.streamListen(EventStreams.kService);
+      unawaited(
+        service.onDone.then((_) {
+          if (generation != _generation || !identical(_service, service)) {
+            return;
+          }
+          _service = null;
+          connectedUri = null;
+          _logger.info('VM service connection closed');
+          onDisconnected?.call();
+        }),
+      );
 
-      _isolateId = await _findIsolateWithFlutterCopilotExtensions();
-      _logger.info('Connected to isolate: $_isolateId');
+      final isolateId = await _awaitCopilotIsolate(waitForExtension);
+      _logger.info('Connected to isolate: $isolateId');
     } catch (err) {
+      _generation++;
+      final service = _service;
       _service = null;
-      _isolateId = null;
+      connectedUri = null;
+      await _serviceEventSubscription?.cancel();
+      _serviceEventSubscription = null;
+      try {
+        await service?.dispose();
+      } catch (disposeError) {
+        _logger
+            .fine('Ignoring dispose error after failed connect: $disposeError');
+      }
       _logger.severe('Failed to connect to VM service', err);
       rethrow;
     }
@@ -96,17 +149,19 @@ class VmServiceConnector {
 
   /// Disconnects from the current VM service.
   Future<void> disconnect() async {
-    if (_service != null) {
-      _logger.info('Disconnecting from VM service');
-      await _serviceEventSubscription?.cancel();
-      _serviceEventSubscription = null;
-      await _service!.dispose();
-      _service = null;
-      _isolateId = null;
-      _registeredServices.clear();
-      _pendingServiceRequests.clear();
-      _logger.fine('Disconnected');
-    }
+    _generation++;
+    final service = _service;
+    if (service == null) return;
+
+    _logger.info('Disconnecting from VM service');
+    _service = null;
+    connectedUri = null;
+    await _serviceEventSubscription?.cancel();
+    _serviceEventSubscription = null;
+    await service.dispose();
+    _registeredServices.clear();
+    _pendingServiceRequests.clear();
+    _logger.fine('Disconnected');
   }
 
   /// Returns a future that completes with the registered method name for the
@@ -157,9 +212,10 @@ class VmServiceConnector {
     _logger.fine('Calling extension: $extensionName with args: $args');
 
     try {
+      final isolateId = await _findIsolateWithFlutterCopilotExtensions();
       final response = await _service!.callServiceExtension(
         'ext.flutter.$extensionName',
-        isolateId: _isolateId,
+        isolateId: isolateId,
         args: args,
       );
 
@@ -270,15 +326,16 @@ class VmServiceConnector {
     _logger.info('Performing hot reload');
 
     try {
+      final isolateId = await _findIsolateWithFlutterCopilotExtensions();
       final method = await waitForServiceRegistration('reloadSources');
       if (method == null) {
-        final report = await _service!.reloadSources(_isolateId!);
+        final report = await _service!.reloadSources(isolateId);
         _logger.fine('Hot reload completed: success=${report.success}');
         return report.success ?? false;
       } else {
         final result = await _service!.callMethod(
           method,
-          isolateId: _isolateId!,
+          isolateId: isolateId,
         );
         _logger.fine('Hot reload completed: result=${result.json}');
         return result.json?['type'] == 'Success';
@@ -365,6 +422,22 @@ class VmServiceConnector {
     return _callExtension('flutter_copilot.navigate', args);
   }
 
+  Future<String> _awaitCopilotIsolate(Duration? timeout) async {
+    if (timeout == null || timeout <= Duration.zero) {
+      return _findIsolateWithFlutterCopilotExtensions();
+    }
+
+    final deadline = DateTime.now().add(timeout);
+    while (true) {
+      try {
+        return await _findIsolateWithFlutterCopilotExtensions();
+      } on NoCopilotExtensionException {
+        if (DateTime.now().isAfter(deadline)) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      }
+    }
+  }
+
   /// Finds the first isolate that has the flutter_copilot extensions.
   ///
   /// Throws an exception if no suitable isolate is found.
@@ -399,9 +472,6 @@ class VmServiceConnector {
       }
     }
 
-    throw Exception(
-      'No isolate found with ext.flutter.flutter_copilot.getLogs extension. '
-      'Make sure the Flutter app has flutter_copilot_claw initialized.',
-    );
+    throw NoCopilotExtensionException(connectedUri);
   }
 }
