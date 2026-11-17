@@ -19,11 +19,6 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -46,13 +41,17 @@ jobs:
           cd packages/flutter_copilot_claw
           flutter pub get
 
-      - name: Check version.g.dart is in sync
+      - name: Check Dart formatting
         run: |
-          dart tool/version.dart
-          if ! git diff --exit-code packages/flutter_copilot_mcp/lib/src/version.g.dart; then
-            echo "ERROR: version.g.dart is out of sync. Please run 'dart tool/version.dart' and commit the changes."
+          if ! dart format --output=none --set-exit-if-changed \
+            packages/flutter_copilot_mcp/lib packages/flutter_copilot_mcp/bin \
+            packages/flutter_copilot_claw/lib tool; then
+            echo "::error::Dart formatting is out of sync. Run: dart format packages/flutter_copilot_mcp/lib packages/flutter_copilot_mcp/bin packages/flutter_copilot_claw/lib tool"
             exit 1
           fi
+
+      - name: Check generated version files are in sync
+        run: dart tool/version.dart --check
 
       - name: Analyze flutter_copilot_mcp
         run: |
@@ -63,18 +62,3 @@ jobs:
         run: |
           cd packages/flutter_copilot_claw
           flutter analyze --fatal-infos lib
-
-      - name: Check formatting for flutter_copilot_mcp
-        run: |
-          cd packages/flutter_copilot_mcp
-          dart format --set-exit-if-changed lib bin
-
-      - name: Check formatting for flutter_copilot_claw
-        run: |
-          cd packages/flutter_copilot_claw
-          dart format --set-exit-if-changed lib
-
-      - name: Check formatting for tool
-        run: |
-          cd tool
-          dart format --set-exit-if-changed .
