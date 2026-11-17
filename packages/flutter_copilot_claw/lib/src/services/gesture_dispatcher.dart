@@ -1,19 +1,38 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_copilot_claw/src/binding/flutter_copilot_configuration.dart';
+import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 import 'package:flutter_copilot_claw/src/services/widget_finder.dart';
 import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
+/// Global hit point and, when a widget was matched, its global bounds.
+class _ResolvedTarget {
+  const _ResolvedTarget(this.position, this.bounds);
+
+  final Offset position;
+  final Rect? bounds;
+}
+
 /// Dispatches gesture events to simulate user interactions.
 class GestureDispatcher {
-  GestureDispatcher({this.onTapAt});
+  GestureDispatcher({this.onTapAt, this.onDragPath});
 
   static const kMaxDelta = 40.0;
   static const kDelay = Duration(milliseconds: 10);
 
-  /// Called after a tap/longPress/doubleTap is dispatched, with the global position.
-  /// Used to show a feedback dot (e.g. [TapFeedbackController.showAt]).
-  final void Function(Offset)? onTapAt;
+  /// Called when a tap, long press, or double tap is shown and again when the
+  /// pointer events finish, so the mark stays visible after the gesture.
+  ///
+  /// [bounds] is the matched widget in global coordinates, or null when the
+  /// gesture targeted raw coordinates.
+  final void Function(Offset position, Rect? bounds, TapFeedbackKind kind)?
+      onTapAt;
+
+  /// Called with the global polyline of a drag or swipe, including the start.
+  ///
+  /// Invoked before the pointer events and again after them.
+  final void Function(List<Offset> path)? onDragPath;
 
   int _nextPointerId = 1;
 
@@ -26,52 +45,35 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    // Fast path for coordinate-based tapping
-    if (matcher is CoordinatesMatcher) {
-      await _dispatchTapAtPosition(matcher.offset);
-      return;
-    }
-
-    final element = widgetFinder.findElement(matcher, configuration);
-
-    if (element == null) {
-      throw Exception('Element matching ${matcher.toJson()} not found');
-    } else {
-      await _dispatchTapAtElement(element);
-    }
-  }
-
-  Future<void> _dispatchTapAtElement(Element element) async {
-    final renderObject = element.renderObject;
-
-    if (renderObject is! RenderBox) {
-      throw Exception('Element does not have a RenderBox');
-    }
-
-    if (!renderObject.hasSize) {
-      throw Exception('RenderBox does not have a size yet');
-    }
-
-    // Get the center position of the widget
-    final center = renderObject.size.center(Offset.zero);
-    final globalPosition = renderObject.localToGlobal(center);
-
-    await _dispatchTapAtPosition(globalPosition);
+    final _ResolvedTarget target = _resolveTarget(
+      matcher,
+      widgetFinder,
+      configuration,
+    );
+    await _dispatchTapAtPosition(
+      target.position,
+      target.bounds,
+      TapFeedbackKind.tap,
+    );
   }
 
   /// Delay between showing tap feedback and dispatching the actual pointer events (ms).
   static const int kTapFeedbackDelayMs = 300;
 
-  Future<void> _dispatchTapAtPosition(Offset globalPosition) async {
-    final pointerId = _nextPointerId++;
+  Future<void> _dispatchTapAtPosition(
+    Offset globalPosition,
+    Rect? bounds,
+    TapFeedbackKind kind,
+  ) async {
+    final int pointerId = _nextPointerId++;
 
-    // Show feedback first, then wait before executing the tap
-    onTapAt?.call(globalPosition);
+    // Show feedback first, then wait before executing the tap.
+    onTapAt?.call(globalPosition, bounds, kind);
     await Future<void>.delayed(
-        const Duration(milliseconds: kTapFeedbackDelayMs));
+      const Duration(milliseconds: kTapFeedbackDelayMs),
+    );
 
-    // Build the event records
-    final records = [
+    final List<List<PointerEvent>> records = [
       [
         PointerAddedEvent(position: globalPosition),
         PointerDownEvent(pointer: pointerId, position: globalPosition),
@@ -80,44 +82,15 @@ class GestureDispatcher {
     ];
 
     await _handlePointerEventRecord(records);
+    onTapAt?.call(globalPosition, bounds, kind);
   }
 
   /// Simulates a drag gesture from [from] to [to].
-  Future<void> drag(Offset from, Offset to) async {
-    final pointerId = _nextPointerId++;
-
-    final delta = to - from;
-    final distance = delta.distance;
-    final stepCount =
-        (distance / kMaxDelta).ceil().clamp(1, double.infinity).toInt();
-
-    final moveRecords = <List<PointerEvent>>[];
-    for (var i = 1; i <= stepCount; i++) {
-      final t = i / stepCount;
-      final position = Offset.lerp(from, to, t)!;
-      final previousPosition =
-          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
-      final stepDelta = position - previousPosition;
-
-      moveRecords.add([
-        PointerMoveEvent(
-          pointer: pointerId,
-          position: position,
-          delta: stepDelta,
-        ),
-      ]);
-    }
-
-    final records = [
-      [
-        PointerAddedEvent(position: from),
-        PointerDownEvent(pointer: pointerId, position: from),
-      ],
-      ...moveRecords,
-      [PointerUpEvent(pointer: pointerId, position: to)],
-    ];
-
-    await _handlePointerEventRecord(records);
+  ///
+  /// [feedback] controls whether to draw the arrow for this gesture.
+  Future<void> drag(Offset from, Offset to, {bool feedback = true}) async {
+    final List<Offset> path = _samplePath(from, to, maxDelta: kMaxDelta);
+    await _dispatchDrag(path, stepDelay: kDelay, feedback: feedback);
   }
 
   /// Simulates a drag gesture starting from an element that matches the given [matcher].
@@ -132,33 +105,13 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    Offset startPosition;
-
-    // Fast path for coordinate-based dragging
-    if (matcher is CoordinatesMatcher) {
-      startPosition = matcher.offset;
-    } else {
-      final element = widgetFinder.findElement(matcher, configuration);
-      if (element == null) {
-        throw Exception('Element matching ${matcher.toJson()} not found');
-      }
-
-      final renderObject = element.renderObject;
-      if (renderObject is! RenderBox) {
-        throw Exception('Element does not have a RenderBox');
-      }
-
-      if (!renderObject.hasSize) {
-        throw Exception('RenderBox does not have a size yet');
-      }
-
-      // Get the center position of the widget
-      final center = renderObject.size.center(Offset.zero);
-      startPosition = renderObject.localToGlobal(center);
-    }
-
-    final endPosition = startPosition + Offset(deltaX, deltaY);
-    await drag(startPosition, endPosition);
+    final _ResolvedTarget target = _resolveTarget(
+      matcher,
+      widgetFinder,
+      configuration,
+    );
+    final Offset endPosition = target.position + Offset(deltaX, deltaY);
+    await drag(target.position, endPosition);
   }
 
   /// Simulates a swipe gesture on an element that matches the given [matcher].
@@ -172,52 +125,29 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    Offset startPosition;
+    final _ResolvedTarget target = _resolveTarget(
+      matcher,
+      widgetFinder,
+      configuration,
+    );
 
-    // Fast path for coordinate-based swiping
-    if (matcher is CoordinatesMatcher) {
-      startPosition = matcher.offset;
-    } else {
-      final element = widgetFinder.findElement(matcher, configuration);
-      if (element == null) {
-        throw Exception('Element matching ${matcher.toJson()} not found');
-      }
+    final Offset endPosition = switch (direction.toLowerCase()) {
+      'left' => target.position + Offset(-distance, 0),
+      'right' => target.position + Offset(distance, 0),
+      'up' => target.position + Offset(0, -distance),
+      'down' => target.position + Offset(0, distance),
+      _ => throw Exception(
+          'Invalid swipe direction: $direction. Must be left, right, up, or down',
+        ),
+    };
 
-      final renderObject = element.renderObject;
-      if (renderObject is! RenderBox) {
-        throw Exception('Element does not have a RenderBox');
-      }
-
-      if (!renderObject.hasSize) {
-        throw Exception('RenderBox does not have a size yet');
-      }
-
-      // Get the center position of the widget
-      final center = renderObject.size.center(Offset.zero);
-      startPosition = renderObject.localToGlobal(center);
-    }
-
-    Offset endPosition;
-    switch (direction.toLowerCase()) {
-      case 'left':
-        endPosition = startPosition + Offset(-distance, 0);
-        break;
-      case 'right':
-        endPosition = startPosition + Offset(distance, 0);
-        break;
-      case 'up':
-        endPosition = startPosition + Offset(0, -distance);
-        break;
-      case 'down':
-        endPosition = startPosition + Offset(0, distance);
-        break;
-      default:
-        throw Exception(
-            'Invalid swipe direction: $direction. Must be left, right, up, or down');
-    }
-
-    // Use faster drag for swipe (fewer steps, shorter delay)
-    await _fastDrag(startPosition, endPosition);
+    final List<Offset> path = _samplePath(
+      target.position,
+      endPosition,
+      maxDelta: kMaxDelta * 2,
+      maxSteps: 20,
+    );
+    await _dispatchDrag(path, stepDelay: const Duration(milliseconds: 5));
   }
 
   /// Simulates a long press gesture on an element that matches the given [matcher].
@@ -231,53 +161,35 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    Offset position;
-
-    // Fast path for coordinate-based long press
-    if (matcher is CoordinatesMatcher) {
-      position = matcher.offset;
-    } else {
-      final element = widgetFinder.findElement(matcher, configuration);
-      if (element == null) {
-        throw Exception('Element matching ${matcher.toJson()} not found');
-      }
-
-      final renderObject = element.renderObject;
-      if (renderObject is! RenderBox) {
-        throw Exception('Element does not have a RenderBox');
-      }
-
-      if (!renderObject.hasSize) {
-        throw Exception('RenderBox does not have a size yet');
-      }
-
-      // Get the center position of the widget
-      final center = renderObject.size.center(Offset.zero);
-      position = renderObject.localToGlobal(center);
-    }
-
-    await _dispatchLongPressAtPosition(position, duration);
+    final _ResolvedTarget target = _resolveTarget(
+      matcher,
+      widgetFinder,
+      configuration,
+    );
+    await _dispatchLongPressAtPosition(
+      target.position,
+      target.bounds,
+      duration,
+    );
   }
 
   Future<void> _dispatchLongPressAtPosition(
     Offset globalPosition,
+    Rect? bounds,
     Duration duration,
   ) async {
-    onTapAt?.call(globalPosition);
+    onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
     await Future<void>.delayed(
-        const Duration(milliseconds: kTapFeedbackDelayMs));
+      const Duration(milliseconds: kTapFeedbackDelayMs),
+    );
 
-    final pointerId = _nextPointerId++;
+    final int pointerId = _nextPointerId++;
 
-    // Build the event records
-    final records = [
-      // Pointer down
+    final List<List<PointerEvent>> records = [
       [
         PointerAddedEvent(position: globalPosition),
         PointerDownEvent(pointer: pointerId, position: globalPosition),
       ],
-      // Hold for the duration (with small moves to simulate pressure)
-      // Add small movements to keep the gesture active
       [
         PointerMoveEvent(
           pointer: pointerId,
@@ -285,30 +197,26 @@ class GestureDispatcher {
           delta: const Offset(0.5, 0.5),
         ),
       ],
-      // Pointer up after duration
       [PointerUpEvent(pointer: pointerId, position: globalPosition)],
     ];
 
-    // Dispatch down event
     records[0].forEach(GestureBinding.instance.handlePointerEvent);
     WidgetsBinding.instance.scheduleFrame();
     await Future<void>.delayed(kDelay);
 
-    // Small move to keep gesture active
     records[1].forEach(GestureBinding.instance.handlePointerEvent);
     WidgetsBinding.instance.scheduleFrame();
     await Future<void>.delayed(kDelay);
 
-    // Hold for the duration (minus the delays already used)
-    final holdDuration = duration - (kDelay * 2);
+    final Duration holdDuration = duration - (kDelay * 2);
     if (holdDuration > Duration.zero) {
       await Future<void>.delayed(holdDuration);
     }
 
-    // Dispatch up event
     records[2].forEach(GestureBinding.instance.handlePointerEvent);
     WidgetsBinding.instance.scheduleFrame();
     await Future<void>.delayed(kDelay);
+    onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
   }
 
   /// Simulates a double tap on an element that matches the given [matcher].
@@ -319,90 +227,130 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    Offset position;
+    final _ResolvedTarget target = _resolveTarget(
+      matcher,
+      widgetFinder,
+      configuration,
+    );
 
-    // Get the position once to ensure both taps are at the same location
-    if (matcher is CoordinatesMatcher) {
-      position = matcher.offset;
-    } else {
-      final element = widgetFinder.findElement(matcher, configuration);
-      if (element == null) {
-        throw Exception('Element matching ${matcher.toJson()} not found');
-      }
-
-      final renderObject = element.renderObject;
-      if (renderObject is! RenderBox) {
-        throw Exception('Element does not have a RenderBox');
-      }
-
-      if (!renderObject.hasSize) {
-        throw Exception('RenderBox does not have a size yet');
-      }
-
-      // Get the center position of the widget
-      final center = renderObject.size.center(Offset.zero);
-      position = renderObject.localToGlobal(center);
-    }
-
-    // First tap
-    await _dispatchTapAtPosition(position);
-
-    // Wait for double tap interval (200ms - shorter for better recognition)
+    await _dispatchTapAtPosition(
+      target.position,
+      target.bounds,
+      TapFeedbackKind.doubleTap,
+    );
     await Future<void>.delayed(const Duration(milliseconds: 200));
-
-    // Second tap at the same position
-    await _dispatchTapAtPosition(position);
+    await _dispatchTapAtPosition(
+      target.position,
+      target.bounds,
+      TapFeedbackKind.doubleTap,
+    );
   }
 
-  /// Performs a fast drag (for swipe gestures) with fewer steps and shorter delays.
-  Future<void> _fastDrag(Offset from, Offset to) async {
-    final pointerId = _nextPointerId++;
-
-    final delta = to - from;
-    final distance = delta.distance;
-    // Use larger steps for faster drag (swipe)
-    final stepCount = (distance / (kMaxDelta * 2)).ceil().clamp(1, 20).toInt();
-
-    final moveRecords = <List<PointerEvent>>[];
-    for (var i = 1; i <= stepCount; i++) {
-      final t = i / stepCount;
-      final position = Offset.lerp(from, to, t)!;
-      final previousPosition =
-          i == 1 ? from : Offset.lerp(from, to, (i - 1) / stepCount)!;
-      final stepDelta = position - previousPosition;
-
-      moveRecords.add([
-        PointerMoveEvent(
-          pointer: pointerId,
-          position: position,
-          delta: stepDelta,
-        ),
-      ]);
+  Future<void> _dispatchDrag(
+    List<Offset> path, {
+    required Duration stepDelay,
+    bool feedback = true,
+  }) async {
+    if (feedback) {
+      onDragPath?.call(path);
     }
 
-    final records = [
+    final int pointerId = _nextPointerId++;
+    final List<List<PointerEvent>> records = <List<PointerEvent>>[
       [
-        PointerAddedEvent(position: from),
-        PointerDownEvent(pointer: pointerId, position: from),
+        PointerAddedEvent(position: path.first),
+        PointerDownEvent(pointer: pointerId, position: path.first),
       ],
-      ...moveRecords,
-      [PointerUpEvent(pointer: pointerId, position: to)],
+      for (var i = 1; i < path.length; i++)
+        [
+          PointerMoveEvent(
+            pointer: pointerId,
+            position: path[i],
+            delta: path[i] - path[i - 1],
+          ),
+        ],
+      [PointerUpEvent(pointer: pointerId, position: path.last)],
     ];
 
-    // Use shorter delay for faster drag
-    await _handlePointerEventRecordFast(records);
-  }
-
-  /// Handles pointer events with shorter delay for fast gestures.
-  Future<void> _handlePointerEventRecordFast(
-    List<List<PointerEvent>> records,
-  ) async {
-    const fastDelay = Duration(milliseconds: 5);
-    for (final record in records) {
+    for (final List<PointerEvent> record in records) {
       record.forEach(GestureBinding.instance.handlePointerEvent);
       WidgetsBinding.instance.scheduleFrame();
-      await Future<void>.delayed(fastDelay);
+      await Future<void>.delayed(stepDelay);
     }
+    if (feedback) {
+      onDragPath?.call(path);
+    }
+  }
+
+  /// Straight polyline from [from] to [to].
+  ///
+  /// Steps are at most [maxDelta] logical pixels. [maxSteps] caps the count
+  /// used by swipes.
+  List<Offset> _samplePath(
+    Offset from,
+    Offset to, {
+    required double maxDelta,
+    int? maxSteps,
+  }) {
+    final double distance = (to - from).distance;
+    var stepCount = (distance / maxDelta).ceil();
+    if (stepCount < 1) {
+      stepCount = 1;
+    }
+    if (maxSteps != null && stepCount > maxSteps) {
+      stepCount = maxSteps;
+    }
+    return <Offset>[
+      from,
+      for (var i = 1; i <= stepCount; i++)
+        Offset.lerp(from, to, i / stepCount)!,
+    ];
+  }
+
+  _ResolvedTarget _resolveTarget(
+    WidgetMatcher matcher,
+    WidgetFinder widgetFinder,
+    FlutterCopilotConfiguration configuration,
+  ) {
+    if (matcher is CoordinatesMatcher) {
+      return _ResolvedTarget(matcher.offset, null);
+    }
+
+    final Element? element = widgetFinder.findElement(matcher, configuration);
+    if (element == null) {
+      throw Exception('Element matching ${matcher.toJson()} not found');
+    }
+
+    final RenderObject? renderObject = element.renderObject;
+    if (renderObject is! RenderBox) {
+      throw Exception('Element does not have a RenderBox');
+    }
+    if (!renderObject.hasSize) {
+      throw Exception('RenderBox does not have a size yet');
+    }
+
+    final RenderBox box = _visibleBox(element, renderObject);
+    final Offset center = box.size.center(Offset.zero);
+    final Offset position = box.localToGlobal(center);
+    final Rect bounds = Rect.fromPoints(
+      box.localToGlobal(Offset.zero),
+      box.localToGlobal(box.size.bottomRight(Offset.zero)),
+    );
+    return _ResolvedTarget(position, bounds);
+  }
+
+  /// Drops a margin [RenderPadding] introduced by a widget such as [Container].
+  ///
+  /// A [Padding] the caller matched directly keeps its own box.
+  RenderBox _visibleBox(Element element, RenderBox renderObject) {
+    if (renderObject is! RenderPadding || element is RenderObjectElement) {
+      return renderObject;
+    }
+    final RenderBox? child = renderObject.child;
+    if (child != null && child.hasSize) {
+      return child;
+    }
+    return renderObject;
   }
 
   /// Handles a list of pointer event records by dispatching them with proper timing.
@@ -412,7 +360,7 @@ class GestureDispatcher {
   Future<void> _handlePointerEventRecord(
     List<List<PointerEvent>> records,
   ) async {
-    for (final record in records) {
+    for (final List<PointerEvent> record in records) {
       record.forEach(GestureBinding.instance.handlePointerEvent);
       WidgetsBinding.instance.scheduleFrame();
       await Future<void>.delayed(kDelay);

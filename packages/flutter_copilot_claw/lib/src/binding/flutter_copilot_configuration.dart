@@ -46,11 +46,11 @@ class FlutterCopilotConfiguration {
   /// 默认 true；release 下若需节省开销可显式传 false。
   final bool enableGlobalRebuildHook;
 
-  /// 是否在 MCP tap/手势操作时显示点击位置红点反馈。
+  /// 是否在点击、长按和拖拽时绘制操作反馈。
   ///
-  /// 为 true 时会创建 [TapFeedbackController]，并在派发 tap 后回调显示红点；
-  /// 应用需在根布局挂载 [TapFeedbackOverlay] 才能看到红点。为 false 时不创建
-  /// controller，保持零开销。默认 true。
+  /// 为 true 时，点击会标出落点和目标组件边框，拖拽和滑动会画出轨迹。
+  /// 反馈画在界面最上层，手势结束后保留 8 秒，这段时间内的截图会带上标注。
+  /// 为 false 时不创建反馈层。默认 true。
   final bool showTapFeedback;
 
   /// Checks if a widget type is interactive (built-in + custom).

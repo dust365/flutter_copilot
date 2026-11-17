@@ -3,52 +3,114 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-/// State for a single tap feedback display (position and optional timestamp).
+/// Which gesture the on-screen mark represents.
+enum TapFeedbackKind {
+  /// One ring at the hit point.
+  tap,
+
+  /// Two concentric rings at the hit point.
+  doubleTap,
+
+  /// Two concentric rings while the press is held.
+  longPress,
+
+  /// A straight arrow from the first path point to the last.
+  drag,
+}
+
+/// Visual mark for the latest copilot gesture.
+///
+/// A tap carries [position] and, when a widget was matched, its global
+/// [bounds]. A drag or swipe carries the global polyline in [path].
 class TapFeedbackState {
   TapFeedbackState({
     required this.position,
+    this.kind = TapFeedbackKind.tap,
+    this.bounds,
+    List<Offset> path = const <Offset>[],
     DateTime? shownAt,
-  }) : _shownAt = shownAt ?? DateTime.now();
+  })  : path = List<Offset>.unmodifiable(path),
+        shownAt = shownAt ?? DateTime.now();
 
+  /// Gesture this mark was drawn for.
+  final TapFeedbackKind kind;
+
+  /// Hit point of a tap, or the start of a drag.
   final Offset position;
-  final DateTime _shownAt;
 
-  DateTime get shownAt => _shownAt;
+  /// Global bounds of the widget that received a point gesture.
+  ///
+  /// Null for coordinate taps and for drag paths.
+  final Rect? bounds;
+
+  /// Global polyline of a drag or swipe, including the start point.
+  ///
+  /// Empty for taps, long presses, and double taps.
+  final List<Offset> path;
+
+  /// When this mark was published. Republishing restarts the visible window.
+  final DateTime shownAt;
+
+  /// Whether [path] is long enough to draw as a stroke.
+  bool get isDrag => path.length >= 2 && (path.last - path.first).distance >= 1;
 }
 
-/// Controller for showing a red dot at tap/gesture positions (e.g. MCP tap).
+/// Controller for the on-screen gesture mark (tap point, widget bounds, drag).
 ///
-/// Call [showAt] when a tap occurs; listeners (e.g. [TapFeedbackOverlay]) will
-/// display a dot at that position. The dot is cleared automatically after
-/// [duration].
+/// Listeners such as [TapFeedbackOverlay] paint [state]. The mark replaces any
+/// previous one and is cleared after [duration]. Showing again restarts that
+/// window, so the mark stays up for a full [duration] after the gesture ends
+/// and is included in screenshots taken in that window.
 class TapFeedbackController {
   TapFeedbackController({
-    this.duration = const Duration(milliseconds: 1200),
+    this.duration = const Duration(seconds: 8),
   });
 
-  /// How long the feedback dot stays visible before being cleared.
+  /// How long the mark stays visible after it was last shown.
   final Duration duration;
 
   final ValueNotifier<TapFeedbackState?> _state =
       ValueNotifier<TapFeedbackState?>(null);
 
-  /// Notifier for the current feedback state. Null when no dot is shown.
+  /// Current mark. Null when nothing is shown.
   ValueListenable<TapFeedbackState?> get state => _state;
 
   Timer? _clearTimer;
 
-  /// Shows a feedback dot at [position]. Any previous dot is replaced and the
-  /// clear timer is reset.
-  void showAt(Offset position) {
-    _clearTimer?.cancel();
-    _state.value = TapFeedbackState(position: position);
-    _clearTimer = Timer(duration, () {
-      _clearTimer = null;
-      _state.value = null;
-    });
+  /// Shows a point mark at [position].
+  ///
+  /// Prefer [showTap] when the target widget's bounds are known.
+  void showAt(Offset position) => showTap(position: position);
+
+  /// Shows a tap, long-press, or double-tap mark.
+  ///
+  /// [bounds] is the target widget in global coordinates. Coordinate gestures
+  /// pass null and only the hit point is drawn.
+  void showTap({
+    required Offset position,
+    Rect? bounds,
+    TapFeedbackKind kind = TapFeedbackKind.tap,
+  }) {
+    _publish(TapFeedbackState(position: position, bounds: bounds, kind: kind));
   }
 
-  /// Clears the current feedback dot immediately.
+  /// Shows a drag or swipe trail. [path] is in global coordinates.
+  ///
+  /// An empty path is ignored. A path that does not move is drawn as a point.
+  void showDrag(List<Offset> path) {
+    if (path.isEmpty) {
+      return;
+    }
+    _publish(
+      TapFeedbackState(
+        position: path.first,
+        path: path,
+        kind: TapFeedbackKind.drag,
+      ),
+    );
+  }
+
+  /// Clears the current mark immediately.
   void clear() {
     _clearTimer?.cancel();
     _clearTimer = null;
@@ -58,6 +120,16 @@ class TapFeedbackController {
   /// Disposes the controller. Call when the binding or overlay is disposed.
   void dispose() {
     _clearTimer?.cancel();
+    _clearTimer = null;
     _state.value = null;
+  }
+
+  void _publish(TapFeedbackState state) {
+    _clearTimer?.cancel();
+    _state.value = state;
+    _clearTimer = Timer(duration, () {
+      _clearTimer = null;
+      _state.value = null;
+    });
   }
 }

@@ -135,7 +135,13 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     if (configuration.showTapFeedback) {
       _tapFeedbackController = TapFeedbackController();
       _gestureDispatcher = GestureDispatcher(
-        onTapAt: (Offset offset) => _tapFeedbackController!.showAt(offset),
+        onTapAt: (Offset offset, Rect? bounds, TapFeedbackKind kind) =>
+            _tapFeedbackController!.showTap(
+          position: offset,
+          bounds: bounds,
+          kind: kind,
+        ),
+        onDragPath: _tapFeedbackController!.showDrag,
       );
     } else {
       _gestureDispatcher = GestureDispatcher();
@@ -171,7 +177,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// The tap feedback controller, if [FlutterCopilotConfiguration.showTapFeedback] was true.
-  /// Used by [TapFeedbackOverlay] to show a red dot at the last MCP tap position.
+  /// Used by [TapFeedbackOverlay] to paint the hit point, widget bounds, and drag trail.
   TapFeedbackController? get tapFeedbackController => _tapFeedbackController;
 
   // ---------- Tap feedback overlay auto-injection ----------

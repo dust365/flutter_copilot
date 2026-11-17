@@ -1,72 +1,156 @@
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 
-/// Radius of the tap feedback dot in logical pixels.
-const double _kTapFeedbackRadius = 28.0;
+const Color _kError = Color(0xFFF44336);
+const Color _kWarning = Color(0xFFFF9800);
+const Color _kHalo = Color(0xFFFFFFFF);
 
-/// Widget that shows a red radial-gradient dot at the last MCP tap position.
+/// Paints the latest copilot gesture on top of the app.
 ///
-/// Typically used internally by [FlutterCopilotBinding] which auto-injects it
-/// via [OverlayEntry]. You do NOT need to add this to your widget tree.
+/// The mark matches the automation hint: an orange rectangle around the
+/// target, a red ring and center dot at the hit point, and a straight arrow
+/// for a drag or swipe. Long press and double tap add a second ring.
+/// The overlay is [IgnorePointer], so the mark does not receive the synthetic
+/// pointer events. It is part of the layer tree and shows up in screenshots
+/// taken while it is visible.
+///
+/// [FlutterCopilotBinding] inserts this automatically. Do not add it yourself.
 class TapFeedbackOverlay extends StatelessWidget {
   const TapFeedbackOverlay({super.key, required this.controller});
 
-  /// The controller that provides the tap position to display.
+  /// Source of the mark to paint.
   final TapFeedbackController controller;
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: ValueListenableBuilder<TapFeedbackState?>(
-        valueListenable: controller.state,
-        builder:
-            (BuildContext context, TapFeedbackState? state, Widget? child) {
-          if (state == null) return const SizedBox.shrink();
-          final double r = _kTapFeedbackRadius;
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const SizedBox.expand(),
-              Positioned(
-                left: state.position.dx - r,
-                top: state.position.dy - r,
-                width: r * 2,
-                height: r * 2,
-                child: CustomPaint(
-                  painter: _RedDotPainter(radius: r),
-                  size: Size(r * 2, r * 2),
-                ),
-              ),
-            ],
-          );
-        },
+    return ExcludeSemantics(
+      child: IgnorePointer(
+        child: ValueListenableBuilder<TapFeedbackState?>(
+          valueListenable: controller.state,
+          builder:
+              (BuildContext context, TapFeedbackState? state, Widget? child) {
+            if (state == null) {
+              return const SizedBox.shrink();
+            }
+            return CustomPaint(
+              painter: _GestureFeedbackPainter(state, context),
+              child: const SizedBox.expand(),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-class _RedDotPainter extends CustomPainter {
-  _RedDotPainter({required this.radius});
+class _GestureFeedbackPainter extends CustomPainter {
+  _GestureFeedbackPainter(this.state, this.context);
 
-  final double radius;
+  final TapFeedbackState state;
+  final BuildContext context;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Offset center = Offset(size.width / 2, size.height / 2);
-    const RadialGradient gradient = RadialGradient(
-      center: Alignment.center,
-      radius: 1.0,
-      colors: <Color>[
-        Color(0xE6FF0000), // center: red, ~90% opacity
-        Color(0x00FF0000), // edge: red, fully transparent
-      ],
+    // Match the reference in logical pixels. Scaling by the window's height
+    // shrinks the mark in landscape and in short desktop windows.
+    const double stroke = 2;
+    const double radius = 16;
+
+    // Gesture positions are global logical coordinates. Cancel the overlay's
+    // transform so insets or a transformed Navigator cannot move the mark.
+    final renderBox = context.findRenderObject() as RenderBox;
+    final transform = renderBox.getTransformTo(null);
+    if (transform.invert() == 0) {
+      return;
+    }
+    canvas.save();
+    canvas.transform(transform.storage);
+
+    final Rect? bounds = state.bounds;
+    if (bounds != null && !bounds.isEmpty) {
+      _outline(
+        canvas,
+        Path()..addRect(bounds),
+        stroke,
+        color: _kWarning,
+      );
+    }
+
+    if (state.kind == TapFeedbackKind.drag && state.path.length >= 2) {
+      _paintArrow(canvas, state.path.first, state.path.last, stroke);
+    }
+
+    final Offset point = state.position;
+    _circle(canvas, point, radius, stroke);
+    if (state.kind == TapFeedbackKind.longPress ||
+        state.kind == TapFeedbackKind.doubleTap) {
+      _circle(canvas, point, radius * 1.4, stroke);
+    }
+    canvas.drawCircle(point, 3, Paint()..color = _kError);
+    canvas.restore();
+  }
+
+  void _paintArrow(Canvas canvas, Offset from, Offset to, double stroke) {
+    final Offset delta = to - from;
+    if (delta.distance <= 1) {
+      return;
+    }
+    final Offset unit = delta / delta.distance;
+    final double head = math.min(12, delta.distance / 2);
+    final Offset base = to - unit * head;
+    final Offset side = Offset(-unit.dy, unit.dx) * head * 0.6;
+    _outline(
+      canvas,
+      Path()
+        ..moveTo(from.dx, from.dy)
+        ..lineTo(to.dx, to.dy)
+        ..moveTo((base + side).dx, (base + side).dy)
+        ..lineTo(to.dx, to.dy)
+        ..lineTo((base - side).dx, (base - side).dy),
+      stroke,
     );
-    final Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    final Paint paint = Paint()..shader = gradient.createShader(rect);
-    canvas.drawCircle(center, radius, paint);
+  }
+
+  void _circle(Canvas canvas, Offset center, double radius, double stroke) {
+    _outline(
+      canvas,
+      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
+      stroke,
+    );
+  }
+
+  void _outline(
+    Canvas canvas,
+    Path path,
+    double stroke, {
+    Color color = _kError,
+  }) {
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = _kHalo
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke * 2.5,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _GestureFeedbackPainter oldDelegate) {
+    final TapFeedbackState previous = oldDelegate.state;
+    return previous.kind != state.kind ||
+        previous.position != state.position ||
+        previous.bounds != state.bounds ||
+        !listEquals(previous.path, state.path);
+  }
 }
