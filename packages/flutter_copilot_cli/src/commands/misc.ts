@@ -51,6 +51,32 @@ Exits 1 on failure.
 `,
     );
 
+  // hot-restart
+  program
+    .command('hot-restart')
+    .description('Trigger a Flutter hot restart on the connected app.')
+    .action(async () => {
+      await withConnector(program, async (c) => {
+        const success = await c.hotRestart();
+        if (success) {
+          log.ok('hot restart succeeded', { success: true });
+        } else {
+          log.err('hot restart reported failure', { success: false });
+          process.exitCode = 1;
+        }
+      });
+    })
+    .addHelpText(
+      'after',
+      `
+Re-runs main() and drops application state. Use this when a hot reload does not
+show the change (main, global initializers, initState).
+
+Requires a debug \`flutter run\` process, which registers \`hotRestart\`. There is
+no fallback for a bare VM service. Exits 1 on failure.
+`,
+    );
+
   // get-logs
   program
     .command('get-logs')

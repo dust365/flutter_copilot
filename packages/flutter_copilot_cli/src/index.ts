@@ -31,7 +31,7 @@ async function main(): Promise<void> {
         '\n' +
         'What it does:\n' +
         '  - Dispatch gestures (tap, drag, swipe, long-press, scroll-to) and text input\n' +
-        '  - Navigate routes, trigger hot reload, grab screenshots and logs\n' +
+        '  - Navigate routes, trigger hot reload or hot restart, grab screenshots and logs\n' +
         '  - Stream live logs / rebuild snapshots with transparent reconnect\n' +
         '  - Run YAML playbooks for smoke tests, or drive the app from a REPL\n' +
         '\n' +
@@ -70,6 +70,7 @@ Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   fcc tap --text "点击"
   fcc take-screenshots -o /tmp/shot.png
   fcc hot-reload
+  fcc hot-restart
 
   # Save a URI as the current project connection
   fcc connect --uri ws://127.0.0.1:8181/abc/ws

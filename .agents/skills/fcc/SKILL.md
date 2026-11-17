@@ -16,6 +16,7 @@ description: 使用 flutter_copilot_cli (fcc) 命令行工具连接并驱动一�
 - 需要读取当前页面可交互元素树：`fcc --json get-interactive-elements`
 - 需要读取应用日志或 rebuild 热点：`fcc get-logs` / `fcc get-rebuild-snapshot`
 - 需要触发热重载：`fcc hot-reload`
+- 热重载后界面没变化：`fcc hot-restart`
 - 需要运行 YAML 脚本做自动化冒烟测试：`fcc run`
 
 ## Prerequisites
@@ -121,6 +122,7 @@ fcc tap --x 200 --y 205
 
 ```bash
 fcc hot-reload
+fcc hot-restart
 ```
 
 ### 实时监听

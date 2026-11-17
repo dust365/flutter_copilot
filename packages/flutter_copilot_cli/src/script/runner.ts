@@ -106,6 +106,11 @@ async function executeStep(c: FlutterCopilotConnector, step: StepT): Promise<voi
       if (!ok) throw new Error('hot reload reported failure');
       return;
     }
+    case 'hot-restart': {
+      const ok = await c.hotRestart();
+      if (!ok) throw new Error('hot restart reported failure');
+      return;
+    }
     case 'take-screenshots': {
       const r = await c.takeScreenshots();
       const shots = r.screenshots ?? [];

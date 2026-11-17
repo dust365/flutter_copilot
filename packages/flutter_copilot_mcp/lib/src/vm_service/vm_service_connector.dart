@@ -4,6 +4,17 @@ import 'package:logging/logging.dart' as logging;
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
+/// Thrown when hot restart is requested but `flutter run` has not registered
+/// its `hotRestart` service.
+class HotRestartUnavailableException implements Exception {
+  const HotRestartUnavailableException();
+
+  @override
+  String toString() =>
+      'hotRestart is not registered. Hot restart requires a debug '
+      'flutter run process; the app alone cannot restart.';
+}
+
 /// Exception thrown when an operation is attempted without an active connection.
 class NotConnectedException implements Exception {
   const NotConnectedException();
@@ -318,30 +329,68 @@ class VmServiceConnector {
 
   /// Performs a hot reload of the Flutter app.
   ///
-  /// Returns information about the reload result.
+  /// Prefers the `reloadSources` service registered by `flutter run`, which
+  /// recompiles and syncs the kernel before reloading. If that service is not
+  /// registered within [serviceTimeout], falls back to the VM's built-in
+  /// `reloadSources`.
+  ///
   /// Throws [NotConnectedException] if not connected.
-  Future<bool> hotReload() async {
+  Future<bool> hotReload({
+    Duration serviceTimeout = const Duration(seconds: 1),
+  }) {
+    return _invokeFlutterRunService(
+      'reloadSources',
+      serviceTimeout: serviceTimeout,
+      fallbackToVmReload: true,
+    );
+  }
+
+  /// Performs a hot restart of the Flutter app.
+  ///
+  /// Calls the `hotRestart` service registered by a debug `flutter run`. There
+  /// is no VM fallback: a bare Dart VM cannot hot restart.
+  ///
+  /// Throws [HotRestartUnavailableException] when the service is not registered
+  /// within [serviceTimeout], and [NotConnectedException] if not connected.
+  Future<bool> hotRestart({
+    Duration serviceTimeout = const Duration(seconds: 1),
+  }) {
+    return _invokeFlutterRunService(
+      'hotRestart',
+      serviceTimeout: serviceTimeout,
+      fallbackToVmReload: false,
+    );
+  }
+
+  Future<bool> _invokeFlutterRunService(
+    String serviceName, {
+    required Duration serviceTimeout,
+    required bool fallbackToVmReload,
+  }) async {
     _ensureConnected();
 
-    _logger.info('Performing hot reload');
+    _logger.info('Calling $serviceName');
 
     try {
       final isolateId = await _findIsolateWithFlutterCopilotExtensions();
-      final method = await waitForServiceRegistration('reloadSources');
+      final method = await waitForServiceRegistration(
+        serviceName,
+        timeout: serviceTimeout,
+      );
       if (method == null) {
+        if (!fallbackToVmReload) {
+          throw const HotRestartUnavailableException();
+        }
         final report = await _service!.reloadSources(isolateId);
-        _logger.fine('Hot reload completed: success=${report.success}');
+        _logger.fine('VM reloadSources completed: success=${report.success}');
         return report.success ?? false;
-      } else {
-        final result = await _service!.callMethod(
-          method,
-          isolateId: isolateId,
-        );
-        _logger.fine('Hot reload completed: result=${result.json}');
-        return result.json?['type'] == 'Success';
       }
+
+      final result = await _service!.callMethod(method, isolateId: isolateId);
+      _logger.fine('$serviceName completed: result=${result.json}');
+      return result.json?['type'] == 'Success';
     } catch (err) {
-      _logger.severe('Hot reload failed', err);
+      _logger.severe('$serviceName failed', err);
       rethrow;
     }
   }

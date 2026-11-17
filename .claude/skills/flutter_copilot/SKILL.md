@@ -54,7 +54,8 @@ description: 连接 Flutter Copilot MCP，支持通过 DTD 发现多台设备、
 | 滚动到 | `scroll_to` | 滚动到文本或 key |
 | 输入文字 | `enter_text` | 写入输入框 |
 | 获取元素 | `get_interactive_elements` | 列出可交互元素 |
-| 热重载 | `hot_reload` | 代码修改后热重载 |
+| 热重载 | `hot_reload` | 代码修改后热重载，保留状态 |
+| 热重启 | `hot_restart` | 热重载看不到改动时，重新跑 main() |
 | 导航 | `navigate` | push/pop/replace |
 | 应用内日志 | `get_logs` | App 里截获的日志 |
 | 启动日志 | `get_app_logs` | launch_app 拉起的 flutter run 输出 |

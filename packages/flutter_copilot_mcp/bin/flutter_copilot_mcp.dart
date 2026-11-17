@@ -83,7 +83,7 @@ Call list_apps to see ids. When more than one app is connected, pass app on ever
 
 stop_app ends a flutter run this server started. The app on the device stays open. disconnect only drops the session.
 
-Use get_interactive_elements before tapping. Prefer a ValueKey. After code changes, call hot_reload on that app.
+Use get_interactive_elements before tapping. Prefer a ValueKey. After code changes, call hot_reload on that app. If the UI does not pick up the change, call hot_restart.
 ''',
       ),
     );

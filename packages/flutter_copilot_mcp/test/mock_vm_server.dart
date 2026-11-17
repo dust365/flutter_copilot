@@ -37,6 +37,12 @@ class MockVmServer {
   /// How many `getIsolate` lookups should pretend the Copilot extension is absent.
   int hideExtensionForCalls = 0;
 
+  /// When true, `streamListen` is followed by `ServiceRegistered` events for
+  /// the `reloadSources` and `hotRestart` services that `flutter run` registers.
+  bool announceFlutterRunServices = false;
+
+  WebSocket? _socket;
+
   /// Starts the server on loopback with an OS-assigned port.
   static Future<MockVmServer> start() async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -67,6 +73,7 @@ class MockVmServer {
       return;
     }
     final ws = await WebSocketTransformer.upgrade(req);
+    _socket = ws;
     ws.listen((raw) {
       final msg = jsonDecode(raw as String) as Map<String, dynamic>;
       final id = msg['id'];
@@ -76,6 +83,25 @@ class MockVmServer {
       final result = _handle(method, params);
       ws.add(jsonEncode({'jsonrpc': '2.0', 'id': id, 'result': result}));
     });
+  }
+
+  void _announce(String service, String method) {
+    _socket?.add(
+      jsonEncode({
+        'jsonrpc': '2.0',
+        'method': 'streamNotify',
+        'params': {
+          'streamId': 'Service',
+          'event': {
+            'type': 'Event',
+            'kind': 'ServiceRegistered',
+            'timestamp': 0,
+            'service': service,
+            'method': method,
+          },
+        },
+      }),
+    );
   }
 
   Map<String, dynamic> _handle(String method, Map<String, dynamic> params) {
@@ -121,7 +147,16 @@ class MockVmServer {
               current ? ['ext.flutter.flutter_copilot.getLogs'] : <String>[],
         };
       case 'streamListen':
+        if (announceFlutterRunServices) {
+          _announce('reloadSources', 's0.reloadSources');
+          _announce('hotRestart', 's0.hotRestart');
+        }
         return {'type': 'Success'};
+      case 's0.reloadSources':
+      case 's0.hotRestart':
+        return {'type': 'Success'};
+      case 'reloadSources':
+        return {'type': 'ReloadReport', 'success': true};
       default:
         // Claw extensions are all of the form `ext.flutter.flutter_copilot.*`.
         // Echo success so the connector's error-status short-circuit is not

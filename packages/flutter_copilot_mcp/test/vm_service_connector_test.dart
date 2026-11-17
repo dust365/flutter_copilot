@@ -108,4 +108,60 @@ void main() {
       expect(call.params.containsKey('arguments'), isFalse);
     });
   });
+
+  group('reload', () {
+    test('hot reload calls the flutter run reloadSources service', () async {
+      final announcedServer = await MockVmServer.start();
+      announcedServer.announceFlutterRunServices = true;
+      final announced = VmServiceConnector();
+      await announced.connect(announcedServer.wsUri);
+      addTearDown(() async {
+        await announced.disconnect();
+        await announcedServer.close();
+      });
+
+      expect(await announced.hotReload(), isTrue);
+
+      expect(announcedServer.lastCallTo('s0.reloadSources'), isNotNull);
+      expect(announcedServer.lastCallTo('reloadSources'), isNull);
+    });
+
+    test('hot reload falls back to the VM method without flutter run',
+        () async {
+      expect(
+        await connector.hotReload(
+            serviceTimeout: const Duration(milliseconds: 20)),
+        isTrue,
+      );
+
+      final call = server.lastCallTo('reloadSources');
+      expect(call, isNotNull);
+      expect(call!.params['isolateId'], 'isolates/1');
+    });
+
+    test('hot restart calls the flutter run hotRestart service', () async {
+      final announcedServer = await MockVmServer.start();
+      announcedServer.announceFlutterRunServices = true;
+      final announced = VmServiceConnector();
+      await announced.connect(announcedServer.wsUri);
+      addTearDown(() async {
+        await announced.disconnect();
+        await announcedServer.close();
+      });
+
+      expect(await announced.hotRestart(), isTrue);
+
+      final call = announcedServer.lastCallTo('s0.hotRestart');
+      expect(call, isNotNull);
+      expect(call!.params['isolateId'], 'isolates/1');
+    });
+
+    test('hot restart fails when flutter run has not registered it', () async {
+      expect(
+        connector.hotRestart(serviceTimeout: const Duration(milliseconds: 20)),
+        throwsA(isA<HotRestartUnavailableException>()),
+      );
+      expect(server.lastCallTo('hotRestart'), isNull);
+    });
+  });
 }

@@ -229,4 +229,18 @@ export class FlutterCopilotConnector {
     const res = await this.client.reloadSources(isolateId);
     return res.success === true || res.type === 'Success';
   }
+
+  async hotRestart(): Promise<boolean> {
+    const isolateId = this.requireIsolate();
+    // `flutter run` registers `s0.hotRestart`. There is no VM fallback:
+    // a bare Dart VM cannot re-run main().
+    const registered = await this.client.waitForServiceRegistration('hotRestart', 1000);
+    if (!registered) {
+      throw new Error(
+        'hotRestart is not registered. Hot restart requires a debug flutter run process; the app alone cannot restart.',
+      );
+    }
+    const res = await this.client.call<{ type?: string }>(registered, { isolateId });
+    return res.type === 'Success';
+  }
 }

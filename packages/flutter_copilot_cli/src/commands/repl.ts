@@ -188,6 +188,12 @@ async function runReplCommand(line: string, c: FlutterCopilotConnector): Promise
       process.stdout.write(s ? chalk.green('✓ reloaded\n') : chalk.red('✗ reload failed\n'));
       break;
     }
+    case 'restart':
+    case 'hot-restart': {
+      const s = await c.hotRestart();
+      process.stdout.write(s ? chalk.green('✓ restarted\n') : chalk.red('✗ restart failed\n'));
+      break;
+    }
     case 'take-screenshots':
     case 'shot': {
       const out = String(args['output'] ?? args['o'] ?? `fc-${Date.now()}.png`);
@@ -245,6 +251,7 @@ function printHelp(): void {
     '  get-logs [N]',
     '  get-rebuild-snapshot',
     '  hot-reload                          (alias: reload)',
+    '  hot-restart                         (alias: restart)',
     '  take-screenshots output=<path>      (alias: shot)',
     '  help | exit',
     '',

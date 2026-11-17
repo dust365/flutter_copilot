@@ -57,6 +57,7 @@ machine-readable surface.
 | Command        | Description                                                                |
 | -------------- | -------------------------------------------------------------------------- |
 | `hot-reload`   | Trigger a Flutter hot reload.                                              |
+| `hot-restart`  | Trigger a Flutter hot restart. Re-runs `main()` and drops app state.      |
 | `run <script>` | Execute a YAML playbook; each step may carry `retry: { attempts, delay }`. |
 | `help-ai`      | Print the entire command surface + script schema as JSON, for AI agents.   |
 

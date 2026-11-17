@@ -80,6 +80,9 @@ class FakeConnector {
   hotReload() {
     return this.record('hotReload', {}, true);
   }
+  hotRestart() {
+    return this.record('hotRestart', {}, true);
+  }
   takeScreenshots() {
     return this.record('takeScreenshots', {}, {
       status: 'Success',

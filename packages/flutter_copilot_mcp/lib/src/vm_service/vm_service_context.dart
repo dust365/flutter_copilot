@@ -739,7 +739,7 @@ final class VmServiceContext {
       ..registerTool(
         'hot_reload',
         description:
-            'Performs a hot reload of the Flutter app. This reloads the Dart code without restarting the app, preserving the current state. Useful after making code changes to see them reflected in the running app. Pass app when more than one app is connected.',
+            'Performs a hot reload of the Flutter app, preserving application state. When flutter run has registered reloadSources, that service recompiles and syncs the change. Otherwise the VM reloadSources method is used directly. Pass app when more than one app is connected.',
         annotations: const ToolAnnotations(title: 'Hot Reload'),
         inputSchema: ToolInputSchema(
           properties: {
@@ -773,6 +773,43 @@ final class VmServiceContext {
             return CallToolResult(
               isError: true,
               content: [TextContent(text: 'Hot reload failed: $err')],
+            );
+          }
+        },
+      )
+      ..registerTool(
+        'hot_restart',
+        description:
+            'Performs a hot restart of the Flutter app. This re-runs main() and drops application state, which is required when a hot reload does not show the change, such as edits to main(), global initializers, or initState. It calls the hotRestart service registered by flutter run and fails when that service is absent. Pass app when more than one app is connected.',
+        annotations: const ToolAnnotations(title: 'Hot Restart'),
+        inputSchema: ToolInputSchema(
+          properties: {
+            'app': JsonSchema.string(description: appParameterDescription),
+          },
+        ),
+        callback: (args, extra) async {
+          _logger.info('Performing hot restart');
+
+          try {
+            final restarted = await (await _connector(args)).hotRestart();
+
+            if (restarted) {
+              return CallToolResult(
+                content: [
+                  const TextContent(text: 'Hot restart completed successfully'),
+                ],
+              );
+            } else {
+              return CallToolResult(
+                isError: true,
+                content: [const TextContent(text: 'Hot restart failed.')],
+              );
+            }
+          } catch (err) {
+            _logger.warning('Failed to perform hot restart', err);
+            return CallToolResult(
+              isError: true,
+              content: [TextContent(text: 'Hot restart failed: $err')],
             );
           }
         },

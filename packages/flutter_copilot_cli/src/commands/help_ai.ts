@@ -195,6 +195,15 @@ export function helpAiCommand(program: Command): void {
             example: 'fcc hot-reload',
           },
           {
+            name: 'hot-restart',
+            category: 'lifecycle',
+            mcpTool: 'hot_restart',
+            description:
+              'Trigger Flutter hot restart. Re-runs main() and drops state. Requires flutter run in debug mode.',
+            options: {},
+            example: 'fcc hot-restart',
+          },
+          {
             name: 'watch',
             category: 'automation',
             description: 'Stream logs and/or rebuild snapshots until Ctrl-C.',
@@ -265,6 +274,7 @@ export function helpAiCommand(program: Command): void {
               fields: ['op', 'route?', 'arguments?', 'retry?', 'name?'],
             },
             'hot-reload': { fields: ['retry?', 'name?'] },
+            'hot-restart': { fields: ['retry?', 'name?'] },
             'take-screenshots': { fields: ['output', 'numbered?', 'retry?', 'name?'] },
             wait: { fields: ['ms', 'name?'] },
             'assert-element': { fields: ['matcher', 'exists?', 'retry?', 'name?'] },

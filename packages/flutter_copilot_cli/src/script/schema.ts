@@ -58,6 +58,9 @@ const Step = z.discriminatedUnion('action', [
     action: z.literal('hot-reload'),
   }),
   BaseStep.extend({
+    action: z.literal('hot-restart'),
+  }),
+  BaseStep.extend({
     action: z.literal('take-screenshots'),
     output: z.string(),
     numbered: z.boolean().optional(),

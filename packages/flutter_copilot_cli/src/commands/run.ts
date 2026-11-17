@@ -37,7 +37,7 @@ optional \`retry: { attempts, delay }\`. Exits non-zero if any step fails when
 
 Supported actions:
   tap, double-tap, long-press, enter-text, scroll-to, swipe, drag,
-  navigate, hot-reload, take-screenshots, wait, assert-element
+  navigate, hot-reload, hot-restart, take-screenshots, wait, assert-element
 
 Minimal example for the bundled demo home page (smoke.yaml):
 
