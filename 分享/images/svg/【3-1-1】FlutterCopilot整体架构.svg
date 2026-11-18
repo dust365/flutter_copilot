@@ -106,13 +106,13 @@
     <g transform="translate(566,0)"><rect width="148" height="26" rx="13" fill="#EEF3FF" stroke="#B8C6F5" stroke-width="1"/><text x="74" y="18" class="chip" text-anchor="middle">rebuild_snapshot ...</text></g>
   </g>
 
-  <!-- 15 tools big badge on right -->
+  <!-- Tooling entrypoints -->
   <g filter="url(#softShadow)">
     <rect x="1170" y="490" width="220" height="150" rx="20" fill="url(#accent)"/>
   </g>
-  <text x="1280" y="520" class="badgeLabel" text-anchor="middle">MCP TOOLS</text>
-  <text x="1280" y="585" class="badgeNum" text-anchor="middle">15</text>
-  <text x="1280" y="615" class="badgeUnit" text-anchor="middle">观察 · 操作 · 诊断</text>
+  <text x="1280" y="520" class="badgeLabel" text-anchor="middle">SHARED SESSIONS</text>
+  <text x="1280" y="578" class="badgeNum" text-anchor="middle" style="font-size:37px">MCP / fcc</text>
+  <text x="1280" y="615" class="badgeUnit" text-anchor="middle">发现 · 启动 · 操作</text>
 
   <!-- Arrow 2 -->
   <path d="M750 675 L750 725" stroke="#4C63E8" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>

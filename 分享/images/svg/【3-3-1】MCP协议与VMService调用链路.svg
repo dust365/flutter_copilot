@@ -245,7 +245,7 @@
     <text x="20" y="28" class="arrowLabel">STEP 3  ·  下发</text>
     <text x="20" y="58" class="hSub" style="font-weight:700">VM Service 共用运行时</text>
     <text x="20" y="82" class="hSub" style="font-size:13px; fill:#5D6B8A">两条链路最终调用同一</text>
-    <text x="20" y="100" class="hSub" style="font-size:13px; fill:#5D6B8A">套 ext.flutter.copilot.*</text>
+    <text x="20" y="100" class="hSub" style="font-size:13px; fill:#5D6B8A">组 Copilot Service Extensions</text>
     <text x="20" y="118" class="hSub" style="font-size:13px; fill:#5D6B8A">扩展，能力对齐</text>
   </g>
 

@@ -94,6 +94,60 @@ _预期效果：观众看到的不是一段事先剪好的 demo，而是 AI 真�
 
 ---
 
+### V2.0.0 升级：从启动到真机验证
+
+这一段用两台 Android 真机走一遍：**发现或启动 App → 选择目标会话 → 看见操作 → 改完代码，在原调试会话里验证。**
+
+#### 1. 一个工程，可以同时连多个 App
+
+已经用 `flutter run` 启动的 App，Copilot 会自动发现并接入，原来的终端仍可以继续调试。没有合适的会话时，Copilot 可以直接启动；只有一台可用真机时自动选中，有多台候选时由用户选一台或多台。
+
+![发现或启动 App，再按会话 ID 操作](./images/svg/【2-4-1】发现与启动会话.svg)
+
+从仓库根目录演示，先用 `fcc --project example apps` 看已运行的会话，再用 `fcc --project example up` 复用或启动。交互终端遇到多个候选时可以输入 `1,2`；脚本也可以重复传 `-d <设备ID>`。启动完成后，用 `fcc --project example --app <会话ID> take-screenshots -o /tmp/shot.png` 截取指定 App。MCP 对应 `list_apps`、`ensure_apps` 和操作工具的 `app` 参数。
+
+**实现思路：用官方调试协议发现和操作 App，由 Copilot 决定选谁、何时启动。**
+
+1. **发现已有会话。** 先在本机查找 DTD 实例，再查询它们的 `ConnectedApp` 登记表并订阅登记、注销事件。这张表告诉我们调试地址，但未必带可靠的工程和设备信息，所以 Copilot 会连接端点，确认 App 已注册 Claw 扩展，再结合 Flutter 入口源码路径或 IDE 提供的元数据识别工程和设备。若重跑后无法确认还是原来的 App，就重新列候选，不按显示名称猜。
+2. **只启动需要的设备。** 优先复用匹配的运行会话。多个候选时，MCP 返回 `selection_required` 供 Agent 询问用户，`fcc` 可直接在终端选择。选定后用 `flutter run --machine` 启动，等到 Flutter 给出调试地址、报告 App 已启动，并且 Claw 扩展就绪，才报告连接成功。启动任务逐台报告结果，一台失败不会撤销其他成功的会话。自启动时可以直接使用 machine 事件给出的地址，无需等待 DTD 登记。
+3. **共享会话，按 ID 操作。** MCP 和 `fcc` 对同一工程和 Flutter SDK 使用同一个本地会话后端，记录 App ID、设备、调试地址和启动归属。选定 App 后，截图、点击等请求经 DDS 转发给 App 的 VM Service，由 Claw 执行。日常只需要选工程和目标，不再读写 `.vm_service_uri`。
+4. **保留原启动方的控制权。** 接入终端或 IDE 已启动的 App，只是多连一个调试客户端。断开连接不退出 App；只有 Copilot 自己启动的会话才能执行 `stop`（退出 App）或 `detach`（结束 Flutter 调试，保留 App）。
+
+#### 2. AI 点在哪、往哪拖，真机上都看得见
+
+现场让 AI 点击滑块，再向右拖动：点击显示落点环，拖拽显示方向箭头。手势结束后，标注约 **1.2 秒**自动消失；如果期间发生路由切换，旧标注会直接清除，返回上一页也不会再出现。
+
+![真机录屏截帧：点击落点、拖拽箭头、切页后无旧标注](./images/png/【2-4-2】真机操作标注.png)
+
+标注沿用现有点击和拖拽命令。Claw 在 App 内拿到手势坐标后，用浮在页面上方且不拦截触摸的图层绘制。手势结束时刷新显示时长；检测到路由变化就清空图层，手势结束回调也不会把旧页面的标注画回新页面。
+
+#### 3. 改完代码，直接在同一台设备上验
+
+| 现场改动 | 选择 | 验证方式 |
+| --- | --- | --- |
+| 改按钮颜色或间距 | 热重载：`hot_reload` / `fcc hot-reload` | 保留当前页面和状态，直接截图对比 |
+| 改 `main()` 里的初始化逻辑 | 热重启：`hot_restart` / `fcc hot-restart` | 重新执行 Dart 入口，应用内存状态重置，再验证启动后的页面 |
+
+这一版是**新增热重启、改进已有热重载**。两者优先调用当前调试会话里由 `flutter run` 注册的 `reloadSources` 和 `hotRestart`，由 Flutter 工具处理编译、同步和生效。热重启会重新创建 Dart isolate，后续操作重新查找带 Claw 扩展的 isolate，仍按原 App 会话操作。热重启不是重新构建安装；需要更新原生代码时，仍要重新运行 App。
+
+#### 4. 这次具体新增了哪些工具和命令
+
+| 用途 | MCP 工具 | `fcc` 命令 | 用在什么时候 |
+| --- | --- | --- | --- |
+| 发现 App | `list_apps` | `fcc apps` | 找当前工程正在运行的会话，拿 App ID |
+| 列出设备 | `list_devices` | `fcc devices` | 启动前查看设备候选，拿设备 ID |
+| 复用或启动 | `ensure_apps`、`launch_app`（同一流程的兼容入口） | `fcc up` | 复用已有 App，或在选定的一台或多台设备上启动 |
+| 查询启动进度 | `operation_status` | `fcc status <任务ID>` | MCP 启动返回任务 ID 时轮询；CLI 默认等结果，加 `--no-wait` 可先返回 |
+| 读取启动日志 | `get_app_logs` | `fcc logs` | 查看本工具启动的 Flutter 进程输出，包括构建或安装失败；已有的 `get_logs` / `fcc get-logs` 读的是 App 内日志 |
+| 停止或脱离 | `stop_app`、`detach_app` | `fcc stop`、`fcc detach` | 管理 Copilot 启动的会话：退出 App，或只结束其 Flutter 调试 |
+| 热重启 | `hot_restart` | `fcc hot-restart` | 修改 Dart 初始化逻辑后重跑入口 |
+| 排查 DTD | `list_dtds`、`connect_dtd`、`disconnect_dtd` | — | 查看、显式连接或断开本地 DTD；日常发现由 `list_apps` 完成 |
+| 关闭本地会话后端 | — | `fcc session-shutdown` | 清理空闲后端；仍有本工具启动的运行会话时会拒绝 |
+
+**已有入口的变化：** CLI 新增全局 `--project <目录>` 和 `--app <会话ID>`；MCP 用 `directory` 定位工程、用 `app` 选操作目标。原有 `connect` 仍可显式接入已知地址，`disconnect` 只断会话，不停止 App。CLI 移除了用来监听旧连接文件的 `--watch-uri`，`watch` 和 `repl` 只在能确认是同一会话时自动重连。
+
+---
+
 ## 三、技术揭秘
 
 效果看完了，接下来聊聊它是怎么做到的。我尽量讲得所有人都能听懂。
@@ -143,13 +197,13 @@ VM Service 是 Dart VM 在 **Debug / Profile 模式**下默认开启的官方调
 - **观察类**：读取 isolate 状态、Widget 树、性能数据、运行日志
 - **干预类**：触发热重载、调用 **Service Extension**（开发者自己在 App 里注册的扩展点）
 
-最后这个 Service Extension 是 Flutter Copilot 的关键齿轮。`flutter_copilot_claw` 在 App 启动时，通过 `registerExtension('ext.flutter.copilot.tap', ...)` 这类调用，把点击、输入、截图、拿日志等能力注册成自定义 Service Extension；MCP Server 拿到一个 VM Service URI 之后，就能像调 RPC 一样调这些扩展。
+最后这个 Service Extension 是 Flutter Copilot 的关键齿轮。`flutter_copilot_claw` 在 App 启动时注册 `ext.flutter.flutter_copilot.tap` 等自定义扩展，把点击、输入、截图、拿日志等能力开放给外部工具；MCP 和 `fcc` 选定会话后，就能像调 RPC 一样调用这些扩展。
 
 ![【3-2-2】VM Service 是什么](./images/svg/【3-2-2】VMService是什么.svg)
 
 一句话：**Flutter Copilot 不是绕过 Flutter 去 hack App，而是站在 Flutter 自己的 Debug 通道上正式接入运行时能力。**
 
-Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖连接、观察、交互、导航、诊断等几个核心方向；底层则通过 App 内部能力和 VM Service 调用链路把这些动作真正执行起来。
+Flutter Copilot 的 MCP 工具覆盖会话管理、观察、交互、导航和诊断；涉及 App 的操作经 VM Service 送到运行时。
 
 ### 3. 一条真实的调用链路
 
@@ -169,7 +223,7 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 ![【3-4-1】Flutter Copilot 能力总览](./images/svg/【3-4-1】FlutterCopilot能力总览.svg)
 
-这套能力最终对外体现为 15 个 MCP 工具，可以按连接、观察、交互、导航、诊断五类理解。
+图中列的是代表工具，启动和多设备流程见前面的 V2.0.0 演示。
 
 支持 4 类元素定位方式：**Key（最稳定）、文本内容、Widget 类型、屏幕坐标**。其中 `ValueKey<String>` 是最推荐的方式；坐标是兜底方案，适合快速验证，但不适合作为长期稳定脚本的主路径。
 
@@ -177,11 +231,11 @@ Flutter Copilot 这一套能力最终对外体现为 15 个 MCP 工具，覆盖�
 
 | 类别 | 工具 | 解决的问题 |
 | ---- | ---- | ---------- |
-| 连接 | `connect` / `disconnect` | 建立或断开和运行中 App 的 VM Service 连接 |
+| 会话 | `list_apps` / `ensure_apps` / `operation_status` | 发现、复用或启动 App，查看每台设备的结果 |
 | 观察 | `get_interactive_elements` / `take_screenshots` | 看当前页面有哪些可操作元素，以及页面真实长什么样 |
 | 交互 | `tap` / `enter_text` / `scroll_to` / `flutter_copilot_drag` / `swipe` / `long_press` / `double_tap` | 完成点击、输入、滚动、拖拽、滑动、长按、双击等人工操作 |
 | 诊断 | `get_logs` / `get_rebuild_snapshot` | 获取运行日志和组件重建热点 |
-| 开发闭环 | `hot_reload` / `navigate` | 修改代码后热重载，或直接控制路由跳转 |
+| 开发闭环 | `hot_reload` / `hot_restart` / `navigate` | 让 Dart 代码改动生效，或直接跳到要验证的页面 |
 
 这些能力组合起来，就能覆盖"观察 → 操作 → 诊断"一条完整的运行时协作链路。
 
@@ -582,7 +636,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 | 问题 | 入口文件 |
 | ---- | -------- |
 | Flutter 端如何注册 VM Service 扩展 | `packages/flutter_copilot_claw/lib/src/binding/flutter_copilot_binding.dart` |
-| MCP Server 如何注册 15 个工具 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart` |
+| MCP Server 如何注册工具 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_context.dart` |
 | MCP Server 如何连接 VM Service 并调用扩展 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_connector.dart` |
 | 元素定位 Key / Text / Type / Coordinates 如何匹配 | `packages/flutter_copilot_claw/lib/src/services/widget_matcher.dart` |
 | CLI 如何直连同一套扩展 | `packages/flutter_copilot_cli/src/vm/connector.ts` |

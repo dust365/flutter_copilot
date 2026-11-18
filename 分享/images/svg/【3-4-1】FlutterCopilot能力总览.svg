@@ -83,18 +83,18 @@
   <rect width="1500" height="1030" rx="28" fill="url(#bg)"/>
 
   <!-- header -->
-  <text x="80" y="80" class="tag">CAPABILITY · 15 MCP TOOLS · 5 CATEGORIES</text>
+  <text x="80" y="80" class="tag">CAPABILITY · MCP TOOL EXAMPLES</text>
   <text x="80" y="130" class="title">Flutter Copilot 能力总览</text>
-  <text x="80" y="165" class="subtitle">15 个工具 · 5 类能力 · 4 种元素匹配 —— 闭合"观察 → 操作 → 诊断 → 开发闭环"协作链路</text>
+  <text x="80" y="165" class="subtitle">发现会话、操作 App、诊断运行问题，并在真机验证改动</text>
   <rect x="80" y="180" width="72" height="4" rx="2" fill="url(#accent)"/>
 
   <!-- Big total badge (top-right) -->
   <g filter="url(#softShadow)">
     <rect x="1220" y="60" width="220" height="130" rx="22" fill="url(#accent)"/>
   </g>
-  <text x="1330" y="100" class="totalTag" text-anchor="middle">TOTAL TOOLS</text>
-  <text x="1330" y="160" class="totalNum" text-anchor="middle">15</text>
-  <text x="1330" y="182" class="totalUnit" text-anchor="middle">MCP capabilities</text>
+  <text x="1330" y="100" class="totalTag" text-anchor="middle">FLUTTER COPILOT</text>
+  <text x="1330" y="151" class="totalNum" text-anchor="middle" style="font-size:40px">5 类</text>
+  <text x="1330" y="178" class="totalUnit" text-anchor="middle">代表能力</text>
 
   <!-- ============ Row 1: 4 small category cards (each 2 tools) ============ -->
   <!-- Connect -->
@@ -104,12 +104,12 @@
   <rect x="80" y="220" width="328" height="6" fill="url(#gConnect)" clip-path="url(#clipConnect)"/>
   <rect x="102" y="248" width="82" height="22" rx="11" fill="url(#gConnect)"/>
   <text x="143" y="263" class="catLabel" text-anchor="middle">CONNECT</text>
-  <text x="102" y="305" class="catName">连接</text>
+  <text x="102" y="305" class="catName">会话</text>
   <text x="102" y="350" class="catCount" style="fill:#5B73E0">2</text>
-  <text x="140" y="350" class="catUnit">tools</text>
+  <text x="140" y="350" class="catUnit">个示例</text>
   <line x1="102" y1="368" x2="386" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
-  <text x="102" y="396" class="toolSm">connect</text>
-  <text x="102" y="421" class="toolSm">disconnect</text>
+  <text x="102" y="396" class="toolSm">list_apps</text>
+  <text x="102" y="421" class="toolSm">ensure_apps</text>
 
   <!-- Observe -->
   <g filter="url(#softShadow)">
@@ -148,10 +148,10 @@
   <text x="1192" y="263" class="catLabel" text-anchor="middle">DEV LOOP</text>
   <text x="1146" y="305" class="catName">开发闭环</text>
   <text x="1146" y="350" class="catCount" style="fill:#0D7F78">2</text>
-  <text x="1184" y="350" class="catUnit">tools</text>
+  <text x="1184" y="350" class="catUnit">个示例</text>
   <line x1="1146" y1="368" x2="1430" y2="368" stroke="#E5EBFF" stroke-width="1.5"/>
   <text x="1146" y="396" class="toolSm">hot_reload</text>
-  <text x="1146" y="421" class="toolSm">navigate  ·  5 ops</text>
+  <text x="1146" y="421" class="toolSm">hot_restart</text>
 
   <!-- ============ Row 2: Interact wide card (7 tools) ============ -->
   <g filter="url(#softShadow)">

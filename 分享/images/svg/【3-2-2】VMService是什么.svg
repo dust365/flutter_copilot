@@ -172,19 +172,19 @@
     <text x="0" y="0" style="font: 700 11px 'SF Mono'; fill:#5B3FD6; letter-spacing:1.5px">REGISTERED SERVICE EXTENSIONS</text>
     <g transform="translate(0, 14)">
       <rect x="0" y="0" width="240" height="26" rx="6" fill="#FFFFFF" stroke="#B49AFF" stroke-width="1"/>
-      <text x="10" y="17" class="extName">ext.flutter.copilot.tap</text>
+      <text x="10" y="17" class="extName">flutter_copilot.tap</text>
     </g>
     <g transform="translate(0, 44)">
       <rect x="0" y="0" width="240" height="26" rx="6" fill="#FFFFFF" stroke="#B49AFF" stroke-width="1"/>
-      <text x="10" y="17" class="extName">ext.flutter.copilot.screenshot</text>
+      <text x="10" y="17" class="extName">flutter_copilot.takeScreenshots</text>
     </g>
     <g transform="translate(0, 74)">
       <rect x="0" y="0" width="240" height="26" rx="6" fill="#FFFFFF" stroke="#B49AFF" stroke-width="1"/>
-      <text x="10" y="17" class="extName">ext.flutter.copilot.get_logs</text>
+      <text x="10" y="17" class="extName">flutter_copilot.getLogs</text>
     </g>
     <g transform="translate(0, 104)">
       <rect x="0" y="0" width="240" height="26" rx="6" fill="#FFFFFF" stroke="#B8C6F5" stroke-width="1" stroke-dasharray="4 3"/>
-      <text x="10" y="17" class="extHint">… 由 flutter_copilot_claw 注册</text>
+      <text x="10" y="17" class="extHint">实际调用带 ext.flutter. 前缀</text>
     </g>
   </g>
 
