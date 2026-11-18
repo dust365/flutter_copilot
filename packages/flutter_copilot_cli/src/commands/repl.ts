@@ -3,8 +3,7 @@ import readline from 'node:readline';
 import chalk from 'chalk';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { withConnector, reconnectWithBackoff, followTarget } from './base.js';
-import { UriFileWatcher } from '../vm/uri_watcher.js';
+import { withConnector, followTarget } from './base.js';
 import { buildMatcher, type MatcherArgs } from '../matcher.js';
 import { resolveShotPath } from '../screenshot_path.js';
 import type { FlutterCopilotConnector } from '../vm/connector.js';
@@ -40,40 +39,6 @@ export function replCommand(program: Command): void {
         prompt();
         rl.prompt();
 
-        // --watch-uri: auto-reconnect on .vm_service_uri content change.
-        const watchUri = program.opts<{ watchUri?: boolean }>().watchUri === true;
-        let watcher: UriFileWatcher | null = null;
-        if (watchUri && !target.refresh) {
-          if (!target.autoUriPath) {
-            process.stderr.write(
-              chalk.yellow(
-                '! --watch-uri requires URI auto-detection; ignored because --uri was used.\n',
-              ),
-            );
-          } else {
-            watcher = new UriFileWatcher(target.autoUriPath);
-            watcher.on('change', async (newUri: string) => {
-              process.stdout.write(
-                chalk.yellow(`\n⟳ reconnecting: ${newUri}\n`),
-              );
-              try {
-                await reconnectWithBackoff(
-                  connector,
-                  newUri,
-                  target.timeoutMs,
-                );
-                process.stdout.write(chalk.green(`✓ reconnected\n`));
-              } catch (e) {
-                process.stdout.write(
-                  chalk.red(`✗ reconnect failed: ${(e as Error).message}\n`),
-                );
-              }
-              rl.prompt();
-            });
-            await watcher.start();
-          }
-        }
-
         await new Promise<void>((resolve) => {
           rl.on('line', async (raw) => {
             const line = raw.trim();
@@ -99,7 +64,6 @@ export function replCommand(program: Command): void {
           });
           rl.on('close', () => {
             stopFollowing();
-            watcher?.stop();
             resolve();
           });
         });
@@ -124,8 +88,7 @@ Examples (at the fc> prompt):
 Aliases: dtap (double-tap), lpress (long-press), text (enter-text),
 scroll (scroll-to), nav (navigate), shot (take-screenshots), ls (get-interactive-elements).
 
-Combine with \`--watch-uri\` to transparently reconnect across \`flutter run\`
-restarts without leaving the session.
+The REPL reconnects when discovery can identify the same App session.
 `,
     );
 }

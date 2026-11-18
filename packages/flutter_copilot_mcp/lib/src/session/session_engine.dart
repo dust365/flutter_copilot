@@ -63,6 +63,11 @@ class SessionEngine {
     // Restore a logical id only with verified device + source identity. Names
     // and guessed Android device ids cannot establish continuity.
     for (final session in apps.sessions) {
+      final owned = runs.ownedByUri(session.uri);
+      if (owned != null && !_excluded.contains(session.uri)) {
+        await runs.reconnect(owned);
+        continue;
+      }
       final existing = _bindings.entries.where((entry) {
         final old = entry.value;
         return old['deviceId'] != null &&
@@ -82,9 +87,10 @@ class SessionEngine {
   List<AppSession> _scoped({bool includeUnknown = false}) => apps.sessions
       .where((session) =>
           !_excluded.contains(session.uri) &&
-          (_explicit.contains(session.uri) || (session.projectRoot != null
-              ? containsProject(root, session.projectRoot!)
-              : includeUnknown)))
+          (_explicit.contains(session.uri) ||
+              (session.projectRoot != null
+                  ? containsProject(root, session.projectRoot!)
+                  : includeUnknown)))
       .toList();
 
   AppSession _select(String? query) {
@@ -132,10 +138,14 @@ class SessionEngine {
         await discover();
         return _select(args['app'] as String?).toJson();
       case 'connect':
-        final session = await apps.connectUri(
-            uri: args['uri'] as String,
-            id: args['name'] as String?,
-            waitForExtension: const Duration(seconds: 5));
+        final uri = args['uri'] as String;
+        final owned = runs.ownedByUri(uri);
+        final session = owned != null
+            ? await runs.reconnect(owned)
+            : await apps.connectUri(
+                uri: uri,
+                id: args['name'] as String?,
+                waitForExtension: const Duration(seconds: 5));
         // An explicit URI is authorization to use an otherwise unidentifiable App.
         session.projectRoot ??= root;
         _excluded.remove(session.uri);
@@ -164,6 +174,13 @@ class SessionEngine {
         };
       case 'stop_app':
       case 'detach_app':
+        final detached = runs.ownedById(args['app'] as String?);
+        if (detached != null) {
+          return {
+            'message':
+                await runs.stop(detached.id, detach: method == 'detach_app')
+          };
+        }
         final session = _select(args['app'] as String?);
         if (!session.launched)
           throw SessionError('external_session',
@@ -214,10 +231,13 @@ class SessionEngine {
       throw SessionError('invalid_arguments',
           'name is only supported for a single-device launch');
     }
-    final targetUri = target == null ? null : Uri.file(p.normalize(p.join(root, target))).toString();
+    final targetUri = target == null
+        ? null
+        : Uri.file(p.normalize(p.join(root, target))).toString();
     bool compatible(AppSession session) =>
-      (targetUri == null || session.target == targetUri) &&
-      (extra.isEmpty || jsonEncode(session.launchArgs) == jsonEncode(extra));
+        (targetUri == null || session.target == targetUri) &&
+        (args['name'] == null || session.id == args['name']) &&
+        (extra.isEmpty || jsonEncode(session.launchArgs) == jsonEncode(extra));
     if (requested.isEmpty) {
       final active = _scoped().where(compatible).toList();
       if (active.length == 1 && args['newSession'] != true) {
@@ -259,11 +279,7 @@ class SessionEngine {
         .toSet()
         .toList();
     if (args['newSession'] != true) {
-      final unknown = _scoped()
-          .where((s) =>
-              s.deviceId == null &&
-              (targetUri == null || s.target == targetUri))
-          .toList();
+      final unknown = _scoped().where((s) => s.deviceId == null).toList();
       if (unknown.isNotEmpty)
         throw SessionError(
             'selection_required',
@@ -317,28 +333,33 @@ class SessionEngine {
       result['state'] = 'launching';
       try {
         final deviceId = result['deviceId'] as String;
-        final matches = _scoped()
+        final onDevice = _scoped()
             .where((s) =>
                 s.deviceId != null &&
                 devices
                     .singleWhere((d) => d.id == deviceId)
-                    .matches(s.deviceId!) &&
+                    .matches(s.deviceId!))
+            .toList();
+        final matches = onDevice
+            .where((s) =>
                 (targetUri == null || s.target == targetUri) &&
-                (args['name'] == null || s.id == args['name']))
+                (args['name'] == null || s.id == args['name']) &&
+                (extra.isEmpty ||
+                    jsonEncode(s.launchArgs) == jsonEncode(extra)))
             .toList();
         if (matches.length > 1 && args['newSession'] != true)
           throw SessionError('selection_required',
               'Several Apps run on $deviceId. Select an app.',
               candidates: matches.map((s) => s.toJson()).toList());
-        if (matches.length == 1 && args['newSession'] != true &&
-            (extra.isEmpty || jsonEncode(matches.single.launchArgs) == jsonEncode(extra))) {
+        if (matches.length == 1 && args['newSession'] != true) {
           result.addAll({'state': 'reused', 'app': matches.single.toJson()});
           continue;
         }
-        if (matches.isNotEmpty && args['newSession'] != true) {
-          throw SessionError('configuration_mismatch',
-            'The running App configuration cannot be verified against the requested flags. '
-            'Select its app id to reuse it, or explicitly request newSession.');
+        if (onDevice.isNotEmpty && args['newSession'] != true) {
+          throw SessionError(
+              'configuration_mismatch',
+              'The running App configuration cannot be verified against the requested flags. '
+                  'Select its app id to reuse it, or explicitly request newSession.');
         }
         final session = await runs.start(
             directory: root,

@@ -2,38 +2,16 @@
 
 通过 MCP 连接已以调试模式运行的 Flutter 应用，进行 UI 检测、点击/输入/滚动、手势、导航与截图/日志等操作。
 
-## 前置条件
+### 1. 发现或启动 App
 
-1. 应用已在 **Debug 模式** 下运行
-2. 优先从项目根目录自动读取 `.vm_service_uri`，拿到 VM service URI 后自动调用 **connect**
-3. 仅当自动发现失败时，再向用户索要 VM service URI（形如 `ws://127.0.0.1:xxxxx/ws`）
+1. 调用 `list_apps(directory)`，其中 `directory` 是 Flutter 工程目录。本仓库用 `example` 的绝对路径。DTD 会自动发现已有 debug 会话。
+2. 没有合适的会话时调用 `ensure_apps(directory)`。如果返回 `selection_required`，请用户从候选中选一台或多台，再传入 `deviceIds` 或 `appIds`。
+3. 有 `operationId` 时轮询 `operation_status`，直到 `state=completed`。启动结果按设备返回；一台失败时可继续使用其他已连接的设备。
+4. 截图、点击等操作传 `app` 为所选会话 ID。重新运行后若原 ID 不可用，重新列出会话并确认目标。只有自动发现不可用时才用 `connect(uri)` 显式连接。
 
-## 自动连接规则
+### 2. 会话生命周期
 
-1. 先读取项目根目录 `.vm_service_uri`
-   - 该文件由 `./scripts/flutter_run.sh` 自动写入
-   - VS Code / 终端只要通过该脚本启动 Flutter，通常都能自动拿到最新地址
-2. 如果文件存在且内容是合法的 `ws://.../ws` URI：
-   - 直接调用 **connect** 连接，不要先反问用户
-3. 如果首次连接失败：
-   - 重新读取一次 `.vm_service_uri`
-   - 若 URI 已变化，则使用最新 URI 再重试一次 **connect**
-4. 如果 `.vm_service_uri` 不存在、为空、格式不对，或重试后仍连接失败：
-   - 再提示用户重新用 `./scripts/flutter_run.sh` 或 `/run-android` 启动调试
-   - 仍失败时，再请用户手动提供 VM service URI
-
-**默认行为：** 执行本命令时，先尝试自动读取 `.vm_service_uri` 并自动连接；不要一开始就向用户询问 URI。
-
----
-
-## 连接管理
-
-| 工具 | 描述 | 参数 |
-|------|------|------|
-| **connect** | 通过 VM service URI 连接到 Flutter 应用。优先使用从 `.vm_service_uri` 自动发现到的地址 | **uri**（必需）：VM service URI，例如 `ws://127.0.0.1:54321/ws` |
-| **disconnect** | 断开当前连接。断开后需再次 **connect** 才能使用其他工具 | 无 |
-
----
+MCP 和 `fcc` 共用会话，退出任一客户端不会停止 App。`disconnect` 只断开连接；`stop_app` 关闭本工具启动的 App，`detach_app` 结束其调试会话但保留 App。外部 `flutter run` 或 IDE 会话需由原启动方停止。
 
 ## UI 元素检测
 
@@ -87,8 +65,8 @@
 
 ## 建议执行流程
 
-1. **自动连接**：先读取项目根目录 `.vm_service_uri`，拿到 URI 后立即调用 **connect**
-2. **失败兜底**：若自动连接失败，重新读取 `.vm_service_uri` 重试一次；仍失败再向用户要 URI 或引导重新启动调试
+1. **自动发现**：先用 `list_apps`，再按会话 ID 操作。
+2. **未运行**：用 `ensure_apps`；遇到多个候选时由用户选择。
 3. **探查界面**：需要时调用 **get_interactive_elements** 或 **take_screenshots**
 4. **交互**：按需使用 **tap**、**enter_text**、**scroll_to** 或手势工具
 5. **导航**：需要跳转页面时使用 **navigate**

@@ -44,7 +44,6 @@ async function main(): Promise<void> {
     .option('--uri <uri>', 'Explicit VM Service URI; bypasses discovery.')
     .option('--project <directory>', 'Flutter project directory; defaults to the nearest package.')
     .option('--app <id>', 'Select a running App by id from fcc apps.')
-    .option('--watch-uri', 'Legacy URI-file watching; DTD sessions reconnect automatically.')
     .option('--timeout <sec>', 'Connection timeout in seconds.', '5')
     .option('--json', 'Output JSON instead of TTY formatting (pipe to jq).')
     .hook('preAction', (thisCmd) => {
@@ -56,9 +55,8 @@ async function main(): Promise<void> {
     `
 Target resolution (first match wins):
   --uri ws://...                    explicit URI
-  $FLUTTER_COPILOT_URI              env var
+  $FLUTTER_COPILOT_URI              env var (unless --app is set)
   DTD                              live discovery scoped to --project / cwd
-  .vm_service_uri                   legacy fallback only
 
 Widget matcher (shared by tap / enter-text / scroll-to / swipe / ...):
   --key <k>                         ValueKey<String> — most reliable
@@ -80,8 +78,8 @@ Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   # Attach an explicit URI without writing a URI file
   fcc connect --uri ws://127.0.0.1:8181/abc/ws
 
-  # Real-time telemetry that survives \`flutter\` restarts
-  fcc --watch-uri watch --logs --rebuilds
+  # Real-time telemetry for the selected session
+  fcc watch --logs --rebuilds
 
   # Scripted smoke test
   fcc run smoke.yaml

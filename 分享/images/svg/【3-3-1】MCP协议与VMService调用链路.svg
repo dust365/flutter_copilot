@@ -174,7 +174,7 @@
   <rect x="956" y="496" width="120" height="22" rx="11" fill="url(#teal)"/>
   <text x="1016" y="511" class="layerTag" text-anchor="middle">CLI  ·  fcc</text>
   <text x="1130" y="550" class="h" text-anchor="middle">flutter_copilot_cli</text>
-  <text x="1130" y="578" class="hSub" text-anchor="middle">命令解析  ·  .vm_service_uri  ·  脚本回放</text>
+  <text x="1130" y="578" class="hSub" text-anchor="middle">命令解析  ·  DTD 会话发现  ·  脚本回放</text>
 
   <!-- ===== Convergence: both lanes call vm_service via callServiceExtension ===== -->
   <g>

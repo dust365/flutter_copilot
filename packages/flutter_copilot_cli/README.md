@@ -14,20 +14,20 @@ Think of it as an alternative to `flutter_copilot_mcp` that is designed for
 
 ## Command reference
 
-All app-driving commands accept the global flag `--uri <ws://...>` for explicit
-targeting, plus `--json` to emit machine-readable output. If `--uri` is omitted,
-the CLI uses `FLUTTER_COPILOT_URI` or the nearest `.vm_service_uri`. Run
-`fcc <command> --help` for per-command details, or `fcc help-ai` for the full
-machine-readable surface.
+Use `--project <directory>` to select a Flutter project and `--app <id>` to select a session when more than one is running. Run `fcc <command> --help` for details or `fcc help-ai` for the machine-readable command surface.
 
 ### Target & session
 
 | Command               | Description                                                       |
 | --------------------- | ----------------------------------------------------------------- |
-| `connect --uri <uri>` | Validate a VM Service URI and save it to `.vm_service_uri`.       |
-| `disconnect`          | Remove the current `.vm_service_uri`.                             |
+| `apps` / `devices` | Discover Apps through DTD or list available devices. |
+| `up [-d <id>]` | Reuse or launch. Repeat `-d` for multiple devices. |
+| `status <operation-id>` | Check a launch started with `up --no-wait`. |
+| `connect --uri <uri>` | Attach an explicit address to the project session backend. |
+| `disconnect` | Disconnect the selected App and leave it running. |
+| `stop` / `detach` | Stop an owned App or leave it running without Flutter tooling. |
 | `doctor`              | Probe the current VM Service URI and the Copilot extensions.      |
-| `repl`                | Open an interactive shell; supports `--watch-uri` auto-reconnect. |
+| `repl`                | Open an interactive shell for the selected App. |
 
 ### Inspect & capture
 
@@ -162,22 +162,14 @@ void main() {
 
 ### Target resolution — no `--uri` needed
 
-The CLI picks a VM Service URI from the first source that matches:
+`fcc apps` discovers running debug Apps through DTD. If no suitable App is running, `fcc up` launches one. Choose one or several listed devices in an interactive terminal, or repeat `-d <device-id>` in scripts. With `--json`, handle `selection_required` on stderr and pass the selected IDs. Successful Apps stay connected if another device fails or the client exits.
 
-1. `--uri <ws://...>` — explicit
-2. `FLUTTER_COPILOT_URI` env var
-3. `.vm_service_uri` in the current directory or any ancestor
-
-#### Recommended: `scripts/flutter_run.sh`
-
-The repo ships a helper that wraps `flutter run` and writes the detected URI to
-`<repo_root>/.vm_service_uri`:
+Use `--uri <uri>` to bypass discovery, or `FLUTTER_COPILOT_URI` as a default when `--app` is absent.
 
 ```bash
-./scripts/flutter_run.sh -d macos          # starts the app; writes .vm_service_uri
-fcc doctor                                 # auto-picks the URI from that file
-fcc --uri "$(cat .vm_service_uri)" doctor  # probes only this explicit URI
-fcc tap --text "点击"
+fcc --project example up
+fcc --project example apps
+fcc --project example --app <id> doctor
 ```
 
 #### Manual connection
@@ -197,25 +189,16 @@ fcc disconnect
 fcc watch --logs --rebuilds --interval 500
 ```
 
-Add `--watch-uri` to survive `flutter run` restarts — the CLI tails
-`.vm_service_uri` and transparently reconnects (with 100ms→1.6s backoff):
-
-```bash
-fcc --watch-uri watch --rebuilds
-# in another terminal: ctrl-c flutter, restart it → CLI auto-reconnects
-```
-
-The same flag works for `repl` too. It's a no-op for one-shot commands and
-requires URI auto-detection (it is ignored when `--uri` was used).
+`watch` and `repl` reconnect when discovery can identify the same session. If an external App restarts without a verified device identity, use `fcc apps` to choose its new session.
 
 ### Interactive REPL
 
 ```bash
 fcc repl
-fc[auto:.vm_service_uri]> tap text="点击"
-fc[auto:.vm_service_uri]> enter-text focused input="demo user"
-fc[auto:.vm_service_uri]> take-screenshots output=/tmp/s.png
-fc[auto:.vm_service_uri]> hot-reload
+fc[app-id]> tap text="点击"
+fc[app-id]> enter-text focused input="demo user"
+fc[app-id]> take-screenshots output=/tmp/s.png
+fc[app-id]> hot-reload
 ```
 
 ### YAML playbook

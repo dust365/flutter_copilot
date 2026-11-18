@@ -145,8 +145,8 @@ class DtdRegistry {
       final services = await client
           .getRegisteredServices()
           .timeout(const Duration(seconds: 3));
-      if (!services.dtdServices
-          .contains(ConnectedAppServiceConstants.serviceName)) {
+      if (!services.dtdServices.contains(
+          '${ConnectedAppServiceConstants.serviceName}.getVmServices')) {
         throw const FormatException(
             'This endpoint does not support ConnectedApp. '
             'Use a DTD endpoint from list_dtds, or connect for a VM service URI.');

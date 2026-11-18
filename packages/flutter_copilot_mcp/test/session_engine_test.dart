@@ -136,6 +136,26 @@ void main() {
     expect(trace, contains('app.stop:phone-a'));
   }, skip: Platform.isWindows ? 'POSIX fixture executable' : false);
 
+  test('owned run remains owned and stoppable across disconnect', () async {
+    final operation = await completeOperation(
+        engine,
+        await engine.call('ensure_apps', {
+          'deviceIds': ['phone-a']
+        }) as Map<String, dynamic>);
+    final app = (operation['results'] as List).single['app'] as Map;
+    final id = app['id'];
+    await engine.call('disconnect', {'app': id});
+    expect(apps.sessions, isEmpty);
+    final reconnected = await engine.call('connect', {'uri': app['uri']});
+    expect(reconnected['id'], id);
+    expect(reconnected['owned'], isTrue);
+    expect(reconnected['deviceId'], 'phone-a');
+    await engine.call('disconnect', {'app': id});
+    await engine.call('stop_app', {'app': id});
+    expect(await File(p.join(project.path, 'trace')).readAsString(),
+        contains('app.stop:phone-a'));
+  }, skip: Platform.isWindows ? 'POSIX fixture executable' : false);
+
   test('an external App can be reused but cannot be stopped', () async {
     final vm = await MockVmServer.start();
     addTearDown(vm.close);

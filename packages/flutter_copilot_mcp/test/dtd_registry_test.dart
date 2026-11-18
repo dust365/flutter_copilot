@@ -26,7 +26,7 @@ class MockDtd {
           case 'getRegisteredServices':
             result = {
               'type': 'RegisteredServicesResponse',
-              'dtdServices': ['ConnectedApp'],
+              'dtdServices': ['ConnectedApp.getVmServices'],
               'clientServices': []
             };
           case 'ConnectedApp.getVmServices':

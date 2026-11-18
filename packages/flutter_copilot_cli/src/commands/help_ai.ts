@@ -11,11 +11,11 @@ export function helpAiCommand(program: Command): void {
     .description('Dump machine-readable command surface (JSON) for AI agents.')
     .action(() => {
       const surface = {
-        schemaVersion: 2,
+        schemaVersion: 3,
         tool: 'flutter_copilot_cli',
         bin: ['fcc', 'flutter_copilot_cli'],
         purpose:
-          'Drive one currently running Flutter app through flutter_copilot_claw VM Service extensions.',
+          'Discover, start, and drive Flutter apps through flutter_copilot_claw VM Service extensions.',
         targetResolution: [
           {
             source: '--uri <ws://...>',
@@ -25,18 +25,19 @@ export function helpAiCommand(program: Command): void {
           {
             source: 'FLUTTER_COPILOT_URI',
             precedence: 2,
-            note: 'Environment variable.',
+            note: 'Environment variable, unless --app is set.',
           },
           {
-            source: '.vm_service_uri',
+            source: 'DTD',
             precedence: 3,
-            note: 'Nearest file in cwd or an ancestor. Written by scripts/flutter_run.sh or fcc connect.',
+            note: 'Live sessions scoped to --project or the current Flutter package.',
           },
         ],
         globalOptions: {
           '--uri <uri>': 'VM Service WebSocket URI.',
           '--timeout <sec>': 'Connection timeout in seconds. Default: 5.',
-          '--watch-uri': 'For watch/repl only: reconnect when the auto-detected .vm_service_uri changes.',
+          '--project <directory>': 'Flutter project directory.',
+          '--app <id>': 'Select a session ID from fcc apps.',
           '--json': 'Machine-readable output. Long-running watch emits NDJSON.',
         },
         matcher: {
@@ -52,18 +53,25 @@ export function helpAiCommand(program: Command): void {
           rule: 'Provide at least one matcher for tap/double-tap/long-press/enter-text/scroll-to/swipe. Drag may instead use absolute from/to coordinates.',
         },
         commands: [
+          { name: 'apps', category: 'target', mcpTool: 'list_apps', description: 'Discover running Apps and list their IDs.', example: 'fcc --project example --json apps' },
+          { name: 'devices', category: 'target', mcpTool: 'list_devices', description: 'List available devices.', example: 'fcc --json devices' },
+          { name: 'up', category: 'target', mcpTool: 'ensure_apps', description: 'Reuse running Apps or start selected devices. If selection_required is returned, ask the user to choose one or more candidates.', options: { '--device <id>': 'Repeat for multiple devices.', '--no-wait': 'Return an operation ID without waiting.' }, example: 'fcc up -d deviceA -d deviceB' },
+          { name: 'status', category: 'target', mcpTool: 'operation_status', description: 'Poll a launch by operation ID.', example: 'fcc status <operation-id>' },
+          { name: 'logs', category: 'target', mcpTool: 'get_app_logs', description: 'Read output from an owned Flutter run.', example: 'fcc --app <id> logs' },
+          { name: 'stop', category: 'target', mcpTool: 'stop_app', description: 'Stop an owned App on the device.', example: 'fcc --app <id> stop' },
+          { name: 'detach', category: 'target', mcpTool: 'detach_app', description: 'End an owned debug session while leaving the App running.', example: 'fcc --app <id> detach' },
           {
             name: 'connect',
             category: 'target',
             mcpTool: 'connect',
-            description: 'Validate a VM Service URI and save it to .vm_service_uri in cwd.',
+            description: 'Attach an explicit VM Service URI to the project session backend.',
             options: { '--uri <uri>': 'required' },
             example: 'fcc connect --uri ws://127.0.0.1:8181/abc/ws',
           },
           {
             name: 'disconnect',
             category: 'target',
-            description: 'Remove the nearest .vm_service_uri file. This CLI has no persistent socket to close.',
+            description: 'Disconnect the selected App while leaving it running.',
             options: {},
             example: 'fcc disconnect',
           },
@@ -220,7 +228,7 @@ export function helpAiCommand(program: Command): void {
             category: 'automation',
             description: 'Open an interactive shell using the same current target.',
             options: {},
-            example: 'fcc --watch-uri repl',
+            example: 'fcc repl',
           },
           {
             name: 'run <script.yaml>',

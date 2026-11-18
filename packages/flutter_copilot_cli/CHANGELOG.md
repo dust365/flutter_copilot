@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Discover running debug Apps through DTD and launch selected devices with `fcc up`.
+  MCP and `fcc` share the same session IDs.
+- Remove URI-file discovery and `--watch-uri`. Use `fcc apps` and `--app` to select
+  a live session, or `--uri` to connect to an explicit address.
+
 ## 1.0.6
 
 ### Breaking

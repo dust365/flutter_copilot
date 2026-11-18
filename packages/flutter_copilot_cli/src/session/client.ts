@@ -111,7 +111,7 @@ async function prepareRuntime(sdk: ProjectSdk): Promise<string> {
   const cacheHome = process.env.FLUTTER_COPILOT_CACHE ?? path.join(
     process.env.XDG_CACHE_HOME ?? path.join(os.homedir(), '.cache'), 'flutter_copilot');
   const runtime = path.join(cacheHome, `${manifest.hash.slice(0, 20)}-${sdkKey}`);
-  const ready = path.join(runtime, '.dart_tool', 'package_config.json');
+  const ready = path.join(runtime, '.ready');
   if (existsSync(ready)) return runtime;
   await fs.mkdir(cacheHome, { recursive: true });
   const lock = `${runtime}.lock`;
@@ -130,6 +130,7 @@ async function prepareRuntime(sdk: ProjectSdk): Promise<string> {
     if (!existsSync(ready)) {
       await fs.cp(source, runtime, { recursive: true });
       await execute(sdk.dart, ['pub', 'get', '--enforce-lockfile', '--no-precompile'], runtime);
+      await fs.writeFile(ready, '');
     }
     return runtime;
   } finally { await fs.rm(lock, { recursive: true, force: true }); }

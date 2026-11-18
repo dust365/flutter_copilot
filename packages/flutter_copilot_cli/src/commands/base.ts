@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import { VmServiceClient } from '../vm/client.js';
 import { FlutterCopilotConnector } from '../vm/connector.js';
-import { autoDetectVmServiceUri } from '../registry/auto_uri.js';
 import * as log from '../logging.js';
 import { SessionClient, SessionError, type AppInfo } from '../session/client.js';
 import { chooseCandidates } from './sessions.js';
@@ -12,8 +11,6 @@ export interface GlobalOpts {
   project?: string;
   timeout?: string;
   json?: boolean;
-  /** Enable .vm_service_uri auto-reconnect (repl/watch only). */
-  watchUri?: boolean;
 }
 
 export interface TargetResolutionOpts extends GlobalOpts {
@@ -26,8 +23,6 @@ export interface ResolvedTarget {
   uri: string;
   displayName: string;
   timeoutMs: number;
-  /** Non-null when URI was sourced from a `.vm_service_uri` file. */
-  autoUriPath?: string;
   refresh?: () => Promise<string>;
 }
 
@@ -37,7 +32,6 @@ export interface ResolvedTarget {
  *   1. `--uri <ws>`
  *   2. `FLUTTER_COPILOT_URI` env var
  *   3. DTD discovery scoped to the current project (or --app)
- *   4. legacy .vm_service_uri fallback
  */
 export async function resolveTargetFromOptions(
   opts: TargetResolutionOpts,
@@ -58,41 +52,24 @@ export async function resolveTargetFromOptions(
   if (env.FLUTTER_COPILOT_URI?.trim() && !opts.app) {
     return { uri: env.FLUTTER_COPILOT_URI.trim(), displayName: '$FLUTTER_COPILOT_URI', timeoutMs };
   }
-  let discoveryError: unknown;
-  try {
-    const session = opts.sessionCall ? null : new SessionClient(opts.project ?? opts.cwd, env);
-    const call = opts.sessionCall ?? ((method, args) => session!.call<AppInfo>(method, args));
-    let app: AppInfo;
-    try { app = await call('resolve', { app: opts.app }); } catch (e) {
-      if (!(e instanceof SessionError) || opts.json) throw e;
-      const selection = await chooseCandidates(e);
-      if (selection.ids.length !== 1) throw new SessionError('selection_required', 'Choose one App for this command. Use fcc up to connect multiple Apps.', e.candidates);
-      app = await call('resolve', { app: selection.ids[0] });
-    }
-    return { uri: app.uri, displayName: app.id, timeoutMs,
-      refresh: async () => (await call('resolve', { app: app.id })).uri };
-  } catch (e) {
-    if (opts.app || e instanceof SessionError && e.code === 'selection_required') throw e;
-    discoveryError = e;
+  const session = opts.sessionCall ? null : new SessionClient(opts.project ?? opts.cwd, env);
+  const call = opts.sessionCall ?? ((method, args) => session!.call<AppInfo>(method, args));
+  let app: AppInfo;
+  try { app = await call('resolve', { app: opts.app }); } catch (e) {
+    if (!(e instanceof SessionError) || opts.json) throw e;
+    const selection = await chooseCandidates(e);
+    if (selection.ids.length !== 1) throw new SessionError('selection_required', 'Choose one App for this command. Use fcc up to connect multiple Apps.', e.candidates);
+    app = await call('resolve', { app: selection.ids[0] });
   }
-  // Legacy files are a final fallback, never allowed to override live discovery.
-  const auto = await autoDetectVmServiceUri(opts.project ?? opts.cwd, { ...env, FLUTTER_COPILOT_URI: '' });
-  if (auto) {
-    log.info('Using legacy .vm_service_uri fallback. Use fcc apps / fcc up for automatic discovery.');
-    return { uri: auto.uri, displayName: `legacy:${auto.path}`, timeoutMs, autoUriPath: auto.path };
-  }
-  if (discoveryError instanceof SessionError) throw discoveryError;
-  throw new SessionError('app_not_found', `No VM Service URI or discoverable App. Use fcc up, or pass --uri. ${String(discoveryError ?? '')}`);
-
+  return { uri: app.uri, displayName: app.id, timeoutMs,
+    refresh: async () => (await call('resolve', { app: app.id })).uri };
 }
 
 export async function resolveTarget(program: Command): Promise<ResolvedTarget> {
   return resolveTargetFromOptions(program.opts<GlobalOpts>());
 }
 
-/** Runs `fn` with a connected connector; handles cleanup and pretty errors.
- *  The callback also receives the resolved target in case it needs access to
- *  `autoUriPath` (for `--watch-uri` auto-reconnect). */
+/** Runs the callback with a connected target and closes the socket afterwards. */
 export async function withConnector<T>(
   program: Command,
   fn: (
@@ -114,27 +91,6 @@ export async function withConnector<T>(
       // ignore cleanup errors
     }
   }
-}
-
-/** Exponential-backoff reconnect helper used by `--watch-uri`.
- *  Tries [100, 200, 400, 800, 1600] ms before giving up for this cycle. */
-export async function reconnectWithBackoff(
-  connector: FlutterCopilotConnector,
-  newUri: string,
-  timeoutMs: number,
-): Promise<void> {
-  const delays = [100, 200, 400, 800, 1600];
-  let lastErr: unknown = null;
-  for (let i = 0; i < delays.length; i++) {
-    try {
-      await connector.reconnect(newUri, timeoutMs);
-      return;
-    } catch (e) {
-      lastErr = e;
-      await new Promise((r) => setTimeout(r, delays[i]!));
-    }
-  }
-  throw lastErr ?? new Error(`Unable to reconnect to ${newUri}`);
 }
 
 /** Follow the selected logical session, without retrying or replaying gestures. */

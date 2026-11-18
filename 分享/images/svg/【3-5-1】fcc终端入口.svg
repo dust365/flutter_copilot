@@ -87,17 +87,17 @@
   <g transform="translate(108, 320)">
     <!-- Step 1: launch app -->
     <text y="0" class="termPrompt">$</text>
-    <text x="20" y="0" class="termCmd">./scripts/flutter_run.sh </text>
-    <text x="226" y="0" class="termFlag">-d macos</text>
+    <text x="20" y="0" class="termCmd">fcc up </text>
+    <text x="82" y="0" class="termFlag">-d macos</text>
     <text y="22" class="termDim">[flutter] Launching lib/main.dart on macOS...</text>
     <text y="42" class="termDim">[flutter] VM Service:  ws://127.0.0.1:54321/ws</text>
-    <text y="62" class="termOk">✓ wrote .vm_service_uri</text>
+    <text y="62" class="termOk">✓ App connected</text>
 
     <!-- Step 2: doctor -->
     <text y="100" class="termPrompt">$</text>
     <text x="20" y="100" class="termCmd">fcc doctor</text>
-    <text y="122" class="termOk">✓ vm_service_uri  </text>
-    <text x="180" y="122" class="termDim">resolved from .vm_service_uri</text>
+    <text y="122" class="termOk">✓ app session  </text>
+    <text x="180" y="122" class="termDim">discovered via DTD</text>
     <text y="142" class="termOk">✓ vm connection   </text>
     <text x="180" y="142" class="termDim">ok (Dart VM 3.5.0)</text>
     <text y="162" class="termOk">✓ copilot ext     </text>

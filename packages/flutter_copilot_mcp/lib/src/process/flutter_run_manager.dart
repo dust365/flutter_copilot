@@ -8,6 +8,7 @@ import 'package:flutter_copilot_mcp/src/process/machine_output.dart';
 import 'package:flutter_copilot_mcp/src/process/platform_launch_gate.dart';
 import 'package:flutter_copilot_mcp/src/session/app_directory.dart';
 import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
+import 'package:flutter_copilot_mcp/src/session/vm_service_uri.dart';
 import 'package:path/path.dart' as p;
 
 /// A resident Flutter machine-protocol process. Stop and detach are distinct.
@@ -25,6 +26,7 @@ class TrackedFlutterRun implements OwnedProcess {
   String? appId;
   String? wsUri;
   String? dtdUri;
+  AppSession? session;
   bool started = false;
   bool _stopped = false;
 
@@ -99,7 +101,7 @@ class TrackedFlutterRun implements OwnedProcess {
       try {
         await process.exitCode.timeout(const Duration(seconds: 5));
       } on TimeoutException {
-        if (detach) return;
+        if (detach) rethrow;
         process.kill();
       }
     } else {
@@ -301,6 +303,7 @@ class FlutterRunManager {
           launchArgs: List.of(extraArgs));
       _runs.remove(run.id);
       run.id = session.id;
+      run.session = session;
       own(run);
       return session;
     } catch (_) {
@@ -335,6 +338,42 @@ class FlutterRunManager {
 
   String logs(String? app, {int lines = 500}) =>
       _select(app).logTail(lines: lines <= 0 ? 500 : lines);
+
+  TrackedFlutterRun? ownedById(String? id) {
+    final run = _runs[id];
+    return run != null && run.isRunning ? run : null;
+  }
+
+  TrackedFlutterRun? ownedByUri(String uri) {
+    final normalized = normalizeVmServiceUri(uri);
+    return _runs.values
+        .where((run) => run.isRunning && run.session?.uri == normalized)
+        .firstOrNull;
+  }
+
+  Future<AppSession> reconnect(TrackedFlutterRun run) async {
+    final previous = run.session!;
+    final session = await apps.connectUri(
+      uri: previous.uri,
+      id: previous.id,
+      deviceId: previous.deviceId,
+      dtdUri: previous.dtdUri,
+      process: run,
+      projectRoot: previous.projectRoot,
+      target: previous.target,
+      displayName: previous.displayName,
+      flavor: previous.flavor,
+      mode: previous.mode,
+      launchArgs: previous.launchArgs,
+      waitForExtension: const Duration(seconds: 5),
+    );
+    if (!apps.sessions.any(
+        (other) => !identical(other, session) && other.id == previous.id)) {
+      session.id = previous.id;
+    }
+    run.session = session;
+    return session;
+  }
 
   void own(TrackedFlutterRun run) {
     _runs[run.id] = run;

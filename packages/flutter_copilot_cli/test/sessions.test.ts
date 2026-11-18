@@ -14,12 +14,10 @@ afterEach(async () => { await rm(directory, { recursive: true, force: true }); }
 const app = { id: 'phone', uri: 'ws://127.0.0.1:1234/ws', name: 'Flutter', deviceId: 'device', projectRoot: '/project', owned: false };
 
 describe('live target selection', () => {
-  it('live discovery wins over a stale URI file', async () => {
-    await writeFile(path.join(directory, '.vm_service_uri'), 'ws://stale/ws');
+  it('live discovery selects an active session', async () => {
     const target = await resolveTargetFromOptions({ cwd: directory, env: {}, sessionCall: async () => app });
     expect(target.uri).toBe(app.uri);
     expect(target.displayName).toBe('phone');
-    expect(target.autoUriPath).toBeUndefined();
   });
   it('rediscovery follows the selected id and picks up a changed URI', async () => {
     let uri = app.uri;
@@ -30,15 +28,14 @@ describe('live target selection', () => {
     uri = 'ws://127.0.0.1:2222/ws';
     expect(await target.refresh!()).toBe(uri);
   });
-  it('ambiguity never falls back to an arbitrary file target', async () => {
-    await writeFile(path.join(directory, '.vm_service_uri'), 'ws://stale/ws');
+  it('ambiguity returns candidates without selecting an arbitrary session', async () => {
     await expect(resolveTargetFromOptions({ cwd: directory, env: {}, json: true, sessionCall: async () => {
       throw new SessionError('selection_required', 'Choose an App', [app, { ...app, id: 'tablet' }]);
     } })).rejects.toMatchObject({ code: 'selection_required', candidates: expect.any(Array) });
   });
-  it('an explicit --app never falls back when that App disappeared', async () => {
+  it('ignores an old URI file when no live App can be resolved', async () => {
     await writeFile(path.join(directory, '.vm_service_uri'), 'ws://wrong/ws');
-    await expect(resolveTargetFromOptions({ app: 'gone', cwd: directory, env: {}, sessionCall: async () => {
+    await expect(resolveTargetFromOptions({ cwd: directory, env: {}, sessionCall: async () => {
       throw new SessionError('app_not_found', 'App disappeared');
     } })).rejects.toMatchObject({ code: 'app_not_found' });
   });

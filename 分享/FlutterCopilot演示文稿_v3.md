@@ -341,10 +341,11 @@ fcc --version
 - **MCP 问题排查**：当 Agent 调用失败时，可以用 `fcc doctor` 先确认 VM Service 和 Copilot 扩展是否正常
 - **稳定流程沉淀**：把已经跑通的自然语言流程逐步固化成命令，便于版本管理、重试和复用
 
-这个 CLI 会自动读取当前目录或父目录里的 `.vm_service_uri`。本地仓库里的 `scripts/flutter_run.sh` 会在启动 Flutter App 时自动捕获 VM Service URI 并写入这个文件，所以终端调试可以变成：
+CLI 通过 DTD 自动发现调试会话，也可以用 `fcc up` 直接启动并连接：
 
 ```bash
-./scripts/flutter_run.sh -d macos
+fcc --project example up -d macos
+cd example
 fcc doctor
 fcc get-interactive-elements
 fcc tap --text "点击"
@@ -359,7 +360,7 @@ MCP 解决的是“AI 能调用哪些工具”，Skill 解决的是“AI 应该�
 
 ```yaml
 name: flutter-copilot
-description: 连接 Flutter Copilot MCP，支持自动读取 VM Service URI、截图、交互、热重载，以及需要重启时自动调用脚本重连
+description: 连接 Flutter Copilot MCP，支持通过 DTD 发现会话、冷启动、截图、交互和热重载
 ```
 
 参考地址：
@@ -585,7 +586,7 @@ Flutter Copilot 带来的不只是“操作更自动化”，而是让“代码�
 | MCP Server 如何连接 VM Service 并调用扩展 | `packages/flutter_copilot_mcp/lib/src/vm_service/vm_service_connector.dart` |
 | 元素定位 Key / Text / Type / Coordinates 如何匹配 | `packages/flutter_copilot_claw/lib/src/services/widget_matcher.dart` |
 | CLI 如何直连同一套扩展 | `packages/flutter_copilot_cli/src/vm/connector.ts` |
-| 本地自动捕获 VM Service URI | `scripts/flutter_run.sh` |
+| 自动发现和启动调试会话 | `packages/flutter_copilot_mcp/lib/src/session/session_engine.dart` |
 
 ---
 

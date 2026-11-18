@@ -97,11 +97,7 @@ dart pub add dev:flutter_copilot_mcp
 flutter run
 ```
 
-Copy the VM Service URI from the console, for example:
-
-```text
-ws://127.0.0.1:12345/ws
-```
+You can also skip this step and use `ensure_apps` to launch from MCP.
 
 ### 5. Connect from your MCP client
 
@@ -134,7 +130,11 @@ Cursor reads `.cursor/mcp.json`.
 
 ## MCP tool list
 
-After calling `connect`, an agent can use these MCP tools:
+Call `list_apps` with the Flutter project `directory` to discover running debug Apps through DTD. If needed, call `ensure_apps`; on `selection_required`, ask the user to select `deviceIds` or `appIds`. Poll `operation_status` when the response contains an operation ID. Use the selected `app` ID for interactions. The session backend is shared with `fcc`.
+
+- `list_apps` / `list_devices`
+- `ensure_apps` / `operation_status`
+- `stop_app` / `detach_app` (owned sessions only)
 
 - `connect`
 - `disconnect`

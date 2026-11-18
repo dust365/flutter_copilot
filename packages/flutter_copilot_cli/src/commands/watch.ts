@@ -1,8 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { withConnector, reconnectWithBackoff, followTarget } from './base.js';
+import { withConnector, followTarget } from './base.js';
 import type { VmEvent } from '../vm/client.js';
-import { UriFileWatcher } from '../vm/uri_watcher.js';
 import * as log from '../logging.js';
 import { getOutputMode } from '../logging.js';
 
@@ -43,7 +42,7 @@ export function watchCommand(program: Command): void {
 
         if (opts.logs) {
           for (const stream of ['Stdout', 'Stderr', 'Extension']) {
-            // Use connector.streamListen so --watch-uri can replay after reconnect.
+            // Use connector.streamListen so subscriptions can resume after reconnect.
             await connector.streamListen(stream);
           }
           client.on('event', (streamId: string, e: VmEvent) => printLogEvent(streamId, e));
@@ -65,37 +64,8 @@ export function watchCommand(program: Command): void {
           log.info(`polling rebuild snapshot every ${interval}ms (Ctrl-C to stop)`);
         }
 
-        // --watch-uri: auto-reconnect when .vm_service_uri content changes.
-        const watchUri = program.opts<{ watchUri?: boolean }>().watchUri === true;
-        let uriWatcher: UriFileWatcher | null = null;
-        if (watchUri && !target.refresh) {
-          if (!target.autoUriPath) {
-            process.stderr.write(
-              chalk.yellow(
-                '! --watch-uri requires URI auto-detection; ignored because --uri was used.\n',
-              ),
-            );
-          } else {
-            uriWatcher = new UriFileWatcher(target.autoUriPath);
-            uriWatcher.on('change', async (newUri: string) => {
-              process.stderr.write(chalk.yellow(`\n⟳ reconnecting: ${newUri}\n`));
-              try {
-                await reconnectWithBackoff(connector, newUri, target.timeoutMs);
-                process.stderr.write(chalk.green(`✓ reconnected\n`));
-              } catch (e) {
-                process.stderr.write(
-                  chalk.red(`✗ reconnect failed: ${(e as Error).message}\n`),
-                );
-              }
-            });
-            await uriWatcher.start();
-            log.info(`watching ${target.autoUriPath} for URI changes`);
-          }
-        }
-
         await stop;
         stopFollowing();
-        uriWatcher?.stop();
         if (rebuildTimer) clearInterval(rebuildTimer);
       });
     })
@@ -109,11 +79,7 @@ Examples:
   # Tail logs and rebuild counts together
   fcc watch --logs --rebuilds --interval 500
 
-  # Survive \`flutter run\` restarts: auto-reconnect when .vm_service_uri changes
-  fcc --watch-uri watch --logs --rebuilds
-
-\`--watch-uri\` is a global flag; it requires URI auto-detection (ignored when
-\`--uri\` is passed).
+Discovery reconnects when it can identify the same App session.
 `,
     );
 }

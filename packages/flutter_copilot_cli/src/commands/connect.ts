@@ -4,7 +4,7 @@ import * as log from '../logging.js';
 import type { GlobalOpts } from './base.js';
 
 export function connectCommands(program: Command): void {
-  program.command('connect').description('Attach an explicit VM Service URI to the project session backend; writes no URI file.')
+  program.command('connect').description('Attach an explicit VM Service URI to the project session backend.')
     .option('--name <alias>', 'Optional session alias.')
     .action(async (opts: { name?: string }) => {
       const global = program.opts<GlobalOpts>();

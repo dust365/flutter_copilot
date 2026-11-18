@@ -169,8 +169,8 @@ dart run ./packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST
 
 1. 启动 Flutter 示例应用
 2. 让 Claude Code 连接 `flutter_copilot_mcp`
-3. 再用 MCP 工具连接 VM Service URI
-4. 调用 `connect`、`get_interactive_elements`、`tap` 等工具
+3. 用 `list_apps` 自动发现示例应用
+4. 调用 `get_logs`、`get_interactive_elements`、`tap` 等工具
 
 ### 7.1 先启动示例应用
 
@@ -180,17 +180,11 @@ dart run ./packages/flutter_copilot_mcp/bin/flutter_copilot_mcp.dart -l FINEST
 cd example && flutter run
 ```
 
-如果你使用 VS Code 的 [`.vscode/launch.json`](../.vscode/launch.json) 中的 `Flutter (Copilot)`，也可以通过 [scripts/flutter_run.sh](../scripts/flutter_run.sh) 启动。
+VS Code 也可通过 [启动配置](../.vscode/launch.json) 运行 `example/lib/main.dart`。
 
-### 7.2 获取 VM Service URI
+### 7.2 发现 App
 
-应用启动后，从终端输出中复制 `ws://.../ws`。
-
-本仓库的启动脚本还会把 URI 写到：
-
-```bash
-.vm_service_uri
-```
+调用 `list_apps` 并传 `example` 的绝对路径；多个会话时，后续操作传选定的 `app` ID。应用还没启动时，使用 `ensure_apps` 并按需选择设备，然后查询 `operation_status`。
 
 ### 7.3 在 Claude Code 中使用 MCP
 
@@ -285,17 +279,9 @@ claude mcp get flutter_copilot_mcp
 cd example && flutter run
 ```
 
-### 第四步：拿到 VM Service URI
+### 第四步：发现示例应用
 
-从终端或 `.vm_service_uri` 中拿到：
-
-```text
-ws://127.0.0.1:xxxx/ws
-```
-
-### 第五步：在 Claude Code 中调用 MCP 工具
-
-先让 Claude Code 使用 `connect` 连接应用，再继续调试其他工具。
+让 Claude Code 调用 `list_apps`，传入示例工程的绝对路径，再使用返回的 App ID 调用调试工具。
 
 ---
 
@@ -334,7 +320,6 @@ ws://127.0.0.1:xxxx/ws
 - [packages/flutter_copilot_mcp/lib/src/compat/copilot_stdio_server_transport.dart](../packages/flutter_copilot_mcp/lib/src/compat/copilot_stdio_server_transport.dart)
 - [.cursor/mcp.json](../.cursor/mcp.json)
 - [.vscode/launch.json](../.vscode/launch.json)
-- [scripts/flutter_run.sh](../scripts/flutter_run.sh)
 
 ---
 

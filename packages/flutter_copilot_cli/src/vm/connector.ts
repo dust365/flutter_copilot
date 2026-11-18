@@ -78,8 +78,7 @@ export class FlutterCopilotConnector {
    * by commands remain live), and re-subscribes to every stream that was
    * active on the old connection.
    *
-   * Throws if the new URI cannot be reached within [timeoutMs] — callers are
-   * expected to implement their own retry/backoff.
+   * Throws if the new URI cannot be reached within [timeoutMs].
    */
   async reconnect(newUri: string, timeoutMs = 5000): Promise<void> {
     const streams = Array.from(this.subscribedStreams);

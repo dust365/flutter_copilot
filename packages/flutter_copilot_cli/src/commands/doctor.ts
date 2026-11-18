@@ -40,11 +40,11 @@ Exits 1 if the current target fails to connect.
 
 Target resolution:
   --uri ws://...
-  FLUTTER_COPILOT_URI
-  nearest .vm_service_uri
+  FLUTTER_COPILOT_URI (unless --app is set)
+  DTD discovery for --project / cwd
 
 Example:
-  ./scripts/flutter_run.sh -d macos
+  fcc up --device macos
   fcc doctor
   fcc --uri ws://127.0.0.1:8181/abc/ws doctor
 `,

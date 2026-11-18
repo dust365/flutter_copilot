@@ -7,7 +7,7 @@ description: 使用 flutter_copilot_cli (fcc) 命令行工具连接并驱动一�
 
 通过 `fcc` 命令行直接驱动运行中的 Flutter debug 应用，无需 MCP 中间层。
 
-当前 `fcc` 是单实例目标模型：每次命令只解析一个 VM Service URI，不再使用 registry / 多实例命名实例。
+MCP 与 `fcc` 共用会话，可启动多台设备；每条 UI 操作命令只作用于一个 App。
 
 ## When to Use
 
@@ -28,65 +28,24 @@ fcc --version
 fcc help-ai
 ```
 
-本项目通常通过 `scripts/flutter_run.sh` 启动 Flutter，并自动写入项目根目录的 `.vm_service_uri`：
+### 启动和选择目标
 
-```bash
-./scripts/flutter_run.sh -d <device-id>
-```
+在 Flutter 工程目录运行 `fcc apps`，它会通过 DTD 发现已运行的 debug App。也可以用 `fcc --project <目录>` 指定工程；本仓库从根目录调用时传 `--project example`。
 
-如果 `.vm_service_uri` 不存在或过期，先重新启动 Flutter debug 会话。
+- 没有 App 时运行 `fcc up`。一台可用真机时直接启动；有多个候选时由用户选择。终端可输入 `1,2`，脚本可重复传 `-d <device-id>`。
+- 使用 `--json` 时，`selection_required` 的候选在 stderr，先让用户选择再重试。会话列表和操作结果在 stdout。
+- 多个 App 可用时，操作命令用 `--app <id>` 指定目标。断线后先重新列出会话；只有能确认是同一个 App 时才自动重连。
+- `--uri` 可显式直连；未指定 `--app` 时也可用环境变量 `FLUTTER_COPILOT_URI`。要把显式地址加入共享会话，使用 `fcc connect --uri <uri>`。
 
-## Target Resolution
+### 常用连接命令
 
-目标 URI 解析优先级从高到低：
-
-1. `--uri ws://...`：本次命令显式指定
-2. `FLUTTER_COPILOT_URI`：环境变量
-3. `.vm_service_uri`：从当前目录或父目录查找最近的 URI 文件
-
-常用检查：
-
-```bash
-test -s .vm_service_uri && cat .vm_service_uri
-fcc doctor
-```
-
-也可以显式指定：
-
-```bash
-fcc --uri "$(cat .vm_service_uri)" doctor
-```
-
-## Connection Commands
-
-`connect` 会校验 URI 并写入当前工作目录的 `.vm_service_uri`。
-
-以下写法均应可用：
-
-```bash
-fcc connect --uri ws://127.0.0.1:8181/abc/ws
-fcc connect --uri=ws://127.0.0.1:8181/abc/ws
-fcc --uri ws://127.0.0.1:8181/abc/ws connect
-```
-
-断开当前项目连接文件：
-
-```bash
-fcc disconnect
-```
-
-注意：`disconnect` 只删除最近的 `.vm_service_uri` 文件；CLI 没有常驻 socket。
-
-## Commands Reference
-
-### 连接与健康检查
-
-| 命令                      | 说明                                                        |
-| ------------------------- | ----------------------------------------------------------- |
-| `fcc doctor`              | 检查解析到的目标是否可连接，并确认 Flutter Copilot 扩展可用 |
-| `fcc connect --uri <uri>` | 校验 URI 并写入 `.vm_service_uri`                           |
-| `fcc disconnect`          | 删除最近的 `.vm_service_uri`                                |
-| `fcc help-ai`             | 输出机器可读命令表面，优先以它为准                          |
+| 命令 | 说明 |
+| --- | --- |
+| `fcc doctor` | 检查目标和 Copilot 扩展 |
+| `fcc up --no-wait` / `fcc status <operation-id>` | 后台启动并查询每台设备的结果 |
+| `fcc --app <id> disconnect` | 断开连接，保留 App |
+| `fcc --app <id> stop` / `detach` | 仅管理 Copilot 启动的会话；分别退出 App、保留 App |
+| `fcc help-ai` | 查看机器可读命令说明 |
 
 ### 查询与诊断
 
@@ -129,10 +88,10 @@ fcc hot-restart
 
 ```bash
 fcc --json watch --logs --rebuilds --interval 500
-fcc --watch-uri repl
+fcc repl
 ```
 
-`--watch-uri` 仅用于 `watch` / `repl`，用于 `.vm_service_uri` 变化时自动重连。
+`watch` 和 `repl` 只在能识别同一会话时重连。
 
 ### YAML 脚本回放
 
@@ -198,7 +157,7 @@ steps:
 
 ## Troubleshooting
 
-- **`No VM Service URI`**：确认 `.vm_service_uri` 存在且非空，或使用 `--uri` 显式指定。
+- **`app_not_found`**：用 `fcc apps` 检查项目和调试会话，或用 `fcc up` 启动。
 - **`ECONNREFUSED`**：URI 对应的 Flutter debug 会话已退出，重新启动 App 获取新 URI。
 - **`EPERM 127.0.0.1`**：当前执行环境不允许连接本机 VM Service，需要在允许本机 socket 的环境执行。
 - **`doctor` 成功但元素为空**：确认 App 侧已集成并注册 `flutter_copilot_claw` 扩展。

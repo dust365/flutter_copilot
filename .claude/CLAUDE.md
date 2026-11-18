@@ -51,7 +51,7 @@ Run commands from the repository root unless noted otherwise.
 
 ### Run the demo app
 - `cd example && flutter run`
-- `./scripts/flutter_run.sh -d <device>` — wraps `flutter run`, captures the VM Service URI, and writes it to `.vm_service_uri` at the repo root (also usable as a VS Code Dart extension `customTool`). The CLI auto-discovers targets from `FLUTTER_COPILOT_URI` or the nearest `.vm_service_uri`.
+- `fcc --project example apps` discovers running debug sessions through DTD; `fcc --project example up -d <device>` starts a session if needed. MCP uses `list_apps` and `ensure_apps`.
 
 ### Run the MCP server locally
 - `cd packages/flutter_copilot_mcp && dart run bin/flutter_copilot_mcp.dart`

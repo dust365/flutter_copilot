@@ -192,11 +192,7 @@ dart pub add dev:flutter_copilot_mcp
 flutter run
 ```
 
-从控制台拿到 VM Service URI，例如：
-
-```text
-ws://127.0.0.1:12345/ws
-```
+也可以跳过这步，在 MCP 中调用 `ensure_apps` 启动。
 
 ### 4. Configure the MCP server in your Agent
 
@@ -231,7 +227,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 
 完成配置后，推荐按下面的顺序使用：
 
-1. 调用 `connect`，传入 VM Service URI
+1. 调用 `list_apps`，传入 Flutter 工程 `directory`；没有 App 时调用 `ensure_apps`。多设备时确认目标并传 `app` ID
 2. 调用 `get_interactive_elements`、`take_screenshots`、`get_logs` 了解当前页面状态
 3. 再调用交互工具，例如：
    - `tap`
@@ -257,22 +253,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 
 如果你在觉得上面手动链接的方案，不方便，请使用项目使用本仓库内置的 `flutter-copilot` skill，可以使用更自动化的连接方案。
 
-这个 skill 会优先从项目根目录的 `.vm_service_uri` 文件读取当前 Flutter App 的 VM Service URI，再完成 Flutter Copilot MCP 连接。相比手动复制 URI，这种方式更适合持续调试、截图验证和热重载后的重复连接。
-
-推荐流程：
-
-1. 通过项目里的启动方式运行 Flutter App，例如 `scripts/flutter_run.sh` 或对应的 VS Code 启动配置
-2. 确认项目根目录下已经生成 `.vm_service_uri`
-3. 在 Claude Code 中使用 `flutter-copilot` skill，让它自动读取 URI 并连接
-4. 后续继续使用截图、点击、输入、滚动、热重载等能力
-
-这种方式特别适合：
-
-- 频繁重启 App 后重新连接
-- 需要快速截图或验证 UI 修改结果
-- 把 Flutter Copilot 作为其他 skill 的前置能力
-
-如果应用重启后 URI 变化，只需要重新使用 `flutter-copilot` skill，它会按新的 `.vm_service_uri` 重新连接。
+`flutter-copilot` skill 通过 `list_apps` 自动发现项目里的运行会话。没有可用的 App 时用 `ensure_apps`；有多个设备时由用户选择，再查看每台设备的启动结果。
 
 ## Flutter Copilot CLI
 
@@ -289,7 +270,7 @@ Cursor 通过 `.cursor/mcp.json` 读取 MCP 配置：
 | 能力                                          | `flutter_copilot_mcp` | `flutter_copilot_cli`         |
 | --------------------------------------------- | :-------------------: | ----------------------------- |
 | tap / drag / scroll / navigate / 日志 / 截图 |          ✅           | ✅                            |
-| 当前 App 连接管理                             |      `connect` 工具   | ✅ `.vm_service_uri` / `connect` |
+| 当前 App 连接管理                             | `list_apps` / `ensure_apps` | ✅ `apps` / `up` / `connect` |
 | 交互式 REPL                                   |          ❌           | ✅ `repl`                     |
 | 日志 / Rebuild 实时流                         |          ❌           | ✅ `watch --logs --rebuilds`  |
 | YAML playbook(CI/冒烟测试)                    |          ❌           | ✅ `run script.yaml`          |
@@ -325,25 +306,19 @@ void main() {
 }
 ```
 
-CLI 按如下顺序解析 VM Service URI,通常无需手动传入：
-
-1. `--uri <ws://...>` — 显式指定
-2. `FLUTTER_COPILOT_URI` 环境变量
-3. 当前目录或任一祖先目录下的 `.vm_service_uri` 文件
-
-推荐配合仓库内的 `scripts/flutter_run.sh` 使用,它会把 URI 写入 `.vm_service_uri`:
+`fcc apps` 自动发现 `flutter run` 已启动的 App；没有运行的 App 时，`fcc up` 启动它。多设备可重复传 `-d`。从本仓库根目录操作示例时，传 `--project example`。
 
 ```bash
-./scripts/flutter_run.sh -d macos       # 启动 App,自动写入 .vm_service_uri
-fcc doctor                              # 自动读取 URI 进行健康检查
-fcc --uri "$(cat .vm_service_uri)" doctor # 只检查显式传入的 URI
+cd example
+fcc up
+fcc doctor
 fcc get-interactive-elements            # 列出当前可交互元素
 fcc tap --text "点击"                   # 按文本点击
 fcc take-screenshots -o /tmp/shot.png   # 截图
 fcc hot-reload                          # 热重载
 ```
 
-或者手动保存当前项目连接：
+如果需要显式连接某个地址：
 
 ```bash
 fcc connect --uri ws://127.0.0.1:8181/abc/ws
@@ -356,8 +331,6 @@ fcc tap --text "点击"
 # 同时订阅日志与 rebuild 事件
 fcc watch --logs --rebuilds --interval 500
 
-# 配合 --watch-uri 可在 flutter 重启后自动重连
-fcc --watch-uri watch --rebuilds
 ```
 
 ### YAML Playbook(CI 场景)
