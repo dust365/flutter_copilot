@@ -1,82 +1,184 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dtd/dtd.dart';
 import 'package:flutter_copilot_mcp/src/session/app_directory.dart';
+import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
 import 'package:flutter_copilot_mcp/src/session/vm_service_uri.dart';
-import 'package:flutter_copilot_mcp/src/vm_service/vm_service_connector.dart';
 import 'package:logging/logging.dart' as logging;
 
-/// One subscription to a Dart Tooling Daemon.
-class _DtdConnection {
-  _DtdConnection(this.uri, this.client, this.subscription);
+typedef ProcessRunner = Future<ProcessResult> Function(
+    String executable, List<String> arguments);
+
+/// Tolerates both older workspaceRoot and newer multi-root DTD listings.
+class DtdInstance {
+  DtdInstance(this.uri, this.roots, this.ideName);
+
+  factory DtdInstance.fromJson(Map<String, dynamic> json) {
+    final roots = <String>{};
+    for (final value in [
+      json['workspaceRoot'],
+      json['workingDirectory'],
+      ...?json['workspaceRoots'] as List?,
+    ]) {
+      if (value is! String || value.isEmpty) continue;
+      final uri = Uri.tryParse(value);
+      roots.add(uri?.scheme == 'file' ? uri!.toFilePath() : value);
+    }
+    return DtdInstance(canonicalDtdUri(json['wsUri'] as String), roots.toList(),
+        json['ideName'] as String?);
+  }
 
   final String uri;
+  final List<String> roots;
+  final String? ideName;
+
+  Map<String, dynamic> toJson() => {
+        'uri': uri,
+        'workspaceRoots': roots,
+        'ideName': ideName,
+      };
+}
+
+class _DtdConnection {
+  _DtdConnection(this.client, this.subscription);
   final DartToolingDaemon client;
   final StreamSubscription<DTDEvent> subscription;
-
   Future<void> close() async {
     await subscription.cancel();
     await client.close();
   }
 }
 
-/// Finds apps through DTD and keeps the [AppDirectory] in sync with them.
+/// Discovers DTDs, subscribes before taking snapshots, and reconciles VM events.
+/// A display name is deliberately never used to replace an existing session.
 class DtdRegistry {
-  DtdRegistry(this.apps) : _logger = logging.Logger('DtdRegistry');
+  DtdRegistry(this.apps, {this.dartExecutable = 'dart', ProcessRunner? run})
+      : _run = run ?? ((exe, args) => Process.run(exe, args));
 
   final AppDirectory apps;
-  final logging.Logger _logger;
+  final String dartExecutable;
+  final ProcessRunner _run;
+  final _logger = logging.Logger('DtdRegistry');
   final Map<String, _DtdConnection> _connections = {};
+  final Map<String, Future<String>> _connecting = {};
+  final Map<String, int> _revisions = {};
+  final List<String> diagnostics = [];
+  bool _closed = false;
+  Future<void>? _refreshing;
 
-  /// Runs `dart tooling-daemon --list` and remembers the text for empty-table errors.
-  Future<String> list() async {
-    final result = await Process.run('dart', ['tooling-daemon', '--list']);
-    final stdoutText = (result.stdout as String).trim();
-    final stderrText = (result.stderr as String).trim();
-    final text = [
-      if (stdoutText.isNotEmpty) stdoutText,
-      if (stderrText.isNotEmpty) stderrText,
-    ].join('\n');
-    final listing = text.isEmpty
-        ? 'dart tooling-daemon --list exited ${result.exitCode} with no output.'
-        : text;
-    apps.dtdListing = listing;
-    return listing;
+  Future<List<DtdInstance>> instances() async {
+    final result =
+        await _run(dartExecutable, ['tooling-daemon', '--list', '--machine'])
+            .timeout(const Duration(seconds: 10));
+    if (result.exitCode != 0) {
+      throw StateError('DTD discovery failed: ${result.stderr}. '
+          'This SDK must support dart tooling-daemon --list --machine.');
+    }
+    final output = (result.stdout as String).trim();
+    if (output.isEmpty) return [];
+    final decoded = jsonDecode(output);
+    if (decoded is! List) throw const FormatException('Invalid DTD listing');
+    final instances = <DtdInstance>[];
+    for (final entry in decoded) {
+      try {
+        instances
+            .add(DtdInstance.fromJson(Map<String, dynamic>.from(entry as Map)));
+      } catch (e) {
+        diagnostics.add('Ignored invalid DTD entry: $e');
+      }
+    }
+    return instances;
   }
 
-  /// Connects [rawUri], pulls apps already registered there, and subscribes to
-  /// later registrations. Calling it again for the same address refreshes the list.
-  Future<String> connect(String rawUri) async {
-    final uri = canonicalDtdUri(rawUri);
-    final existing = _connections[uri];
-    if (existing != null) {
-      if (!existing.client.isClosed) {
-        final summary = await _pull(existing);
-        return 'Already connected to $uri.\n$summary';
-      }
-      await existing.close();
-      _connections.remove(uri);
-    }
+  Future<String> list() async {
+    final result =
+        jsonEncode((await instances()).map((e) => e.toJson()).toList());
+    apps.dtdListing = result;
+    return result;
+  }
 
-    final client = await DartToolingDaemon.connect(Uri.parse(uri));
+  Future<void> refresh() => _refreshing ??= _refresh().whenComplete(() {
+        _refreshing = null;
+      });
+
+  Future<void> _refresh() async {
+    if (_closed) return;
+    diagnostics.clear();
+    final found = await instances();
+    for (var start = 0; start < found.length; start += 4) {
+      await Future.wait(found.skip(start).take(4).map((instance) async {
+        try {
+          await connect(instance.uri);
+        } catch (e) {
+          diagnostics.add('DTD ${instance.uri}: $e');
+        }
+      }));
+    }
+  }
+
+  Future<String> connect(String rawUri) {
+    final uri = canonicalDtdUri(rawUri);
+    return _connecting[uri] ??= _connect(uri).whenComplete(() {
+      _connecting.remove(uri);
+    });
+  }
+
+  Future<String> _connect(String uri) async {
+    if (_closed) throw StateError('DTD registry is closed');
+    var existing = _connections[uri];
+    if (existing != null && existing.client.isClosed) {
+      _connections.remove(uri);
+      await existing.close();
+      existing = null;
+    }
+    if (existing != null) {
+      await _pull(uri, existing.client);
+      return 'Refreshed $uri.\n${apps.describeAll}';
+    }
+    final client = await DartToolingDaemon.connect(Uri.parse(uri))
+        .timeout(const Duration(seconds: 5));
     StreamSubscription<DTDEvent>? subscription;
     try {
-      await _rejectVmService(client, uri);
-      subscription = client.onVmServiceUpdate().listen(
-        (event) {
-          unawaited(_onEvent(uri, event));
-        },
-        onError: (Object err, StackTrace stack) {
-          _logger.warning('DTD event stream failed for $uri', err, stack);
-        },
-      );
-      await client.streamListen(ConnectedAppServiceConstants.serviceName);
-      final connection = _DtdConnection(uri, client, subscription);
+      // A successful websocket handshake alone does not distinguish DDS and DTD.
+      final services = await client
+          .getRegisteredServices()
+          .timeout(const Duration(seconds: 3));
+      if (!services.dtdServices
+          .contains(ConnectedAppServiceConstants.serviceName)) {
+        throw const FormatException(
+            'This endpoint does not support ConnectedApp. '
+            'Use a DTD endpoint from list_dtds, or connect for a VM service URI.');
+      }
+      subscription = client.onVmServiceUpdate().listen((event) {
+        final raw = event.data['uri']?.toString();
+        if (raw == null) return;
+        final key = '$uri|$raw';
+        final revision = (_revisions[key] ?? 0) + 1;
+        _revisions[key] = revision;
+        if (event.kind == ConnectedAppServiceConstants.vmServiceUnregistered) {
+          unawaited(apps.removeByUri(raw));
+        } else if (event.kind ==
+            ConnectedAppServiceConstants.vmServiceRegistered) {
+          unawaited(_register(uri, client, event.data, key, revision,
+              wait: const Duration(seconds: 15)));
+        }
+      }, onError: (Object e, StackTrace stack) {
+        _logger.warning('DTD stream failed', e, stack);
+      });
+      await client
+          .streamListen(ConnectedAppServiceConstants.serviceName)
+          .timeout(const Duration(seconds: 3));
+      if (_closed) throw StateError('DTD registry is closed');
+      final connection = _DtdConnection(client, subscription);
       _connections[uri] = connection;
-      final summary = await _pull(connection);
-      return 'Connected to $uri.\n$summary';
-    } catch (err) {
+      unawaited(client.done.then((_) {
+        if (identical(_connections[uri], connection)) _connections.remove(uri);
+      }));
+      await _pull(uri, client);
+      return 'Connected $uri.\n${apps.describeAll}';
+    } catch (_) {
       _connections.remove(uri);
       await subscription?.cancel();
       await client.close();
@@ -84,140 +186,74 @@ class DtdRegistry {
     }
   }
 
-  /// Drops the DTD subscription and the sessions that came from it.
-  ///
-  /// A `flutter run` this server started is not killed.
+  Future<void> _pull(String uri, DartToolingDaemon client) async {
+    final response =
+        await client.getVmServices().timeout(const Duration(seconds: 5));
+    for (final info in response.vmServicesInfos) {
+      final key = '$uri|${info.uri}';
+      await _register(uri, client, info.toJson(), key, _revisions[key] ?? 0,
+          wait: const Duration(seconds: 2));
+    }
+  }
+
+  Future<void> _register(String dtdUri, DartToolingDaemon client,
+      Map<String, dynamic> data, String key, int revision,
+      {required Duration wait}) async {
+    final raw = data['uri'] as String?;
+    if (raw == null || _closed || (_revisions[key] ?? 0) != revision) return;
+    try {
+      // fcc/MCP run on the development host. exposedUri is for remote frontends.
+      final session = await apps.connectUri(
+        uri: raw,
+        dtdUri: dtdUri,
+        displayName: data['name'] as String?,
+        waitForExtension: wait,
+      );
+      if (_closed || (_revisions[key] ?? 0) != revision) {
+        await apps.removeByUri(raw);
+        return;
+      }
+      try {
+        final response = await client
+            .call('Editor', 'getDebugSessions')
+            .timeout(const Duration(seconds: 2));
+        for (final entry in response.result['debugSessions'] as List? ?? []) {
+          if (entry is! Map || entry['vmServiceUri'] == null) continue;
+          if (normalizeVmServiceUri(entry['vmServiceUri'] as String) !=
+              session.uri) continue;
+          session.deviceId =
+              entry['flutterDeviceId'] as String? ?? session.deviceId;
+          session.mode = entry['flutterMode'] as String? ?? session.mode;
+          final root = entry['projectRootPath'] as String?;
+          if (root != null && Directory(root).existsSync()) {
+            session.projectRoot = canonicalDirectory(root);
+          }
+        }
+      } catch (_) {
+        // Editor services are optional, including in AS/IDEA and flutter run.
+      }
+    } catch (e, stack) {
+      diagnostics.add('Could not connect ${data['name'] ?? raw}: $e');
+      _logger.fine('Skipping VM service', e, stack);
+    }
+  }
+
   Future<String> disconnect(String rawUri) async {
     final uri = canonicalDtdUri(rawUri);
     final connection = _connections.remove(uri);
-    if (connection == null) {
-      return 'Not connected to DTD $uri.';
-    }
-    await connection.close();
-    final victims = apps.sessionsForDtd(uri);
-    for (final session in victims) {
+    await connection?.close();
+    for (final session in apps.sessionsForDtd(uri)) {
       await apps.removeSession(session);
     }
-    if (victims.isEmpty) {
-      return 'Disconnected DTD $uri.';
-    }
-    final names = victims.map((session) => session.id).join(', ');
-    return 'Disconnected DTD $uri and removed $names. '
-        'flutter run processes started by this server are still running until stop_app.';
+    return 'Disconnected DTD $uri. Owned flutter runs remain running.';
   }
 
   Future<void> close() async {
-    final connections = List<_DtdConnection>.of(_connections.values);
+    _closed = true;
+    final connections = _connections.values.toList();
     _connections.clear();
     for (final connection in connections) {
       await connection.close();
     }
-  }
-
-  Future<String> _pull(_DtdConnection connection) async {
-    final response = await connection.client.getVmServices();
-    final connected = <String>[];
-    final skipped = <String>[];
-    final seen = <String>{};
-
-    for (final info in response.vmServicesInfos) {
-      final raw = _preferredUri(info.uri, info.exposedUri);
-      if (raw == null || !seen.add(raw)) continue;
-      try {
-        final session = await apps.connectUri(
-          uri: raw,
-          id: info.name,
-          dtdUri: connection.uri,
-          waitForExtension: const Duration(seconds: 2),
-        );
-        connected.add(session.describe());
-      } on NoCopilotExtensionException {
-        skipped.add(info.name ?? raw);
-      }
-    }
-
-    final buffer = StringBuffer();
-    if (connected.isEmpty) {
-      buffer.writeln('No Flutter Copilot apps on this DTD.');
-    } else {
-      buffer.writeln('Apps:');
-      for (final line in connected) {
-        buffer.writeln('- $line');
-      }
-    }
-    if (skipped.isNotEmpty) {
-      buffer.writeln(
-        'Skipped (FlutterCopilotBinding is not initialized):',
-      );
-      for (final line in skipped) {
-        buffer.writeln('- $line');
-      }
-    }
-    return buffer.toString().trimRight();
-  }
-
-  Future<void> _onEvent(String dtdUri, DTDEvent event) async {
-    final raw = _preferredUri(
-      event.data['uri']?.toString(),
-      event.data['exposedUri']?.toString(),
-    );
-    if (raw == null) {
-      _logger.warning('DTD ${event.kind} event had no uri: ${event.data}');
-      return;
-    }
-
-    if (event.kind == ConnectedAppServiceConstants.vmServiceUnregistered) {
-      await apps.removeByUri(raw);
-      return;
-    }
-    if (event.kind != ConnectedAppServiceConstants.vmServiceRegistered) {
-      return;
-    }
-
-    final name = event.data['name']?.toString();
-    try {
-      await apps.connectUri(
-        uri: raw,
-        id: name,
-        dtdUri: dtdUri,
-        replaceSameId: name != null && name.isNotEmpty,
-        waitForExtension: const Duration(seconds: 15),
-      );
-    } on NoCopilotExtensionException {
-      _logger.info('Skipping $raw ($name): flutter_copilot is not initialized');
-    } catch (err, stack) {
-      _logger.warning('Failed to connect app from DTD event $raw', err, stack);
-    }
-  }
-
-  Future<void> _rejectVmService(DartToolingDaemon client, String uri) async {
-    try {
-      final response = await client.call(null, 'getVM');
-      final looksLikeVm =
-          response.type == 'VM' || response.result['isolates'] != null;
-      if (looksLikeVm) {
-        throw FormatException(
-          '$uri is a VM service address, not a DTD. '
-          'Use connect with the ws:// address.',
-        );
-      }
-    } catch (err) {
-      if (err is FormatException) rethrow;
-      if (_isMethodNotFound(err)) return;
-      rethrow;
-    }
-  }
-
-  String? _preferredUri(String? uri, String? exposedUri) {
-    final preferred =
-        (exposedUri != null && exposedUri.isNotEmpty) ? exposedUri : uri;
-    if (preferred == null || preferred.isEmpty) return null;
-    return preferred;
-  }
-
-  bool _isMethodNotFound(Object error) {
-    final text = error.toString();
-    return text.contains('-32601') ||
-        text.toLowerCase().contains('method not found');
   }
 }

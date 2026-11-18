@@ -2,6 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter_copilot_mcp/src/session/vm_service_uri.dart';
 
+List<Map<String, dynamic>> machineMessages(String line) {
+  final decoded = _tryDecode(line.trim());
+  if (decoded == null) return [];
+  return (decoded is List ? decoded : [decoded])
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
+}
+
 /// Addresses discovered from one `flutter run --machine` line.
 class MachineLine {
   const MachineLine({this.wsUri, this.dtdUri});
@@ -60,6 +69,8 @@ class FlutterDevice {
     required this.supported,
     required this.targetPlatform,
     required this.emulator,
+    this.physicalId,
+    this.transports = const [],
   });
 
   final String id;
@@ -67,6 +78,22 @@ class FlutterDevice {
   final bool supported;
   final String targetPlatform;
   final bool emulator;
+  final String? physicalId;
+  final List<String> transports;
+
+  bool matches(String value) => id == value || transports.contains(value);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'supported': supported,
+        'targetPlatform': targetPlatform,
+        'emulator': emulator,
+        'physicalId': physicalId,
+        'transports': transports.isEmpty ? [id] : transports,
+        'physical': !emulator &&
+            (targetPlatform.startsWith('android') || targetPlatform == 'ios'),
+      };
 
   String describe() {
     final where = emulator ? 'emulator' : 'device';
@@ -108,6 +135,33 @@ List<FlutterDevice> parseFlutterDevices(String output) {
 String formatFlutterDevices(List<FlutterDevice> devices) {
   if (devices.isEmpty) return 'No devices reported by flutter devices.';
   return devices.map((device) => '- ${device.describe()}').join('\n');
+}
+
+/// Merge only transports whose physical serial has been verified by adb.
+List<FlutterDevice> mergeDeviceTransports(
+    List<FlutterDevice> devices, Map<String, String> identities) {
+  final groups = <String, List<FlutterDevice>>{};
+  for (final device in devices) {
+    final serial = identities[device.id];
+    final key = serial == null ? 'transport:${device.id}' : 'physical:$serial';
+    groups.putIfAbsent(key, () => []).add(device);
+  }
+  return groups.values.map((group) {
+    final ordered = group.toList()
+      ..sort((a, b) {
+        bool wireless(String id) => id.contains(':') || id.contains('._adb');
+        return (wireless(a.id) ? 1 : 0).compareTo(wireless(b.id) ? 1 : 0);
+      });
+    final device = ordered.first;
+    return FlutterDevice(
+        id: device.id,
+        name: device.name,
+        supported: device.supported,
+        targetPlatform: device.targetPlatform,
+        emulator: device.emulator,
+        physicalId: identities[device.id],
+        transports: group.map((d) => d.id).toList());
+  }).toList();
 }
 
 Object? _tryDecode(String text) {

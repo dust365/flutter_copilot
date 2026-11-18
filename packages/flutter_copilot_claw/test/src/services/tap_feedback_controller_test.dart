@@ -4,14 +4,12 @@ import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 
 void main() {
   group('TapFeedbackController', () {
-    testWidgets('default lifetime matches the eight second reference hint', (
-      tester,
-    ) async {
+    testWidgets('default lifetime is 1.2 seconds', (tester) async {
       final controller = TapFeedbackController();
       addTearDown(controller.dispose);
       controller.showAt(const Offset(20, 20));
 
-      await tester.pump(const Duration(milliseconds: 7999));
+      await tester.pump(const Duration(milliseconds: 1199));
       expect(controller.state.value, isNotNull);
       await tester.pump(const Duration(milliseconds: 1));
       expect(controller.state.value, isNull);

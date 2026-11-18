@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
 import 'package:logging/logging.dart' as logging;
+import 'package:path/path.dart' as p;
 import 'package:vm_service/vm_service.dart';
 import 'package:vm_service/vm_service_io.dart';
 
@@ -103,7 +106,13 @@ class VmServiceConnector {
     final generation = _generation;
 
     try {
-      final service = await vmServiceConnectUri(uri);
+      final pending = vmServiceConnectUri(uri);
+      final service =
+          await pending.timeout(const Duration(seconds: 5), onTimeout: () {
+        unawaited(pending.then((lateService) => lateService.dispose(),
+            onError: (Object _) {}));
+        throw TimeoutException('VM service handshake timed out');
+      });
       _service = service;
       connectedUri = uri;
       _serviceEventSubscription = service.onServiceEvent.listen((e) {
@@ -125,7 +134,9 @@ class VmServiceConnector {
             _logger.info('Service event: $e');
         }
       });
-      await service.streamListen(EventStreams.kService);
+      await service
+          .streamListen(EventStreams.kService)
+          .timeout(const Duration(seconds: 5));
       unawaited(
         service.onDone.then((_) {
           if (generation != _generation || !identical(_service, service)) {
@@ -202,6 +213,43 @@ class VmServiceConnector {
         return null;
       },
     );
+  }
+
+  /// Best-effort runtime metadata; display names are never used as identity.
+  Future<Map<String, dynamic>> describeApp() async {
+    _ensureConnected();
+    final vm = await _service!.getVM().timeout(const Duration(seconds: 5));
+    final isolateId = await _findIsolateWithFlutterCopilotExtensions();
+    final isolate = await _service!
+        .getIsolate(isolateId)
+        .timeout(const Duration(seconds: 5));
+    var entry = isolate.rootLib?.uri;
+    if (entry?.startsWith('package:') == true) {
+      try {
+        final resolved = await _service!.lookupResolvedPackageUris(
+            isolateId, [entry!]).timeout(const Duration(seconds: 3));
+        entry = resolved.uris?.firstOrNull ?? entry;
+      } catch (_) {
+        // Older VMs and web backends may not support package URI resolution.
+      }
+    }
+    String? root;
+    final uri = entry == null ? null : Uri.tryParse(entry);
+    if (uri?.scheme == 'file') {
+      try {
+        final file = File.fromUri(uri!);
+        if (file.existsSync()) root = projectDirectory(p.dirname(file.path));
+      } catch (_) {
+        // Remote source paths are not necessarily accessible on this host.
+      }
+    }
+    return {
+      'platform': vm.operatingSystem,
+      if (root != null) 'projectRoot': root,
+      if (entry != null) 'target': entry,
+      'hotReload': _registeredServices.containsKey('reloadSources'),
+      'hotRestart': _registeredServices.containsKey('hotRestart'),
+    };
   }
 
   /// Ensures that there is an active connection.

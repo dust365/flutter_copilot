@@ -6,14 +6,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 
 const Color _kError = Color(0xFFF44336);
-const Color _kWarning = Color(0xFFFF9800);
 const Color _kHalo = Color(0xFFFFFFFF);
 
 /// Paints the latest copilot gesture on top of the app.
 ///
-/// The mark matches the automation hint: an orange rectangle around the
-/// target, a red ring and center dot at the hit point, and a straight arrow
-/// for a drag or swipe. Long press and double tap add a second ring.
+/// Paints a red ring and translucent center dot at the hit point, and a
+/// straight arrow for a drag or swipe. Long press and double tap add a
+/// second ring.
 /// The overlay is [IgnorePointer], so the mark does not receive the synthetic
 /// pointer events. It is part of the layer tree and shows up in screenshots
 /// taken while it is visible.
@@ -70,16 +69,6 @@ class _GestureFeedbackPainter extends CustomPainter {
     canvas.save();
     canvas.transform(transform.storage);
 
-    final Rect? bounds = state.bounds;
-    if (bounds != null && !bounds.isEmpty) {
-      _outline(
-        canvas,
-        Path()..addRect(bounds),
-        stroke,
-        color: _kWarning,
-      );
-    }
-
     if (state.kind == TapFeedbackKind.drag && state.path.length >= 2) {
       _paintArrow(canvas, state.path.first, state.path.last, stroke);
     }
@@ -90,7 +79,7 @@ class _GestureFeedbackPainter extends CustomPainter {
         state.kind == TapFeedbackKind.doubleTap) {
       _circle(canvas, point, radius * 1.4, stroke);
     }
-    canvas.drawCircle(point, 3, Paint()..color = _kError);
+    canvas.drawCircle(point, 3, Paint()..color = _kError.withAlpha(191));
     canvas.restore();
   }
 
@@ -126,9 +115,8 @@ class _GestureFeedbackPainter extends CustomPainter {
   void _outline(
     Canvas canvas,
     Path path,
-    double stroke, {
-    Color color = _kError,
-  }) {
+    double stroke,
+  ) {
     canvas.drawPath(
       path,
       Paint()
@@ -139,7 +127,7 @@ class _GestureFeedbackPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = color
+        ..color = _kError
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke,
     );
@@ -150,7 +138,6 @@ class _GestureFeedbackPainter extends CustomPainter {
     final TapFeedbackState previous = oldDelegate.state;
     return previous.kind != state.kind ||
         previous.position != state.position ||
-        previous.bounds != state.bounds ||
         !listEquals(previous.path, state.path);
   }
 }

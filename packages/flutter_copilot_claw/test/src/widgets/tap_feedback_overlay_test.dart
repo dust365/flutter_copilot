@@ -1,15 +1,17 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
+import 'package:flutter_copilot_claw/src/widgets/tap_feedback_navigation_guard.dart';
 import 'package:flutter_copilot_claw/src/widgets/tap_feedback_overlay.dart';
 
 void main() {
   group('TapFeedbackOverlay', () {
-    testWidgets('paints a hit point and the widget border', (tester) async {
+    testWidgets('paints a translucent hit point without a widget border',
+        (tester) async {
       final TapFeedbackController controller = TapFeedbackController(
         duration: const Duration(seconds: 5),
       );
@@ -26,8 +28,11 @@ void main() {
 
       final _Shot image = await _capture(tester);
       expect(_isErrorRed(image.at(100, 80)), isTrue);
+      expect(image.at(100, 80).a, closeTo(191, 1));
       expect(image.at(40, 50).a, 0);
-      expect(_hasWarningStroke(image, 30, 80), isTrue);
+      expect(image.at(30, 80).a, 0);
+      expect(image.at(100, 40).a, 0);
+      expect(image.at(170, 80).a, 0);
       expect(image.at(8, 8).a, 0);
       expect(find.byType(IgnorePointer), findsOneWidget);
       controller.dispose();
@@ -102,7 +107,7 @@ void main() {
 
       final image = await _capture(tester);
       expect(_isErrorRed(image.at(100, 100)), isTrue);
-      expect(_hasWarningStroke(image, 40, 100), isTrue);
+      expect(image.at(40, 100).a, 0);
       expect(image.at(124, 160).a, 0);
 
       controller.showDrag(const [Offset(100, 100), Offset(100, 250)]);
@@ -111,6 +116,74 @@ void main() {
       expect(_isErrorRed(drag.at(100, 180)), isTrue);
       expect(_isErrorRed(drag.at(104, 243)), isTrue);
       expect(drag.at(124, 200).a, 0);
+      controller.dispose();
+    });
+  });
+
+  group('TapFeedbackNavigationGuard', () {
+    testWidgets('clears the mark when a route is pushed or popped', (
+      tester,
+    ) async {
+      final TapFeedbackController controller = TapFeedbackController(
+        duration: const Duration(seconds: 5),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TapFeedbackNavigationGuard(
+          controller: controller,
+          child: MaterialApp(
+            home: Builder(
+              builder: (BuildContext context) {
+                return TextButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => const Text('next'),
+                      ),
+                    );
+                  },
+                  child: const Text('open'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      controller.showTap(position: const Offset(10, 10));
+      await tester.tap(find.text('open'));
+      await tester.pump();
+      expect(controller.state.value, isNull);
+
+      await tester.pumpAndSettle();
+      controller.showTap(position: const Offset(10, 10));
+      Navigator.of(tester.element(find.text('next'))).pop();
+      await tester.pump();
+      expect(controller.state.value, isNull);
+      controller.dispose();
+    });
+
+    testWidgets('keeps the mark when the route stack does not change', (
+      tester,
+    ) async {
+      final TapFeedbackController controller = TapFeedbackController(
+        duration: const Duration(seconds: 5),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        TapFeedbackNavigationGuard(
+          controller: controller,
+          child: const MaterialApp(home: Text('home')),
+        ),
+      );
+      await tester.pump();
+
+      controller.showTap(position: const Offset(10, 10));
+      await tester.pump();
+      expect(controller.state.value, isNotNull);
       controller.dispose();
     });
   });
@@ -145,7 +218,9 @@ Future<_Shot> _capture(WidgetTester tester) async {
       tester.renderObject<RenderRepaintBoundary>(find.byType(RepaintBoundary));
   final _Shot? shot = await tester.runAsync(() async {
     final ui.Image image = await boundary.toImage(pixelRatio: 1);
-    final ByteData? data = await image.toByteData();
+    final ByteData? data = await image.toByteData(
+      format: ui.ImageByteFormat.rawStraightRgba,
+    );
     final _Shot captured = _Shot(data!, image.width, image.height);
     image.dispose();
     return captured;
@@ -185,16 +260,4 @@ bool _isErrorRed(_Pixel pixel) {
       (pixel.g - 67).abs() < 40 &&
       (pixel.b - 54).abs() < 40 &&
       pixel.a > 180;
-}
-
-bool _hasWarningStroke(_Shot image, int x, int y) {
-  for (var dy = -2; dy <= 2; dy++) {
-    for (var dx = -2; dx <= 2; dx++) {
-      final _Pixel pixel = image.at(x + dx, y + dy);
-      if (pixel.r > 200 && pixel.g > 100 && pixel.b < 80 && pixel.a > 80) {
-        return true;
-      }
-    }
-  }
-  return false;
 }

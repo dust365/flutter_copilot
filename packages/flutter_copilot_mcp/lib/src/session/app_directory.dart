@@ -21,6 +21,13 @@ class AppSession {
     this.deviceId,
     this.dtdUri,
     this.process,
+    this.projectRoot,
+    this.target,
+    this.platform,
+    this.displayName,
+    this.flavor,
+    this.mode = 'debug',
+    this.launchArgs,
   });
 
   String id;
@@ -29,6 +36,28 @@ class AppSession {
   String? dtdUri;
   VmServiceConnector connector;
   OwnedProcess? process;
+  String? projectRoot;
+  String? target;
+  String? platform;
+  String? displayName;
+  String? flavor;
+  String mode;
+  List<String>? launchArgs;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'uri': uri,
+        'name': displayName ?? id,
+        'deviceId': deviceId,
+        'projectRoot': projectRoot,
+        'target': target,
+        'platform': platform,
+        'flavor': flavor,
+        'mode': mode,
+        'launchArgs': launchArgs,
+        'owned': launched,
+        'state': connector.isConnected ? 'connected' : 'disconnected',
+      };
 
   bool get launched => process != null;
 
@@ -56,6 +85,10 @@ class AppSelectionException implements Exception {
 /// The in-memory table of DDS connections for this MCP process.
 class AppDirectory {
   final List<AppSession> _sessions = [];
+  final Map<String, Future<AppSession>> _connecting = {};
+  int _nextId = 1;
+  final String _epoch = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
+  bool _closed = false;
 
   /// Last `dart tooling-daemon --list` output, included when no app is connected.
   String? dtdListing;
@@ -120,7 +153,53 @@ class AppDirectory {
     OwnedProcess? process,
     bool replaceSameId = false,
     Duration? waitForExtension,
+    String? projectRoot,
+    String? target,
+    String? displayName,
+    String? flavor,
+    String? mode,
+    List<String>? launchArgs,
   }) async {
+    final normalized = normalizeVmServiceUri(uri);
+    final pending = _connecting[normalized];
+    if (pending != null) {
+      await pending;
+    }
+    final future = _connectUri(
+      uri: normalized,
+      id: id,
+      deviceId: deviceId,
+      dtdUri: dtdUri,
+      process: process,
+      replaceSameId: replaceSameId,
+      waitForExtension: waitForExtension,
+    );
+    _connecting[normalized] = future;
+    try {
+      final session = await future;
+      session.projectRoot = projectRoot ?? session.projectRoot;
+      session.target = target ?? session.target;
+      session.displayName = displayName ?? session.displayName;
+      session.flavor = flavor ?? session.flavor;
+      if (mode != null) session.mode = mode;
+      session.launchArgs = launchArgs ?? session.launchArgs;
+      return session;
+    } finally {
+      if (identical(_connecting[normalized], future))
+        _connecting.remove(normalized);
+    }
+  }
+
+  Future<AppSession> _connectUri({
+    required String uri,
+    String? id,
+    String? deviceId,
+    String? dtdUri,
+    OwnedProcess? process,
+    bool replaceSameId = false,
+    Duration? waitForExtension,
+  }) async {
+    if (_closed) throw StateError('App directory is closed');
     final normalized = normalizeVmServiceUri(uri);
     final existing = _findByUri(normalized);
     if (existing != null) {
@@ -130,7 +209,9 @@ class AppDirectory {
       return existing;
     }
 
-    final base = (id == null || id.trim().isEmpty) ? normalized : id.trim();
+    final base = (id == null || id.trim().isEmpty)
+        ? 'app-$_epoch-${_nextId++}'
+        : id.trim();
     final clash = _findById(base);
     if (clash != null && replaceSameId) {
       await _retarget(
@@ -152,13 +233,33 @@ class AppDirectory {
       rethrow;
     }
 
+    Map<String, dynamic> metadata = {};
+    try {
+      metadata = await connector.describeApp();
+    } catch (_) {
+      // Explicit URI connections still work without optional runtime metadata.
+    }
+    if (_closed) {
+      await connector.disconnect();
+      throw StateError('App directory is closed');
+    }
+    final platform = metadata['platform'] as String?;
+    final desktopDevice = switch (platform) {
+      'macos' => 'macos',
+      'linux' => 'linux',
+      'windows' => 'windows',
+      _ => null,
+    };
     final session = AppSession(
       id: clash == null ? base : _suffixedId(base, normalized),
       uri: normalized,
       connector: connector,
-      deviceId: deviceId,
+      deviceId: deviceId ?? desktopDevice,
       dtdUri: dtdUri,
       process: process,
+      projectRoot: metadata['projectRoot'] as String?,
+      target: metadata['target'] as String?,
+      platform: platform,
     );
     _bind(session, connector);
     _sessions.add(session);
@@ -200,6 +301,7 @@ class AppDirectory {
   }
 
   Future<void> close() async {
+    _closed = true;
     final copy = List<AppSession>.of(_sessions);
     for (final session in copy) {
       await removeSession(session);

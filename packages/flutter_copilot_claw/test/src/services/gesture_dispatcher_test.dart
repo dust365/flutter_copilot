@@ -63,6 +63,31 @@ void main() {
       expect(taps, hasLength(2));
     });
 
+    testWidgets('a route change drops the mark drawn after the tap', (
+      tester,
+    ) async {
+      var epoch = 0;
+      final List<Offset> taps = <Offset>[];
+      final GestureDispatcher dispatcher = GestureDispatcher(
+        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
+            taps.add(position),
+        routeEpoch: () => epoch,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      final Future<void> gesture = dispatcher.tap(
+        const CoordinatesMatcher(12, 34),
+        finder,
+        configuration,
+      );
+      expect(taps, hasLength(1));
+      epoch = 1;
+
+      await tester.pump(const Duration(milliseconds: 400));
+      await gesture;
+      expect(taps, hasLength(1));
+    });
+
     testWidgets('drag reports the pointer polyline before and after', (
       tester,
     ) async {

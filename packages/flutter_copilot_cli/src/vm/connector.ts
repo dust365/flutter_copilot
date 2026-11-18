@@ -110,7 +110,9 @@ export class FlutterCopilotConnector {
     extension: string,
     args: Record<string, unknown> = {},
   ): Promise<T> {
-    const isolateId = this.requireIsolate();
+    this.requireIsolate();
+    const isolateId = await findFlutterCopilotIsolate(this.client);
+    this.isolateId = isolateId;
     let result: Record<string, unknown>;
     try {
       result = await this.client.callServiceExtension<Record<string, unknown>>(
@@ -212,7 +214,9 @@ export class FlutterCopilotConnector {
   }
 
   async hotReload(): Promise<boolean> {
-    const isolateId = this.requireIsolate();
+    this.requireIsolate();
+    const isolateId = await findFlutterCopilotIsolate(this.client);
+    this.isolateId = isolateId;
     // Under DDS (the usual `flutter run` case), `reloadSources` is re-registered
     // by flutter_tools as e.g. `s0.reloadSources`. The plain `reloadSources`
     // call bypasses flutter_tools and fails with "Error while starting Kernel
@@ -231,7 +235,9 @@ export class FlutterCopilotConnector {
   }
 
   async hotRestart(): Promise<boolean> {
-    const isolateId = this.requireIsolate();
+    this.requireIsolate();
+    const isolateId = await findFlutterCopilotIsolate(this.client);
+    this.isolateId = isolateId;
     // `flutter run` registers `s0.hotRestart`. There is no VM fallback:
     // a bare Dart VM cannot re-run main().
     const registered = await this.client.waitForServiceRegistration('hotRestart', 1000);

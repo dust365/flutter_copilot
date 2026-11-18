@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { withConnector, reconnectWithBackoff } from './base.js';
+import { withConnector, reconnectWithBackoff, followTarget } from './base.js';
 import type { VmEvent } from '../vm/client.js';
 import { UriFileWatcher } from '../vm/uri_watcher.js';
 import * as log from '../logging.js';
@@ -26,6 +26,7 @@ export function watchCommand(program: Command): void {
       }
 
       await withConnector(program, async (connector, target) => {
+        const stopFollowing = followTarget(connector, target);
         const client = connector.client;
 
         let rebuildTimer: NodeJS.Timeout | null = null;
@@ -67,7 +68,7 @@ export function watchCommand(program: Command): void {
         // --watch-uri: auto-reconnect when .vm_service_uri content changes.
         const watchUri = program.opts<{ watchUri?: boolean }>().watchUri === true;
         let uriWatcher: UriFileWatcher | null = null;
-        if (watchUri) {
+        if (watchUri && !target.refresh) {
           if (!target.autoUriPath) {
             process.stderr.write(
               chalk.yellow(
@@ -93,6 +94,7 @@ export function watchCommand(program: Command): void {
         }
 
         await stop;
+        stopFollowing();
         uriWatcher?.stop();
         if (rebuildTimer) clearInterval(rebuildTimer);
       });

@@ -3,7 +3,7 @@ import readline from 'node:readline';
 import chalk from 'chalk';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { withConnector, reconnectWithBackoff } from './base.js';
+import { withConnector, reconnectWithBackoff, followTarget } from './base.js';
 import { UriFileWatcher } from '../vm/uri_watcher.js';
 import { buildMatcher, type MatcherArgs } from '../matcher.js';
 import { resolveShotPath } from '../screenshot_path.js';
@@ -29,6 +29,7 @@ export function replCommand(program: Command): void {
     .description('Interactive shell for driving the app (multi-command session).')
     .action(async () => {
       await withConnector(program, async (connector, target) => {
+        const stopFollowing = followTarget(connector, target);
         const rl = readline.createInterface({
           input: process.stdin,
           output: process.stdout,
@@ -42,7 +43,7 @@ export function replCommand(program: Command): void {
         // --watch-uri: auto-reconnect on .vm_service_uri content change.
         const watchUri = program.opts<{ watchUri?: boolean }>().watchUri === true;
         let watcher: UriFileWatcher | null = null;
-        if (watchUri) {
+        if (watchUri && !target.refresh) {
           if (!target.autoUriPath) {
             process.stderr.write(
               chalk.yellow(
@@ -97,6 +98,7 @@ export function replCommand(program: Command): void {
             rl.prompt();
           });
           rl.on('close', () => {
+            stopFollowing();
             watcher?.stop();
             resolve();
           });

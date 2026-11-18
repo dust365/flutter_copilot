@@ -15,6 +15,7 @@ import 'package:flutter_copilot_claw/src/services/scroll_simulator.dart';
 import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 import 'package:flutter_copilot_claw/src/services/text_input_simulator.dart';
 import 'package:flutter_copilot_claw/src/services/widget_finder.dart';
+import 'package:flutter_copilot_claw/src/widgets/tap_feedback_navigation_guard.dart';
 import 'package:flutter_copilot_claw/src/widgets/tap_feedback_overlay.dart';
 import 'package:flutter_copilot_claw/src/services/widget_rebuild_tracker.dart';
 import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
@@ -113,6 +114,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   CopilotBuildOwner? _copilotBuildOwner;
   TapFeedbackController? _tapFeedbackController;
   OverlayEntry? _tapFeedbackOverlayEntry;
+  int _feedbackRouteEpoch = 0;
 
   // Service instances
   late final ElementTreeFinder _elementTreeFinder;
@@ -142,6 +144,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
           kind: kind,
         ),
         onDragPath: _tapFeedbackController!.showDrag,
+        routeEpoch: () => _feedbackRouteEpoch,
       );
     } else {
       _gestureDispatcher = GestureDispatcher();
@@ -179,6 +182,20 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   /// The tap feedback controller, if [FlutterCopilotConfiguration.showTapFeedback] was true.
   /// Used by [TapFeedbackOverlay] to paint the hit point, widget bounds, and drag trail.
   TapFeedbackController? get tapFeedbackController => _tapFeedbackController;
+
+  @override
+  void attachRootWidget(Widget rootWidget) {
+    final TapFeedbackController? controller = _tapFeedbackController;
+    super.attachRootWidget(
+      controller == null
+          ? rootWidget
+          : TapFeedbackNavigationGuard(
+              controller: controller,
+              onRouteChanged: () => _feedbackRouteEpoch++,
+              child: rootWidget,
+            ),
+    );
+  }
 
   // ---------- Tap feedback overlay auto-injection ----------
 

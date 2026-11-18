@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:flutter_copilot_mcp/src/session/session_server.dart';
 import 'package:logging/logging.dart' as logging;
 import 'package:flutter_copilot_mcp/src/compat/copilot_stdio_server_transport.dart';
 import 'package:flutter_copilot_mcp/src/version.g.dart';
@@ -45,6 +46,8 @@ void printUsage(ArgParser argParser) {
 }
 
 Future<int> main(List<String> arguments) async {
+  if (arguments.contains('--session-daemon'))
+    return runSessionDaemon(arguments);
   final argParser = buildParser();
   try {
     final results = argParser.parse(arguments);
@@ -74,14 +77,14 @@ Future<int> main(List<String> arguments) async {
         instructions: '''
 Flutter Copilot MCP drives Flutter apps that include flutter_copilot_claw and are running in debug mode. One server holds every connected device.
 
-Find apps:
-1. Call list_dtds, then connect_dtd with a local ws:// URI from that list. Every registered app that initialized Flutter Copilot is connected. Apps that appear later on the same DTD are connected automatically, and a restarted app keeps its name.
-2. Or call list_devices, then launch_app. launch_app starts flutter run and connects that device before it returns. Call it once per device. Same-target devices (two Android, two iOS, or two of the same desktop OS) must be launched one after another; different targets can be launched together.
-3. connect is only for a ws:// DDS address you already have. It adds a session and does not replace the others.
+Find or start apps:
+1. Call list_apps with the Flutter project directory. DTD discovery is automatic; existing IDE and flutter run sessions are reused without URI files.
+2. If no suitable App is running, call ensure_apps. When selection_required is returned, show candidates to the user and pass their chosen deviceIds (one or more), or app id to reuse.
+3. ensure_apps returns an operationId promptly. Poll operation_status until state is completed. Each device reports its own result. Do not repeat launch requests while an operation is running.
+4. Explicit connect and connect_dtd remain available for exceptional environments.
 
-Call list_apps to see ids. When more than one app is connected, pass app on every other tool. When only one app is connected, app can be omitted.
-
-stop_app ends a flutter run this server started. The app on the device stays open. disconnect only drops the session.
+Pass an app id when several Apps are available. Apps started by Copilot are owned by a shared local backend and survive MCP or fcc client exit.
+stop_app terminates an owned device App. detach_app leaves the device App running but ends its Flutter tooling session. disconnect only drops the session. External IDE sessions cannot be stopped here.
 
 Use get_interactive_elements before tapping. Prefer a ValueKey. After code changes, call hot_reload on that app. If the UI does not pick up the change, call hot_restart.
 ''',

@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:logging/logging.dart' as logging;
-import 'package:flutter_copilot_mcp/src/dtd/dtd_registry.dart';
-import 'package:flutter_copilot_mcp/src/process/flutter_run_manager.dart';
-import 'package:flutter_copilot_mcp/src/process/machine_output.dart';
 import 'package:flutter_copilot_mcp/src/session/app_directory.dart';
+import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
+import 'package:flutter_copilot_mcp/src/session/session_client.dart';
+import 'package:flutter_copilot_mcp/src/session/session_error.dart';
 import 'package:flutter_copilot_mcp/src/vm_service/vm_service_connector.dart';
 import 'package:mcp_dart/mcp_dart.dart';
 
@@ -15,322 +15,211 @@ const appParameterDescription =
 
 /// Context for managing VM service connections and registering MCP tools.
 final class VmServiceContext {
-  VmServiceContext({
-    AppDirectory? apps,
-    DtdRegistry? dtds,
-    FlutterRunManager? runs,
-  })  : apps = apps ?? AppDirectory(),
-        _logger = logging.Logger('VmServiceContext') {
-    this.dtds = dtds ?? DtdRegistry(this.apps);
-    this.runs = runs ?? FlutterRunManager(apps: this.apps, dtds: this.dtds);
-    this.apps.listDtds = this.dtds.list;
-  }
+  VmServiceContext({AppDirectory? apps})
+      : apps = apps ?? AppDirectory(),
+        _logger = logging.Logger('VmServiceContext');
 
   final AppDirectory apps;
-  late final DtdRegistry dtds;
-  late final FlutterRunManager runs;
   final logging.Logger _logger;
+  final Map<String, SessionClient> _clients = {};
+  final Map<String, SessionClient> _appOwners = {};
+  final Map<String, SessionClient> _operationOwners = {};
 
-  /// Stops owned `flutter run` processes and closes DDS and DTD connections.
-  Future<void> close() async {
-    await runs.close();
-    await dtds.close();
-    await apps.close();
+  SessionClient _client(String? directory) {
+    final root = projectDirectory(directory ?? Directory.current.path);
+    return _clients.putIfAbsent(root, () => SessionClient(root));
+  }
+
+  /// Close this client's DDS sockets. Owned runs belong to the shared backend.
+  Future<void> close() => apps.close();
+
+  Future<dynamic> _sessionCall(String method, Map<String, dynamic> args) async {
+    final app = args['app'] as String?;
+    final operationId = args['operationId'] as String?;
+    final client = (app == null ? null : _appOwners[app]) ??
+        (operationId == null ? null : _operationOwners[operationId]) ??
+        _client(args['directory'] as String?);
+    final result = await client.call(method, args);
+    if (result is Map) {
+      if (result['operationId'] is String)
+        _operationOwners[result['operationId'] as String] = client;
+      final sessions = <dynamic>[
+        if (result['id'] is String) result,
+        ...?result['apps'] as List?,
+        for (final entry in result['results'] as List? ?? [])
+          if (entry is Map && entry['app'] is Map) entry['app'],
+      ];
+      for (final session in sessions) {
+        if (session is Map && session['id'] is String)
+          _appOwners[session['id'] as String] = client;
+      }
+    }
+    return result;
   }
 
   Future<VmServiceConnector> _connector(Map<String, dynamic> args) async {
-    final session = await apps.open(args['app'] as String?);
+    final info =
+        Map<String, dynamic>.from(await _sessionCall('resolve', args) as Map);
+    final session = await apps.connectUri(
+        uri: info['uri'] as String,
+        id: info['id'] as String,
+        replaceSameId: true,
+        waitForExtension: const Duration(seconds: 5));
     return session.connector;
+  }
+
+  void _registerSessionTools(McpServer server) {
+    final directory = JsonSchema.string(
+        description:
+            'Flutter project directory. Defaults to the working directory.');
+    final app = JsonSchema.string(description: appParameterDescription);
+    final tools = <String,
+        ({
+      String description,
+      Map<String, JsonSchema> properties,
+      List<String> required
+    })>{
+      'list_apps': (
+        description:
+            'Discover running Copilot Apps for this project, including IDE and flutter run sessions. No URI file is required. Returns stable app ids and metadata.',
+        properties: {'directory': directory},
+        required: []
+      ),
+      'list_devices': (
+        description:
+            'List available devices supported by the Flutter project. Distinguishes physical mobile devices from desktop and web targets.',
+        properties: {'directory': directory},
+        required: []
+      ),
+      'list_dtds': (
+        description:
+            'List local DTD endpoints as structured data. Normally list_apps discovers them automatically.',
+        properties: {'directory': directory},
+        required: []
+      ),
+      'connect_dtd': (
+        description:
+            'Explicitly connect a local DTD endpoint. Normally list_apps discovers these automatically.',
+        properties: {'directory': directory, 'uri': JsonSchema.string()},
+        required: ['uri']
+      ),
+      'disconnect_dtd': (
+        description: 'Disconnect a DTD subscription without stopping Apps.',
+        properties: {'directory': directory, 'uri': JsonSchema.string()},
+        required: ['uri']
+      ),
+      'connect': (
+        description:
+            'Explicitly attach to an existing App by VM Service URI. Does not write a URI file or restart the App.',
+        properties: {
+          'directory': directory,
+          'uri': JsonSchema.string(),
+          'name': JsonSchema.string()
+        },
+        required: ['uri']
+      ),
+      'disconnect': (
+        description:
+            'Disconnect an App session without terminating its Flutter run or device process.',
+        properties: {'directory': directory, 'app': app},
+        required: []
+      ),
+      'operation_status': (
+        description:
+            'Poll a launch operation until state is completed. Each device independently reports connected, reused, or failed. Successful sessions remain available on partial failure.',
+        properties: {
+          'directory': directory,
+          'operationId': JsonSchema.string()
+        },
+        required: ['operationId']
+      ),
+      'get_app_logs': (
+        description:
+            'Read Flutter tool output for an owned App, including while a launch operation is running. Pass app id or device id.',
+        properties: {
+          'directory': directory,
+          'app': app,
+          'lines': JsonSchema.integer()
+        },
+        required: []
+      ),
+      'stop_app': (
+        description:
+            'Stop an App launched by Copilot using Flutter app.stop. This terminates the device App. External IDE sessions are protected.',
+        properties: {'directory': directory, 'app': app},
+        required: []
+      ),
+      'detach_app': (
+        description:
+            'Detach an owned Flutter run using app.detach, leaving the device App running. Its hot reload service becomes unavailable.',
+        properties: {'directory': directory, 'app': app},
+        required: []
+      ),
+    };
+    final launchProperties = <String, JsonSchema>{
+      'directory': directory,
+      'app': JsonSchema.string(
+          description:
+              'Explicit running App id to reuse, useful when its device identity is unavailable.'),
+      'appIds': JsonSchema.array(
+          items: JsonSchema.string(),
+          description: 'One or more running App ids to reuse.'),
+      'deviceId': JsonSchema.string(
+          description: 'One device id; alternatively use deviceIds.'),
+      'deviceIds': JsonSchema.array(
+          items: JsonSchema.string(),
+          description:
+              'One or more selected device ids. Omit to reuse a unique existing App or choose a unique physical device. Ambiguity returns selection_required with candidates.'),
+      'target': JsonSchema.string(
+          description:
+              'Project-relative entrypoint. Defaults to lib/main.dart when launching.'),
+      'name': JsonSchema.string(
+          description: 'Optional alias for a single-device launch.'),
+      'timeout': JsonSchema.integer(
+          description:
+              'Per-device startup timeout in seconds, default 180. Queue time is excluded.'),
+      'args': JsonSchema.array(
+          items: JsonSchema.string(),
+          description:
+              'Extra flags: --debug, --profile, --flavor, --dart-define. Release and device/target overrides are rejected.'),
+      'newSession': JsonSchema.boolean(
+          description:
+              'Explicitly launch instead of reusing an existing App. Does not stop IDE sessions.'),
+    };
+    for (final name in ['ensure_apps', 'launch_app']) {
+      tools[name] = (
+        description:
+            'Reuse matching running Apps or start this project on selected devices. Returns a launch operation promptly; poll operation_status for readiness. Multiple devices require an explicit selection when ambiguous. Apps keep running when the MCP client exits.',
+        properties: launchProperties,
+        required: []
+      );
+    }
+    for (final entry in tools.entries) {
+      server.registerTool(entry.key,
+          description: entry.value.description,
+          inputSchema: ToolInputSchema(
+              properties: entry.value.properties,
+              required: entry.value.required), callback: (args, extra) async {
+        try {
+          final result = await _sessionCall(
+              entry.key == 'launch_app' ? 'ensure_apps' : entry.key, args);
+          return CallToolResult(
+              content: [TextContent(text: jsonEncode(result))]);
+        } catch (e) {
+          final error = e is SessionError
+              ? e.toJson()
+              : {'code': 'session_error', 'message': e.toString()};
+          return CallToolResult(
+              isError: true, content: [TextContent(text: jsonEncode(error))]);
+        }
+      });
+    }
   }
 
   /// Registers all VM service related tools with the MCP server.
   void registerTools(McpServer server) {
-    // Connection management tools
+    _registerSessionTools(server);
     server
-      ..registerTool(
-        'connect',
-        description:
-            'Connects to one Flutter app by its DDS WebSocket URI and adds it to the session table. Existing sessions stay connected. Prefer list_dtds and connect_dtd when a Dart Tooling Daemon is available. An http:// VM service address is accepted and converted to ws://.../ws.',
-        annotations: const ToolAnnotations(title: 'Connect to App'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'uri': JsonSchema.string(
-              description:
-                  'DDS WebSocket URI (ws://127.0.0.1:PORT/TOKEN=/ws), or the http:// address printed by flutter run.',
-            ),
-            'name': JsonSchema.string(
-              description:
-                  'Stable name for this app. Later tools pass it as app. Defaults to the URI.',
-            ),
-          },
-          required: ['uri'],
-        ),
-        callback: (args, extra) async {
-          final uri = args['uri'] as String;
-          final name = args['name'] as String?;
-          _logger.info('Connecting to app at $uri');
-
-          try {
-            final session = await apps.connectUri(uri: uri, id: name);
-            return CallToolResult(
-              content: [
-                TextContent(text: 'Connected ${session.describe()}'),
-              ],
-            );
-          } catch (err) {
-            _logger.severe('Failed to connect to app', err);
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to connect to app: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'disconnect',
-        description:
-            'Drops one DDS session. Does not stop a flutter run process started by launch_app; use stop_app for that. With several apps, pass app.',
-        annotations: const ToolAnnotations(title: 'Disconnect from App'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'app': JsonSchema.string(description: appParameterDescription),
-          },
-        ),
-        callback: (args, extra) async {
-          _logger.info('Disconnecting from app');
-
-          try {
-            final message = await apps.disconnectApp(args['app'] as String?);
-            return CallToolResult(content: [TextContent(text: message)]);
-          } catch (err) {
-            _logger.severe('Error during disconnect', err);
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Error during disconnect: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'list_dtds',
-        description:
-            'Lists Dart Tooling Daemon instances on this machine by running `dart tooling-daemon --list`. Use a local ws:// URI from the result with connect_dtd. This does not connect to anything.',
-        annotations: const ToolAnnotations(
-          title: 'List DTDs',
-          readOnlyHint: true,
-        ),
-        inputSchema: const ToolInputSchema(properties: {}),
-        callback: (args, extra) async {
-          try {
-            final listing = await dtds.list();
-            return CallToolResult(content: [TextContent(text: listing)]);
-          } catch (err) {
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to list DTDs: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'connect_dtd',
-        description:
-            'Connects to one local Dart Tooling Daemon and adds every registered app that has Flutter Copilot initialized. Later VmServiceRegistered events on this DTD connect automatically, and a restarted app keeps the same name. Passing a VM service URI is rejected.',
-        annotations: const ToolAnnotations(title: 'Connect DTD'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'uri': JsonSchema.string(
-              description:
-                  'Local DTD URI from list_dtds, ws://127.0.0.1:PORT/TOKEN.',
-            ),
-          },
-          required: ['uri'],
-        ),
-        callback: (args, extra) async {
-          try {
-            final summary = await dtds.connect(args['uri'] as String);
-            return CallToolResult(content: [TextContent(text: summary)]);
-          } catch (err) {
-            _logger.warning('Failed to connect DTD', err);
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to connect DTD: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'disconnect_dtd',
-        description:
-            'Disconnects from a DTD and removes the sessions discovered through it. flutter run processes started by this server keep running until stop_app.',
-        annotations: const ToolAnnotations(title: 'Disconnect DTD'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'uri': JsonSchema.string(
-              description: 'DTD URI previously passed to connect_dtd.',
-            ),
-          },
-          required: ['uri'],
-        ),
-        callback: (args, extra) async {
-          try {
-            final summary = await dtds.disconnect(args['uri'] as String);
-            return CallToolResult(content: [TextContent(text: summary)]);
-          } catch (err) {
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to disconnect DTD: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'list_apps',
-        description:
-            'Lists DDS sessions in this server. Pass an id from this list as app when more than one app is connected.',
-        annotations: const ToolAnnotations(
-          title: 'List Apps',
-          readOnlyHint: true,
-        ),
-        inputSchema: const ToolInputSchema(properties: {}),
-        callback: (args, extra) async {
-          return CallToolResult(content: [TextContent(text: apps.describeAll)]);
-        },
-      )
-      ..registerTool(
-        'list_devices',
-        description:
-            'Lists devices reported by `flutter devices --machine`. Use an id with launch_app.',
-        annotations: const ToolAnnotations(
-          title: 'List Devices',
-          readOnlyHint: true,
-        ),
-        inputSchema: const ToolInputSchema(properties: {}),
-        callback: (args, extra) async {
-          try {
-            final devices = await runs.listDevices();
-            return CallToolResult(
-              content: [TextContent(text: formatFlutterDevices(devices))],
-            );
-          } catch (err) {
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to list devices: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'launch_app',
-        description:
-            'Starts `flutter run --print-dtd --machine` for one device, connects its DDS, and subscribes to its DTD. Returns when the app is in the session table. Defaults to debug. The flutter run process exits when this MCP server exits. stop_app does not close the app on the device. Same-target launches (two Android, two iOS, or two of the same desktop OS) wait until the previous one has connected. Other targets run at the same time. Timeout starts when this device\'s turn starts.',
-        annotations: const ToolAnnotations(title: 'Launch App'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'directory': JsonSchema.string(
-              description:
-                  'Flutter project directory. Defaults to the MCP server working directory.',
-            ),
-            'deviceId': JsonSchema.string(
-              description:
-                  'Device id from list_devices. Optional only when exactly one supported device is connected.',
-            ),
-            'name': JsonSchema.string(
-              description: 'Stable app id used later as the app argument.',
-            ),
-            'target': JsonSchema.string(
-              description:
-                  'Entrypoint passed as flutter run --target. Optional.',
-            ),
-            'timeout': JsonSchema.integer(
-              description:
-                  'Seconds to wait for the VM service and DTD. Default is 90. Increase it for a cold Gradle build.',
-            ),
-            'args': JsonSchema.array(
-              description:
-                  'Extra flutter run arguments. Allowed flags: --debug, --profile, --release, --flavor, --dart-define, --target, --device-id.',
-              items: JsonSchema.string(),
-            ),
-          },
-        ),
-        callback: (args, extra) async {
-          try {
-            final timeout = args['timeout'];
-            final summary = await runs.launch(
-              directory:
-                  (args['directory'] as String?)?.trim().isNotEmpty == true
-                      ? args['directory'] as String
-                      : Directory.current.path,
-              deviceId: args['deviceId'] as String?,
-              name: args['name'] as String?,
-              target: args['target'] as String?,
-              timeoutSeconds: timeout is num ? timeout.toInt() : 90,
-              extraArgs: _stringArgs(args['args']),
-            );
-            return CallToolResult(content: [TextContent(text: summary)]);
-          } catch (err) {
-            _logger.warning('Failed to launch app', err);
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to launch app: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'stop_app',
-        description:
-            'Stops a flutter run process started by launch_app and drops its session. The app process on the device stays in the foreground. With several launched apps, pass app.',
-        annotations: const ToolAnnotations(title: 'Stop App'),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'app': JsonSchema.string(description: appParameterDescription),
-          },
-        ),
-        callback: (args, extra) async {
-          try {
-            final summary = await runs.stop(args['app'] as String?);
-            return CallToolResult(content: [TextContent(text: summary)]);
-          } catch (err) {
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: 'Failed to stop app: $err')],
-            );
-          }
-        },
-      )
-      ..registerTool(
-        'get_app_logs',
-        description:
-            'Reads the trailing output of a flutter run process started by launch_app. This is the flutter tool log, separate from get_logs, which reads logs captured inside the app. With several launched apps, pass app.',
-        annotations: const ToolAnnotations(
-          title: 'Get Flutter Run Logs',
-          readOnlyHint: true,
-        ),
-        inputSchema: ToolInputSchema(
-          properties: {
-            'app': JsonSchema.string(description: appParameterDescription),
-            'lines': JsonSchema.integer(
-              description: 'How many trailing lines to return. Default is 500.',
-            ),
-          },
-        ),
-        callback: (args, extra) async {
-          try {
-            final lines = args['lines'];
-            final text = runs.logs(
-              args['app'] as String?,
-              lines: lines is num ? lines.toInt() : 500,
-            );
-            return CallToolResult(content: [TextContent(text: text)]);
-          } catch (err) {
-            return CallToolResult(
-              isError: true,
-              content: [TextContent(text: err.toString())],
-            );
-          }
-        },
-      )
       // Interactive elements inspection
       ..registerTool(
         'get_interactive_elements',
@@ -1328,14 +1217,6 @@ final class VmServiceContext {
       return jsonEncode(value);
     }
     return value.toString();
-  }
-
-  List<String> _stringArgs(Object? value) {
-    if (value == null) return const [];
-    if (value is List) {
-      return value.map((item) => item.toString()).toList();
-    }
-    throw FormatException('args must be a list of strings');
   }
 
   /// Parses a value to double, handling both num and String types.

@@ -16,13 +16,13 @@ class _ResolvedTarget {
 
 /// Dispatches gesture events to simulate user interactions.
 class GestureDispatcher {
-  GestureDispatcher({this.onTapAt, this.onDragPath});
+  GestureDispatcher({this.onTapAt, this.onDragPath, this.routeEpoch});
 
   static const kMaxDelta = 40.0;
   static const kDelay = Duration(milliseconds: 10);
 
-  /// Called when a tap, long press, or double tap is shown and again when the
-  /// pointer events finish, so the mark stays visible after the gesture.
+  /// Called when a tap, long press, or double tap is shown and, when the route
+  /// did not change, again when the pointer events finish.
   ///
   /// [bounds] is the matched widget in global coordinates, or null when the
   /// gesture targeted raw coordinates.
@@ -31,8 +31,21 @@ class GestureDispatcher {
 
   /// Called with the global polyline of a drag or swipe, including the start.
   ///
-  /// Invoked before the pointer events and again after them.
+  /// Invoked before the pointer events and, when the route did not change,
+  /// again after them.
   final void Function(List<Offset> path)? onDragPath;
+
+  /// Route generation while a gesture is in flight.
+  ///
+  /// The mark is shown again after the pointer events only when this value is
+  /// unchanged. A page change clears the mark and must not draw it back on the
+  /// next page.
+  final int Function()? routeEpoch;
+
+  int? _shownOnRoute() => routeEpoch?.call();
+
+  bool _routeUnchanged(int? epoch) =>
+      routeEpoch == null || routeEpoch!.call() == epoch;
 
   int _nextPointerId = 1;
 
@@ -68,6 +81,7 @@ class GestureDispatcher {
     final int pointerId = _nextPointerId++;
 
     // Show feedback first, then wait before executing the tap.
+    final int? epoch = _shownOnRoute();
     onTapAt?.call(globalPosition, bounds, kind);
     await Future<void>.delayed(
       const Duration(milliseconds: kTapFeedbackDelayMs),
@@ -82,7 +96,9 @@ class GestureDispatcher {
     ];
 
     await _handlePointerEventRecord(records);
-    onTapAt?.call(globalPosition, bounds, kind);
+    if (_routeUnchanged(epoch)) {
+      onTapAt?.call(globalPosition, bounds, kind);
+    }
   }
 
   /// Simulates a drag gesture from [from] to [to].
@@ -178,6 +194,7 @@ class GestureDispatcher {
     Rect? bounds,
     Duration duration,
   ) async {
+    final int? epoch = _shownOnRoute();
     onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
     await Future<void>.delayed(
       const Duration(milliseconds: kTapFeedbackDelayMs),
@@ -216,7 +233,9 @@ class GestureDispatcher {
     records[2].forEach(GestureBinding.instance.handlePointerEvent);
     WidgetsBinding.instance.scheduleFrame();
     await Future<void>.delayed(kDelay);
-    onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
+    if (_routeUnchanged(epoch)) {
+      onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
+    }
   }
 
   /// Simulates a double tap on an element that matches the given [matcher].
@@ -251,6 +270,7 @@ class GestureDispatcher {
     required Duration stepDelay,
     bool feedback = true,
   }) async {
+    final int? epoch = feedback ? _shownOnRoute() : null;
     if (feedback) {
       onDragPath?.call(path);
     }
@@ -277,7 +297,7 @@ class GestureDispatcher {
       WidgetsBinding.instance.scheduleFrame();
       await Future<void>.delayed(stepDelay);
     }
-    if (feedback) {
+    if (feedback && _routeUnchanged(epoch)) {
       onDragPath?.call(path);
     }
   }

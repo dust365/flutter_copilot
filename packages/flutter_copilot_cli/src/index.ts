@@ -3,6 +3,8 @@ import { Command } from 'commander';
 import { setOutputMode } from './logging.js';
 import * as log from './logging.js';
 
+import { sessionCommands } from './commands/sessions.js';
+import { SessionError } from './session/client.js';
 import { connectCommands } from './commands/connect.js';
 import { doctorCommand } from './commands/doctor.js';
 import { gestureCommands } from './commands/gestures.js';
@@ -36,11 +38,13 @@ async function main(): Promise<void> {
         '  - Run YAML playbooks for smoke tests, or drive the app from a REPL\n' +
         '\n' +
         'If --uri is not given, the URI is auto-detected from\n' +
-        '$FLUTTER_COPILOT_URI or the nearest .vm_service_uri file.',
+        'DTD for the current project. Use fcc up to start an App.',
     )
     .version(VERSION)
-    .option('--uri <uri>', 'VM Service WebSocket URI.')
-    .option('--watch-uri', 'Auto-reconnect when .vm_service_uri changes (repl/watch only).')
+    .option('--uri <uri>', 'Explicit VM Service URI; bypasses discovery.')
+    .option('--project <directory>', 'Flutter project directory; defaults to the nearest package.')
+    .option('--app <id>', 'Select a running App by id from fcc apps.')
+    .option('--watch-uri', 'Legacy URI-file watching; DTD sessions reconnect automatically.')
     .option('--timeout <sec>', 'Connection timeout in seconds.', '5')
     .option('--json', 'Output JSON instead of TTY formatting (pipe to jq).')
     .hook('preAction', (thisCmd) => {
@@ -53,7 +57,8 @@ async function main(): Promise<void> {
 Target resolution (first match wins):
   --uri ws://...                    explicit URI
   $FLUTTER_COPILOT_URI              env var
-  .vm_service_uri                   file in cwd or any ancestor directory
+  DTD                              live discovery scoped to --project / cwd
+  .vm_service_uri                   legacy fallback only
 
 Widget matcher (shared by tap / enter-text / scroll-to / swipe / ...):
   --key <k>                         ValueKey<String> — most reliable
@@ -64,7 +69,7 @@ Widget matcher (shared by tap / enter-text / scroll-to / swipe / ...):
 
 Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   # Start the app, then drive it from the CLI (URI auto-detected)
-  ./scripts/flutter_run.sh -d macos
+  fcc up --device macos
   fcc doctor
   fcc get-interactive-elements
   fcc tap --text "点击"
@@ -72,7 +77,7 @@ Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   fcc hot-reload
   fcc hot-restart
 
-  # Save a URI as the current project connection
+  # Attach an explicit URI without writing a URI file
   fcc connect --uri ws://127.0.0.1:8181/abc/ws
 
   # Real-time telemetry that survives \`flutter\` restarts
@@ -92,6 +97,7 @@ Run \`${invokedAs} <command> --help\` for per-command details.
   );
 
   // Current connection & health
+  sessionCommands(program);
   connectCommands(program);
   doctorCommand(program);
 
@@ -108,7 +114,7 @@ Run \`${invokedAs} <command> --help\` for per-command details.
   try {
     await program.parseAsync(process.argv);
   } catch (e) {
-    log.err((e as Error).message);
+    log.err((e as Error).message, e instanceof SessionError ? { code: e.code, candidates: e.candidates } : undefined);
     process.exit(1);
   }
 }

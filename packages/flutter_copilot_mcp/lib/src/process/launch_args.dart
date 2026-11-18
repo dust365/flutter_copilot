@@ -5,22 +5,13 @@
 const allowedLaunchFlags = <String>{
   '--debug',
   '--profile',
-  '--release',
   '--flavor',
   '--dart-define',
-  '--target',
-  '--device-id',
-  '-t',
-  '-d',
 };
 
 const _flagsWithValue = <String>{
   '--flavor',
   '--dart-define',
-  '--target',
-  '--device-id',
-  '-t',
-  '-d',
 };
 
 class LaunchArgsException implements Exception {
@@ -48,8 +39,13 @@ void validateLaunchArgs(List<String> args) {
       );
     }
     final takesValue = _flagsWithValue.contains(flag) && !arg.contains('=');
-    if (takesValue && i + 1 < args.length && !args[i + 1].startsWith('-')) {
+    if (takesValue) {
+      if (i + 1 >= args.length || args[i + 1].startsWith('-')) {
+        throw LaunchArgsException('Missing value for $flag');
+      }
       i++;
+    } else if (_flagsWithValue.contains(flag) && arg.endsWith('=')) {
+      throw LaunchArgsException('Missing value for $flag');
     }
   }
 }

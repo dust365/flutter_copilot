@@ -58,7 +58,7 @@ describe('resolveTargetFromOptions', () => {
 
   it('throws when no current target exists', async () => {
     await expect(resolveTargetFromOptions({ cwd: dir, env: {} })).rejects.toThrow(
-      'No VM Service URI',
+      'Flutter SDK not found',
     );
   });
 });

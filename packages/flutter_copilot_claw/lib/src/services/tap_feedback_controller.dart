@@ -59,11 +59,11 @@ class TapFeedbackState {
 ///
 /// Listeners such as [TapFeedbackOverlay] paint [state]. The mark replaces any
 /// previous one and is cleared after [duration]. Showing again restarts that
-/// window, so the mark stays up for a full [duration] after the gesture ends
-/// and is included in screenshots taken in that window.
+/// window, so the mark stays up for a full [duration] after the gesture ends.
+/// The default window is 1.2 seconds. A route change clears it immediately.
 class TapFeedbackController {
   TapFeedbackController({
-    this.duration = const Duration(seconds: 8),
+    this.duration = const Duration(milliseconds: 1200),
   });
 
   /// How long the mark stays visible after it was last shown.

@@ -42,6 +42,7 @@ class MockVmServer {
   bool announceFlutterRunServices = false;
 
   WebSocket? _socket;
+  final List<WebSocket> _sockets = [];
 
   /// Starts the server on loopback with an OS-assigned port.
   static Future<MockVmServer> start() async {
@@ -63,6 +64,9 @@ class MockVmServer {
   }
 
   Future<void> close() async {
+    for (final socket in _sockets) {
+      await socket.close();
+    }
     await _server.close(force: true);
   }
 
@@ -74,6 +78,7 @@ class MockVmServer {
     }
     final ws = await WebSocketTransformer.upgrade(req);
     _socket = ws;
+    _sockets.add(ws);
     ws.listen((raw) {
       final msg = jsonDecode(raw as String) as Map<String, dynamic>;
       final id = msg['id'];
