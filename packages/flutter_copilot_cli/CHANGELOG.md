@@ -1,17 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Breaking
-
-- Removed the `focused` matcher (`--focused`, YAML `focused: true`). The App-side matcher never supported focus, so these calls failed at runtime. Match by `--key`, `--text`, `--type`, or `--x/--y` instead. `assert-element` with no key, text, or type is rejected.
-
-### Bug fixes
-
-- `help-ai` now lists `session-shutdown`.
-- `repl` runs commands one at a time, in input order, and exits only after the last one finishes. Before, piped input could run commands in parallel and cut off the connection while a command was still running.
-- `watch --logs` subscribes to the log streams after attaching its listener, so output that arrives during startup is no longer dropped.
-
 ## 2.0.0
 
 ### Breaking
@@ -19,11 +7,18 @@
 - Discover running debug Apps through DTD. `fcc apps` lists them and `fcc up` launches the selected devices. MCP and `fcc` share the same session IDs.
 - Removed URI-file discovery (`.vm_service_uri`) and `--watch-uri`. Select a live session with `--app`, or pass `--uri` for an explicit address.
 - `connect` attaches an explicit URI to the shared session backend. `disconnect` drops that session and no longer deletes a URI file.
+- Removed the `focused` matcher (`--focused`, YAML `focused: true`). The App-side matcher never supported focus, so these calls failed at runtime. Match by `--key`, `--text`, `--type`, or `--x/--y` instead. `assert-element` with no key, text, or type is rejected.
 
 ### New features
 
 - `devices`, `status <operation-id>`, `stop`, `detach`, and `hot-restart`.
 - `logs` reads Flutter tool output, including output from a launch still in progress.
+
+### Bug fixes
+
+- `help-ai` now lists `session-shutdown`.
+- `repl` runs commands one at a time, in input order, and exits only after the last one finishes. Before, piped input could run commands in parallel and cut off the connection while a command was still running.
+- `watch --logs` subscribes to the log streams after attaching its listener, so output that arrives during startup is no longer dropped.
 
 ## 1.0.6
 

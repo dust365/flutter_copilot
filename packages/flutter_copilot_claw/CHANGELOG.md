@@ -1,18 +1,16 @@
 # Changelog
 
-## Unreleased
-
-### Bug fixes
-
-- `drag` with absolute `fromX/fromY/toX/toY` and no matcher now works. Before, the matcher was parsed first and the request failed with "Matcher JSON must contain ...", so `fcc drag --from-x ... --to-x ...` could never succeed.
-- `enterText` calls the field's `onChanged` after setting the value. Before, validation and form state did not see text entered by automation.
-
 ## 2.0.0
 
 Shared release with `flutter_copilot_mcp` and `flutter_copilot_cli`. The binding entry points from 1.0.6 (`ensureInitialized`, `captureLogs`, `addLog`) are unchanged.
 
 - Tap feedback now marks the hit point for taps, long-presses, and double-taps, and draws a direction arrow for drags and swipes. The overlay stays for 1.2 seconds and clears immediately when the route changes.
 - Set `FlutterCopilotConfiguration(showTapFeedback: false)` to skip the overlay.
+
+### Bug fixes
+
+- `drag` with absolute `fromX/fromY/toX/toY` and no matcher now works. Before, the matcher was parsed first and the request failed with "Matcher JSON must contain ...", so `fcc drag --from-x ... --to-x ...` could never succeed.
+- `enterText` calls the field's `onChanged` after setting the value. Before, validation and form state did not see text entered by automation.
 
 ## 1.0.6
 
