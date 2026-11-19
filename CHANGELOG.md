@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.0
+
+`flutter_copilot_claw`, `flutter_copilot_mcp`, and `flutter_copilot_cli` (`fcc`) share this version.
+
+### Breaking
+
+- MCP and `fcc` discover running debug Apps through DTD and share one session backend. `list_apps` / `fcc apps` lists sessions; `ensure_apps` / `fcc up` cold-starts selected devices.
+- URI-file discovery (`.vm_service_uri`) and `fcc --watch-uri` are removed. Pass an app id when several Apps are connected, or an explicit `--uri` / `connect` address.
+
+### Other
+
+- `hot_restart` / `fcc hot-restart` reruns `main()` when hot reload does not pick up a change.
+- In-app tap feedback marks hit points and drag direction, then clears on navigation.
+- `FlutterCopilotBinding.ensureInitialized()` and `captureLogs` keep the 1.0.6 contract.
+
 ## 1.0.6
 
 ### Breaking changes (flutter_copilot_claw)

@@ -1,11 +1,17 @@
 # Changelog
 
-## Unreleased
+## 2.0.0
 
-- Discover running debug Apps through DTD and launch selected devices with `fcc up`.
-  MCP and `fcc` share the same session IDs.
-- Remove URI-file discovery and `--watch-uri`. Use `fcc apps` and `--app` to select
-  a live session, or `--uri` to connect to an explicit address.
+### Breaking
+
+- Discover running debug Apps through DTD. `fcc apps` lists them and `fcc up` launches the selected devices. MCP and `fcc` share the same session IDs.
+- Removed URI-file discovery (`.vm_service_uri`) and `--watch-uri`. Select a live session with `--app`, or pass `--uri` for an explicit address.
+- `connect` attaches an explicit URI to the shared session backend. `disconnect` drops that session and no longer deletes a URI file.
+
+### New features
+
+- `devices`, `status <operation-id>`, `stop`, `detach`, and `hot-restart`.
+- `logs` reads Flutter tool output, including output from a launch still in progress.
 
 ## 1.0.6
 

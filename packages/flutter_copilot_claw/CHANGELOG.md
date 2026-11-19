@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0
+
+Shared release with `flutter_copilot_mcp` and `flutter_copilot_cli`. The binding entry points from 1.0.6 (`ensureInitialized`, `captureLogs`, `addLog`) are unchanged.
+
+- Tap feedback now marks the hit point and widget bounds for taps, long-presses, and double-taps, and draws a direction arrow for drags and swipes. The overlay stays for 1.2 seconds and clears immediately when the route changes.
+- Set `FlutterCopilotConfiguration(showTapFeedback: false)` to skip the overlay.
+
 ## 1.0.6
 
 ### Breaking changes (flutter_copilot_claw)

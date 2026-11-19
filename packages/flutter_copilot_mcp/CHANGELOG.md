@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0
+
+### Breaking
+
+- Connection is DTD-based. `list_apps` discovers running debug Apps for a project directory. `ensure_apps` reuses a live session or cold-starts the selected devices. URI files are no longer the connection path.
+- One local session backend is shared with `fcc`. Session IDs match across both clients, and an App keeps running when either client exits.
+- `stop_app` and `detach_app` only manage Apps this backend launched. An IDE or external `flutter run` session cannot be stopped here.
+
+### New tools
+
+- `list_devices`, `list_dtds`, `connect_dtd`, `disconnect_dtd`, `operation_status`, `get_app_logs`, and `hot_restart`.
+- When several Apps are connected, pass `app`. A launch returns an `operationId`; poll `operation_status` until it completes.
+
 ## 1.0.6
 
 Shared release with `flutter_copilot_claw`. The MCP server itself is unchanged; this version bump ships to keep `flutter_copilot_claw` and `flutter_copilot_mcp` aligned (they share a single version line via `tool/version.dart`).
