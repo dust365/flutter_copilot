@@ -137,10 +137,9 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
     if (configuration.showTapFeedback) {
       _tapFeedbackController = TapFeedbackController();
       _gestureDispatcher = GestureDispatcher(
-        onTapAt: (Offset offset, Rect? bounds, TapFeedbackKind kind) =>
+        onTapAt: (Offset offset, TapFeedbackKind kind) =>
             _tapFeedbackController!.showTap(
           position: offset,
-          bounds: bounds,
           kind: kind,
         ),
         onDragPath: _tapFeedbackController!.showDrag,
@@ -180,7 +179,7 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
   }
 
   /// The tap feedback controller, if [FlutterCopilotConfiguration.showTapFeedback] was true.
-  /// Used by [TapFeedbackOverlay] to paint the hit point, widget bounds, and drag trail.
+  /// Used by [TapFeedbackOverlay] to paint the hit point and drag trail.
   TapFeedbackController? get tapFeedbackController => _tapFeedbackController;
 
   @override
@@ -493,37 +492,40 @@ class FlutterCopilotBinding extends WidgetsFlutterBinding {
       name: 'flutter_copilot.drag',
       callback: (params) async {
         try {
-          final matcher = WidgetMatcher.fromJson(params);
-
           // Parse deltaX/deltaY with type conversion
           final deltaX = _parseDouble(params['deltaX']) ?? 0.0;
           final deltaY = _parseDouble(params['deltaY']) ?? 0.0;
 
-          // Support from/to coordinates as alternative
-          Offset? from;
-          Offset? to;
-          if (params.containsKey('fromX') && params.containsKey('fromY')) {
-            final fromX = _parseDouble(params['fromX']) ?? 0.0;
-            final fromY = _parseDouble(params['fromY']) ?? 0.0;
-            from = Offset(fromX, fromY);
-          }
-          if (params.containsKey('toX') && params.containsKey('toY')) {
-            final toX = _parseDouble(params['toX']) ?? 0.0;
-            final toY = _parseDouble(params['toY']) ?? 0.0;
-            to = Offset(toX, toY);
+          // Absolute from/to coordinates need no matcher, so handle them before
+          // WidgetMatcher.fromJson, which rejects a payload without one.
+          final hasAbsolute = params.containsKey('fromX') &&
+              params.containsKey('fromY') &&
+              params.containsKey('toX') &&
+              params.containsKey('toY');
+          if (hasAbsolute) {
+            final from = Offset(
+              _parseDouble(params['fromX']) ?? 0.0,
+              _parseDouble(params['fromY']) ?? 0.0,
+            );
+            final to = Offset(
+              _parseDouble(params['toX']) ?? 0.0,
+              _parseDouble(params['toY']) ?? 0.0,
+            );
+            await _gestureDispatcher.drag(from, to);
+            return <String, dynamic>{
+              'status': 'Success',
+              'message': 'Dragged from $from to $to',
+            };
           }
 
-          if (from != null && to != null) {
-            await _gestureDispatcher.drag(from, to);
-          } else {
-            await _gestureDispatcher.dragByMatcher(
-              matcher,
-              deltaX,
-              deltaY,
-              _widgetFinder,
-              configuration,
-            );
-          }
+          final matcher = WidgetMatcher.fromJson(params);
+          await _gestureDispatcher.dragByMatcher(
+            matcher,
+            deltaX,
+            deltaY,
+            _widgetFinder,
+            configuration,
+          );
 
           return <String, dynamic>{
             'status': 'Success',

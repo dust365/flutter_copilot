@@ -6,7 +6,6 @@ export interface MatcherArgs {
   type?: string;
   x?: string | number;
   y?: string | number;
-  focused?: boolean;
 }
 
 /** Builds a `Matcher` from CLI option values; returns `{}` if all empty. */
@@ -17,7 +16,6 @@ export function buildMatcher(args: MatcherArgs): Matcher {
   if (args.type) m.type = args.type;
   if (args.x !== undefined) m.x = toNum(args.x);
   if (args.y !== undefined) m.y = toNum(args.y);
-  if (args.focused) m.focused = true;
   return m;
 }
 

@@ -25,6 +25,14 @@ final class VmServiceContext {
   final Map<String, SessionClient> _appOwners = {};
   final Map<String, SessionClient> _operationOwners = {};
 
+  /// Session-backend methods that remove Apps from the backend.
+  static const _endingMethods = {
+    'disconnect',
+    'disconnect_dtd',
+    'stop_app',
+    'detach_app',
+  };
+
   SessionClient _client(String? directory) {
     final root = projectDirectory(directory ?? Directory.current.path);
     return _clients.putIfAbsent(root, () => SessionClient(root));
@@ -40,9 +48,25 @@ final class VmServiceContext {
         (operationId == null ? null : _operationOwners[operationId]) ??
         _client(args['directory'] as String?);
     final result = await client.call(method, args);
+    if (result is Map && _endingMethods.contains(method)) {
+      // The backend dropped these sessions. Drop this process's own DDS sockets
+      // too, or the App stays reachable here after it was disconnected.
+      for (final entry in result['sessions'] as List? ?? []) {
+        if (entry is! Map) continue;
+        _appOwners.remove(entry['id']);
+        final uri = entry['uri'];
+        if (uri is String) await apps.removeByUri(uri);
+      }
+    }
     if (result is Map) {
-      if (result['operationId'] is String)
+      if (result['operationId'] is String) {
         _operationOwners[result['operationId'] as String] = client;
+        // The backend keeps only its 50 most recent operations, so mirror that
+        // bound here instead of growing for the whole MCP session.
+        while (_operationOwners.length > 50) {
+          _operationOwners.remove(_operationOwners.keys.first);
+        }
+      }
       final sessions = <dynamic>[
         if (result['id'] is String) result,
         ...?result['apps'] as List?,
@@ -336,8 +360,16 @@ final class VmServiceContext {
               description:
                   'The key of the text field. You can get the key of an element by calling get_interactive_elements.',
             ),
+            'text': JsonSchema.string(
+              description:
+                  'The visible text of the text field, when it has no key.',
+            ),
+            'type': JsonSchema.string(
+              description:
+                  'The widget type name of the text field, e.g. "TextField". Use with key or text to narrow the match.',
+            ),
           },
-          required: ['input', 'key'],
+          required: ['input'],
         ),
         callback: (args, extra) async {
           final input = args['input'] as String;

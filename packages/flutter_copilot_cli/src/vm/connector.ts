@@ -8,7 +8,6 @@ export interface Matcher {
   type?: string;
   x?: number;
   y?: number;
-  focused?: boolean;
 }
 
 export interface ExtensionSuccess {

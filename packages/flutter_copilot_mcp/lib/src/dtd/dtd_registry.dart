@@ -64,6 +64,7 @@ class DtdRegistry {
   final Map<String, _DtdConnection> _connections = {};
   final Map<String, Future<String>> _connecting = {};
   final Map<String, int> _revisions = {};
+  final Set<String> _suppressedDtds = {};
   final List<String> diagnostics = [];
   bool _closed = false;
   Future<void>? _refreshing;
@@ -106,7 +107,9 @@ class DtdRegistry {
   Future<void> _refresh() async {
     if (_closed) return;
     diagnostics.clear();
-    final found = await instances();
+    final found = (await instances())
+        .where((instance) => !_suppressedDtds.contains(instance.uri))
+        .toList();
     for (var start = 0; start < found.length; start += 4) {
       await Future.wait(found.skip(start).take(4).map((instance) async {
         try {
@@ -120,6 +123,8 @@ class DtdRegistry {
 
   Future<String> connect(String rawUri) {
     final uri = canonicalDtdUri(rawUri);
+    // An explicit connect lifts a previous disconnect of the same DTD.
+    _suppressedDtds.remove(uri);
     return _connecting[uri] ??= _connect(uri).whenComplete(() {
       _connecting.remove(uri);
     });
@@ -201,6 +206,7 @@ class DtdRegistry {
       {required Duration wait}) async {
     final raw = data['uri'] as String?;
     if (raw == null || _closed || (_revisions[key] ?? 0) != revision) return;
+    if (_suppressedDtds.contains(dtdUri) || apps.isSuppressed(raw)) return;
     try {
       // fcc/MCP run on the development host. exposedUri is for remote frontends.
       final session = await apps.connectUri(
@@ -209,7 +215,11 @@ class DtdRegistry {
         displayName: data['name'] as String?,
         waitForExtension: wait,
       );
-      if (_closed || (_revisions[key] ?? 0) != revision) {
+      // A disconnect can land while the VM service is still initializing.
+      if (_closed ||
+          (_revisions[key] ?? 0) != revision ||
+          _suppressedDtds.contains(dtdUri) ||
+          apps.isSuppressed(raw)) {
         await apps.removeByUri(raw);
         return;
       }
@@ -238,8 +248,11 @@ class DtdRegistry {
     }
   }
 
+  /// Drops the DTD subscription and the Apps it discovered. The DTD stays
+  /// suppressed until [connect] is called for it again.
   Future<String> disconnect(String rawUri) async {
     final uri = canonicalDtdUri(rawUri);
+    _suppressedDtds.add(uri);
     final connection = _connections.remove(uri);
     await connection?.close();
     for (final session in apps.sessionsForDtd(uri)) {

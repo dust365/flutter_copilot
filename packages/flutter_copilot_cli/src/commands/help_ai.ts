@@ -48,7 +48,6 @@ export function helpAiCommand(program: Command): void {
             type: 'Widget type name, e.g. ElevatedButton.',
             x: 'Logical x coordinate; use with y.',
             y: 'Logical y coordinate; use with x.',
-            focused: 'Currently focused element.',
           },
           rule: 'Provide at least one matcher for tap/double-tap/long-press/enter-text/scroll-to/swipe. Drag may instead use absolute from/to coordinates.',
         },
@@ -60,6 +59,13 @@ export function helpAiCommand(program: Command): void {
           { name: 'logs', category: 'target', mcpTool: 'get_app_logs', description: 'Read output from an owned Flutter run.', example: 'fcc --app <id> logs' },
           { name: 'stop', category: 'target', mcpTool: 'stop_app', description: 'Stop an owned App on the device.', example: 'fcc --app <id> stop' },
           { name: 'detach', category: 'target', mcpTool: 'detach_app', description: 'End an owned debug session while leaving the App running.', example: 'fcc --app <id> detach' },
+          {
+            name: 'session-shutdown',
+            category: 'target',
+            description: 'Shut down an idle session backend. Refuses while owned Apps are running; stop or detach them first.',
+            options: {},
+            example: 'fcc session-shutdown',
+          },
           {
             name: 'connect',
             category: 'target',
@@ -147,7 +153,7 @@ export function helpAiCommand(program: Command): void {
             mcpTool: 'enter_text',
             description: 'Focus a matched text field and enter text.',
             options: { matcher: true, '--input <text>': 'required' },
-            example: 'fcc enter-text --focused --input demo',
+            example: 'fcc enter-text --key SearchField --input demo',
           },
           {
             name: 'scroll-to',
@@ -252,7 +258,7 @@ export function helpAiCommand(program: Command): void {
             stopOnFailure: 'optional boolean, default true',
             steps: 'required non-empty array',
           },
-          matcherFields: ['key', 'text', 'type', 'x', 'y', 'focused'],
+          matcherFields: ['key', 'text', 'type', 'x', 'y'],
           retry: {
             attempts: 'positive integer, default 3 when retry is present',
             delay: 'milliseconds, non-negative integer, default 500 when retry is present',

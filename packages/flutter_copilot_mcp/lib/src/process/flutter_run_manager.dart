@@ -101,8 +101,10 @@ class TrackedFlutterRun implements OwnedProcess {
       try {
         await process.exitCode.timeout(const Duration(seconds: 5));
       } on TimeoutException {
-        if (detach) rethrow;
-        process.kill();
+        // A detach already succeeded, so the App is no longer ours. Rethrowing
+        // here would leave this run marked as running and let a later stop
+        // target an App that was detached.
+        if (!detach) process.kill();
       }
     } else {
       process.kill();

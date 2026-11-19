@@ -43,7 +43,7 @@ Use `--project <directory>` to select a Flutter project and `--app <id>` to sele
 
 | Command      | Description                                                                                         |
 | ------------ | --------------------------------------------------------------------------------------------------- |
-| `tap`        | Tap by `--key` / `--text` / `--type` / `--x --y` / `--focused`.                                     |
+| `tap`        | Tap by `--key` / `--text` / `--type` / `--x --y`.                                                   |
 | `double-tap` | Double-tap using the same matchers as `tap`.                                                        |
 | `long-press` | Long-press using the same matchers; `--duration <ms>` is optional.                                  |
 | `enter-text` | Focus a field and enter text. `--input <string>` is required.                                       |
@@ -85,6 +85,14 @@ fcc --version          # 1.0.3
 fcc --help
 flutter_copilot_cli --help    # same binary, full name
 ```
+
+The first command that starts the session backend runs `dart pub get` for the
+bundled runtime, which downloads its Dart packages. That step needs network
+access unless they are already in the pub cache (`$PUB_CACHE`, default
+`~/.pub-cache`). The prepared runtime is stored under `$FLUTTER_COPILOT_CACHE`
+(or `$XDG_CACHE_HOME/flutter_copilot`, default `~/.cache/flutter_copilot`), so
+later runs skip that step. For offline or restricted CI, run `fcc` once on a
+connected machine with the same Dart SDK, or keep the pub cache warm.
 
 The package exposes two bin names that point at the same binary:
 
@@ -196,7 +204,7 @@ fcc watch --logs --rebuilds --interval 500
 ```bash
 fcc repl
 fc[app-id]> tap text="点击"
-fc[app-id]> enter-text focused input="demo user"
+fc[app-id]> enter-text key=SearchField input="demo user"
 fc[app-id]> take-screenshots output=/tmp/s.png
 fc[app-id]> hot-reload
 ```

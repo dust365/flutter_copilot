@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+
+- Removed the `focused` matcher (`--focused`, YAML `focused: true`). The App-side matcher never supported focus, so these calls failed at runtime. Match by `--key`, `--text`, `--type`, or `--x/--y` instead. `assert-element` with no key, text, or type is rejected.
+
+### Bug fixes
+
+- `help-ai` now lists `session-shutdown`.
+- `repl` runs commands one at a time, in input order, and exits only after the last one finishes. Before, piped input could run commands in parallel and cut off the connection while a command was still running.
+- `watch --logs` subscribes to the log streams after attaching its listener, so output that arrives during startup is no longer dropped.
+
 ## 2.0.0
 
 ### Breaking

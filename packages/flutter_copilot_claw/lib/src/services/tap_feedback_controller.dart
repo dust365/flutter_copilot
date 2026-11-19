@@ -20,13 +20,12 @@ enum TapFeedbackKind {
 
 /// Visual mark for the latest copilot gesture.
 ///
-/// A tap carries [position] and, when a widget was matched, its global
-/// [bounds]. A drag or swipe carries the global polyline in [path].
+/// A tap carries [position]. A drag or swipe carries the global polyline in
+/// [path].
 class TapFeedbackState {
   TapFeedbackState({
     required this.position,
     this.kind = TapFeedbackKind.tap,
-    this.bounds,
     List<Offset> path = const <Offset>[],
     DateTime? shownAt,
   })  : path = List<Offset>.unmodifiable(path),
@@ -37,11 +36,6 @@ class TapFeedbackState {
 
   /// Hit point of a tap, or the start of a drag.
   final Offset position;
-
-  /// Global bounds of the widget that received a point gesture.
-  ///
-  /// Null for coordinate taps and for drag paths.
-  final Rect? bounds;
 
   /// Global polyline of a drag or swipe, including the start point.
   ///
@@ -55,7 +49,7 @@ class TapFeedbackState {
   bool get isDrag => path.length >= 2 && (path.last - path.first).distance >= 1;
 }
 
-/// Controller for the on-screen gesture mark (tap point, widget bounds, drag).
+/// Controller for the on-screen gesture mark (tap point and drag trail).
 ///
 /// Listeners such as [TapFeedbackOverlay] paint [state]. The mark replaces any
 /// previous one and is cleared after [duration]. Showing again restarts that
@@ -78,20 +72,14 @@ class TapFeedbackController {
   Timer? _clearTimer;
 
   /// Shows a point mark at [position].
-  ///
-  /// Prefer [showTap] when the target widget's bounds are known.
   void showAt(Offset position) => showTap(position: position);
 
-  /// Shows a tap, long-press, or double-tap mark.
-  ///
-  /// [bounds] is the target widget in global coordinates. Coordinate gestures
-  /// pass null and only the hit point is drawn.
+  /// Shows a tap, long-press, or double-tap mark at [position].
   void showTap({
     required Offset position,
-    Rect? bounds,
     TapFeedbackKind kind = TapFeedbackKind.tap,
   }) {
-    _publish(TapFeedbackState(position: position, bounds: bounds, kind: kind));
+    _publish(TapFeedbackState(position: position, kind: kind));
   }
 
   /// Shows a drag or swipe trail. [path] is in global coordinates.

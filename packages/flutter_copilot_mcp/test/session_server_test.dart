@@ -18,6 +18,10 @@ void main() {
     final state = File('${directory.path}/endpoint.json');
     final server = (await SessionServer.start(engine, state: state))!;
     try {
+      if (!Platform.isWindows) {
+        // The state file holds the bearer token, so only the owner may read it.
+        expect(FileStat.statSync(state.path).mode & 0x1FF, 0x180); // 0600
+      }
       final endpoint =
           jsonDecode(await state.readAsString()) as Map<String, dynamic>;
       final first = await SessionClient.request(endpoint, 'hello', {});

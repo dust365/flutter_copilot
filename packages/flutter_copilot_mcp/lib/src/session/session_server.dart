@@ -52,6 +52,16 @@ class SessionServer {
           List.generate(32, (_) => Random.secure().nextInt(256)));
       final server = SessionServer._(engine, http, lock, file, token);
       final temporary = File('${file.path}.$pid.tmp');
+      // Restrict the file before the token is written. Writing first would
+      // leave the token readable by other local users until chmod ran.
+      await temporary.create();
+      if (!Platform.isWindows) {
+        final chmod = await Process.run('chmod', ['600', temporary.path]);
+        if (chmod.exitCode != 0) {
+          throw FileSystemException(
+              'Cannot restrict session state file', temporary.path);
+        }
+      }
       await temporary.writeAsString(
           jsonEncode({
             'protocol': 1,
@@ -63,9 +73,6 @@ class SessionServer {
             'token': token,
           }),
           flush: true);
-      if (!Platform.isWindows) {
-        await Process.run('chmod', ['600', temporary.path]);
-      }
       await temporary.rename(file.path);
       http.listen((request) {
         unawaited(server._handle(request));

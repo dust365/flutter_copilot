@@ -63,7 +63,6 @@ Widget matcher (shared by tap / enter-text / scroll-to / swipe / ...):
   --text <t>                        visible text
   --type <n>                        widget type name (e.g. ElevatedButton)
   --x <n> --y <n>                   coordinates in logical pixels
-  --focused                         the currently focused element
 
 Examples (\`fcc\` is the short alias for \`flutter_copilot_cli\`):
   # Start the app, then drive it from the CLI (URI auto-detected)

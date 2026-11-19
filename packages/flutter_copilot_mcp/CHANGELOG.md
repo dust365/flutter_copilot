@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Bug fixes
+
+- `disconnect`, `stop_app`, `detach_app`, and `disconnect_dtd` now also drop this process's own VM service connections. Before, an App could stay reachable here after it was disconnected.
+- A disconnected App or DTD is not rediscovered by the next discovery pass. An explicit `connect` or `connect_dtd` lifts the suppression.
+- The session backend starts with `--packages` pinned to the entry script's `package_config.json`, so it no longer depends on the working directory.
+- `enter_text` no longer requires `key`. It accepts `key`, `text`, or `type`.
+- The session state file, which holds the backend's bearer token, is restricted to the owner before the token is written. Previously it was readable by other local users until `chmod` ran. A failed `chmod` now stops the backend from starting.
+- The MCP process keeps at most 50 operation owners, matching the backend's retention. Before, the map grew for the whole session.
+- `detach_app` no longer reports an error when `flutter run` takes more than 5 seconds to exit after a successful detach. The run is released instead of staying marked as running.
+
 ## 2.0.0
 
 ### Breaking

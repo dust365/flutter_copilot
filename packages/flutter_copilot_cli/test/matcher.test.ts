@@ -8,8 +8,8 @@ describe('buildMatcher', () => {
   });
 
   it('collects defined fields', () => {
-    const m = buildMatcher({ key: 'K', text: 'T', type: 'El', x: '10', y: 20, focused: true });
-    expect(m).toEqual({ key: 'K', text: 'T', type: 'El', x: 10, y: 20, focused: true });
+    const m = buildMatcher({ key: 'K', text: 'T', type: 'El', x: '10', y: 20 });
+    expect(m).toEqual({ key: 'K', text: 'T', type: 'El', x: 10, y: 20 });
   });
 
   it('coerces numeric strings', () => {
@@ -22,9 +22,9 @@ describe('buildMatcher', () => {
     expect(() => buildMatcher({ x: 'abc' })).toThrow();
   });
 
-  it('does not emit focused:false', () => {
-    const m = buildMatcher({ key: 'K' });
-    expect('focused' in m).toBe(false);
+  it('ignores unsupported focus flags', () => {
+    const m = buildMatcher({ key: 'K', focused: true } as Parameters<typeof buildMatcher>[0]);
+    expect(m).toEqual({ key: 'K' });
   });
 
   it('accepts empty string text (valid matcher)', () => {

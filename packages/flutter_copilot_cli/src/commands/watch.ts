@@ -41,11 +41,13 @@ export function watchCommand(program: Command): void {
         });
 
         if (opts.logs) {
+          // Attach before subscribing: events that arrive while the awaits below
+          // are pending would otherwise be dropped.
+          client.on('event', (streamId: string, e: VmEvent) => printLogEvent(streamId, e));
           for (const stream of ['Stdout', 'Stderr', 'Extension']) {
             // Use connector.streamListen so subscriptions can resume after reconnect.
             await connector.streamListen(stream);
           }
-          client.on('event', (streamId: string, e: VmEvent) => printLogEvent(streamId, e));
           log.info('listening for Stdout/Stderr/Extension events (Ctrl-C to stop)');
         }
 

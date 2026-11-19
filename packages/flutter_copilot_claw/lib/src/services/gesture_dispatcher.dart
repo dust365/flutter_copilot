@@ -6,14 +6,6 @@ import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 import 'package:flutter_copilot_claw/src/services/widget_finder.dart';
 import 'package:flutter_copilot_claw/src/services/widget_matcher.dart';
 
-/// Global hit point and, when a widget was matched, its global bounds.
-class _ResolvedTarget {
-  const _ResolvedTarget(this.position, this.bounds);
-
-  final Offset position;
-  final Rect? bounds;
-}
-
 /// Dispatches gesture events to simulate user interactions.
 class GestureDispatcher {
   GestureDispatcher({this.onTapAt, this.onDragPath, this.routeEpoch});
@@ -24,10 +16,8 @@ class GestureDispatcher {
   /// Called when a tap, long press, or double tap is shown and, when the route
   /// did not change, again when the pointer events finish.
   ///
-  /// [bounds] is the matched widget in global coordinates, or null when the
-  /// gesture targeted raw coordinates.
-  final void Function(Offset position, Rect? bounds, TapFeedbackKind kind)?
-      onTapAt;
+  /// [position] is the global hit point.
+  final void Function(Offset position, TapFeedbackKind kind)? onTapAt;
 
   /// Called with the global polyline of a drag or swipe, including the start.
   ///
@@ -58,14 +48,13 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    final _ResolvedTarget target = _resolveTarget(
+    final Offset target = _resolveTarget(
       matcher,
       widgetFinder,
       configuration,
     );
     await _dispatchTapAtPosition(
-      target.position,
-      target.bounds,
+      target,
       TapFeedbackKind.tap,
     );
   }
@@ -75,14 +64,13 @@ class GestureDispatcher {
 
   Future<void> _dispatchTapAtPosition(
     Offset globalPosition,
-    Rect? bounds,
     TapFeedbackKind kind,
   ) async {
     final int pointerId = _nextPointerId++;
 
     // Show feedback first, then wait before executing the tap.
     final int? epoch = _shownOnRoute();
-    onTapAt?.call(globalPosition, bounds, kind);
+    onTapAt?.call(globalPosition, kind);
     await Future<void>.delayed(
       const Duration(milliseconds: kTapFeedbackDelayMs),
     );
@@ -97,7 +85,7 @@ class GestureDispatcher {
 
     await _handlePointerEventRecord(records);
     if (_routeUnchanged(epoch)) {
-      onTapAt?.call(globalPosition, bounds, kind);
+      onTapAt?.call(globalPosition, kind);
     }
   }
 
@@ -121,13 +109,13 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    final _ResolvedTarget target = _resolveTarget(
+    final Offset target = _resolveTarget(
       matcher,
       widgetFinder,
       configuration,
     );
-    final Offset endPosition = target.position + Offset(deltaX, deltaY);
-    await drag(target.position, endPosition);
+    final Offset endPosition = target + Offset(deltaX, deltaY);
+    await drag(target, endPosition);
   }
 
   /// Simulates a swipe gesture on an element that matches the given [matcher].
@@ -141,24 +129,24 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    final _ResolvedTarget target = _resolveTarget(
+    final Offset target = _resolveTarget(
       matcher,
       widgetFinder,
       configuration,
     );
 
     final Offset endPosition = switch (direction.toLowerCase()) {
-      'left' => target.position + Offset(-distance, 0),
-      'right' => target.position + Offset(distance, 0),
-      'up' => target.position + Offset(0, -distance),
-      'down' => target.position + Offset(0, distance),
+      'left' => target + Offset(-distance, 0),
+      'right' => target + Offset(distance, 0),
+      'up' => target + Offset(0, -distance),
+      'down' => target + Offset(0, distance),
       _ => throw Exception(
           'Invalid swipe direction: $direction. Must be left, right, up, or down',
         ),
     };
 
     final List<Offset> path = _samplePath(
-      target.position,
+      target,
       endPosition,
       maxDelta: kMaxDelta * 2,
       maxSteps: 20,
@@ -177,25 +165,23 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    final _ResolvedTarget target = _resolveTarget(
+    final Offset target = _resolveTarget(
       matcher,
       widgetFinder,
       configuration,
     );
     await _dispatchLongPressAtPosition(
-      target.position,
-      target.bounds,
+      target,
       duration,
     );
   }
 
   Future<void> _dispatchLongPressAtPosition(
     Offset globalPosition,
-    Rect? bounds,
     Duration duration,
   ) async {
     final int? epoch = _shownOnRoute();
-    onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
+    onTapAt?.call(globalPosition, TapFeedbackKind.longPress);
     await Future<void>.delayed(
       const Duration(milliseconds: kTapFeedbackDelayMs),
     );
@@ -234,7 +220,7 @@ class GestureDispatcher {
     WidgetsBinding.instance.scheduleFrame();
     await Future<void>.delayed(kDelay);
     if (_routeUnchanged(epoch)) {
-      onTapAt?.call(globalPosition, bounds, TapFeedbackKind.longPress);
+      onTapAt?.call(globalPosition, TapFeedbackKind.longPress);
     }
   }
 
@@ -246,21 +232,19 @@ class GestureDispatcher {
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) async {
-    final _ResolvedTarget target = _resolveTarget(
+    final Offset target = _resolveTarget(
       matcher,
       widgetFinder,
       configuration,
     );
 
     await _dispatchTapAtPosition(
-      target.position,
-      target.bounds,
+      target,
       TapFeedbackKind.doubleTap,
     );
     await Future<void>.delayed(const Duration(milliseconds: 200));
     await _dispatchTapAtPosition(
-      target.position,
-      target.bounds,
+      target,
       TapFeedbackKind.doubleTap,
     );
   }
@@ -327,13 +311,15 @@ class GestureDispatcher {
     ];
   }
 
-  _ResolvedTarget _resolveTarget(
+  /// Global hit point of [matcher]: the given offset, or the center of the
+  /// matched widget.
+  Offset _resolveTarget(
     WidgetMatcher matcher,
     WidgetFinder widgetFinder,
     FlutterCopilotConfiguration configuration,
   ) {
     if (matcher is CoordinatesMatcher) {
-      return _ResolvedTarget(matcher.offset, null);
+      return matcher.offset;
     }
 
     final Element? element = widgetFinder.findElement(matcher, configuration);
@@ -351,12 +337,7 @@ class GestureDispatcher {
 
     final RenderBox box = _visibleBox(element, renderObject);
     final Offset center = box.size.center(Offset.zero);
-    final Offset position = box.localToGlobal(center);
-    final Rect bounds = Rect.fromPoints(
-      box.localToGlobal(Offset.zero),
-      box.localToGlobal(box.size.bottomRight(Offset.zero)),
-    );
-    return _ResolvedTarget(position, bounds);
+    return box.localToGlobal(center);
   }
 
   /// Drops a margin [RenderPadding] introduced by a widget such as [Container].

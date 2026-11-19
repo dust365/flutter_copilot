@@ -14,7 +14,7 @@ import type { FlutterCopilotConnector } from '../vm/connector.js';
  * Syntax: `<action> [k=v ...]`
  * Example:
  *   > tap text="点击"
- *   > enter-text focused input="demo user"
+ *   > enter-text key=SearchField input="demo user"
  *   > take-screenshots output=/tmp/s.png
  *   > reload
  *   > get-interactive-elements
@@ -40,7 +40,7 @@ export function replCommand(program: Command): void {
         rl.prompt();
 
         await new Promise<void>((resolve) => {
-          rl.on('line', async (raw) => {
+          const handleLine = async (raw: string): Promise<void> => {
             const line = raw.trim();
             if (!line) {
               rl.prompt();
@@ -61,10 +61,19 @@ export function replCommand(program: Command): void {
               process.stdout.write(chalk.red(`! ${(e as Error).message}\n`));
             }
             rl.prompt();
+          };
+          // Run lines one at a time, in input order. Piped input delivers every
+          // line at once, and the connection must stay open until the last
+          // command finishes, so `close` waits for the queue to drain.
+          let queue: Promise<void> = Promise.resolve();
+          rl.on('line', (raw) => {
+            queue = queue.then(() => handleLine(raw));
           });
           rl.on('close', () => {
-            stopFollowing();
-            resolve();
+            void queue.then(() => {
+              stopFollowing();
+              resolve();
+            });
           });
         });
       });
@@ -76,7 +85,7 @@ Syntax: \`<action> [key=value ...]\` — one command per line.
 
 Examples (at the fc> prompt):
   tap text="点击"
-  enter-text focused input="demo user"
+  enter-text key=SearchField input="demo user"
   swipe key=Feed direction=up distance=400
   navigate action=push route=/settings
   take-screenshots output=/tmp/s.png
@@ -220,7 +229,7 @@ function printHelp(): void {
     '  take-screenshots output=<path>      (alias: shot)',
     '  help | exit',
     '',
-    'matcher keys: key, text, type, x, y, focused',
+    'matcher keys: key, text, type, x, y',
     'example: tap text="点击"',
   ].join('\n');
   process.stdout.write(chalk.gray(lines + '\n'));

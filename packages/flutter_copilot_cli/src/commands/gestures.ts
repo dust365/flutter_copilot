@@ -9,14 +9,13 @@ function attachMatcherOptions(cmd: Command): Command {
     .option('--text <text>', 'Match by visible text.')
     .option('--type <type>', 'Match by widget type name (e.g. ElevatedButton).')
     .option('--x <x>', 'X coordinate (positional).')
-    .option('--y <y>', 'Y coordinate (positional).')
-    .option('--focused', 'Match the focused element.');
+    .option('--y <y>', 'Y coordinate (positional).');
 }
 
 function requireMatcher(opts: MatcherArgs): ReturnType<typeof buildMatcher> {
   const m = buildMatcher(opts);
   if (isMatcherEmpty(m)) {
-    throw new Error('At least one matcher required: --key, --text, --type, --x/--y or --focused.');
+    throw new Error('At least one matcher required: --key, --text, --type or --x/--y.');
   }
   return m;
 }
@@ -91,7 +90,7 @@ Examples:
     `
 Examples:
   fcc enter-text --key <TextFieldKey> --input demo
-  fcc enter-text --focused --input "hello world"
+  fcc enter-text --key <TextFieldKey> --input "hello world"
 
 The target TextField gains focus, then receives the characters one by one.
 `,

@@ -285,6 +285,18 @@ class AppDirectory {
     await removeSession(session);
   }
 
+  final Set<String> _suppressed = {};
+
+  String _suppressionKey(String uri) => _tryNormalize(uri) ?? uri.trim();
+
+  /// Whether discovery must not adopt [uri] again. Set when the user
+  /// disconnects an App; cleared by an explicit connect.
+  bool isSuppressed(String uri) => _suppressed.contains(_suppressionKey(uri));
+
+  void suppress(String uri) => _suppressed.add(_suppressionKey(uri));
+
+  void unsuppress(String uri) => _suppressed.remove(_suppressionKey(uri));
+
   Future<void> removeSession(
     AppSession session, {
     bool closeConnector = true,

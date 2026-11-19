@@ -5,71 +5,8 @@ import 'dart:io';
 import 'package:flutter_copilot_mcp/src/dtd/dtd_registry.dart';
 import 'package:flutter_copilot_mcp/src/session/app_directory.dart';
 import 'package:test/test.dart';
+import 'mock_dtd.dart';
 import 'mock_vm_server.dart';
-
-class MockDtd {
-  MockDtd(this.server);
-  final HttpServer server;
-  final sockets = <WebSocket>[];
-  final apps = <Map<String, dynamic>>[];
-  String get uri => 'ws://127.0.0.1:${server.port}/token';
-  static Future<MockDtd> start() async {
-    final mock =
-        MockDtd(await HttpServer.bind(InternetAddress.loopbackIPv4, 0));
-    mock.server.listen((request) async {
-      final socket = await WebSocketTransformer.upgrade(request);
-      mock.sockets.add(socket);
-      socket.listen((raw) {
-        final message = jsonDecode(raw as String) as Map;
-        final dynamic result;
-        switch (message['method']) {
-          case 'getRegisteredServices':
-            result = {
-              'type': 'RegisteredServicesResponse',
-              'dtdServices': ['ConnectedApp.getVmServices'],
-              'clientServices': []
-            };
-          case 'ConnectedApp.getVmServices':
-            result = {'type': 'VmServicesResponse', 'vmServices': mock.apps};
-          case 'streamListen':
-            result = {'type': 'Success'};
-          default:
-            socket.add(jsonEncode({
-              'jsonrpc': '2.0',
-              'id': message['id'],
-              'error': {'code': -32601, 'message': 'Method not found'}
-            }));
-            return;
-        }
-        socket.add(jsonEncode(
-            {'jsonrpc': '2.0', 'id': message['id'], 'result': result}));
-      });
-    });
-    return mock;
-  }
-
-  void event(String kind, Map<String, dynamic> app) {
-    for (final socket in sockets) {
-      socket.add(jsonEncode({
-        'jsonrpc': '2.0',
-        'method': 'streamNotify',
-        'params': {
-          'streamId': 'ConnectedApp',
-          'eventKind': kind,
-          'eventData': app,
-          'timestamp': 0,
-        }
-      }));
-    }
-  }
-
-  Future<void> close() async {
-    for (final socket in sockets) {
-      await socket.close();
-    }
-    await server.close(force: true);
-  }
-}
 
 Future<void> eventually(bool Function() predicate) async {
   final deadline = DateTime.now().add(const Duration(seconds: 5));
@@ -78,6 +15,17 @@ Future<void> eventually(bool Function() predicate) async {
     await Future<void>.delayed(const Duration(milliseconds: 20));
   }
 }
+
+/// A DtdRegistry whose machine listing reports [dtdUri] as the only DTD.
+DtdRegistry listingRegistry(AppDirectory apps, String dtdUri) =>
+    DtdRegistry(apps,
+        run: (_, __) async => ProcessResult(
+            0,
+            0,
+            jsonEncode([
+              {'wsUri': dtdUri, 'workspaceRoot': '/project'}
+            ]),
+            ''));
 
 void main() {
   late AppDirectory apps;
@@ -143,5 +91,33 @@ void main() {
     replacement.apps.add({'uri': second.wsUri});
     await registry.connect(replacement.uri);
     expect(apps.sessions.map((s) => s.uri), contains(second.wsUri));
+  });
+  test('a suppressed App is not adopted by a later registration', () async {
+    dtd.apps.add({'uri': first.wsUri, 'name': 'Flutter'});
+    apps.suppress(first.wsUri);
+    await registry.connect(dtd.uri);
+    expect(apps.sessions, isEmpty);
+
+    apps.unsuppress(first.wsUri);
+    await registry.connect(dtd.uri);
+    expect(apps.sessions.single.uri, first.wsUri);
+  });
+  test('a disconnected DTD stays down through refresh until connected again',
+      () async {
+    final discovering = listingRegistry(apps, dtd.uri);
+    addTearDown(discovering.close);
+    dtd.apps.add({'uri': first.wsUri, 'name': 'Flutter'});
+    await discovering.connect(dtd.uri);
+    expect(apps.sessions, hasLength(1));
+
+    await discovering.disconnect(dtd.uri);
+    expect(apps.sessions, isEmpty);
+
+    // Discovery would reconnect this DTD unless the disconnect holds.
+    await discovering.refresh();
+    expect(apps.sessions, isEmpty);
+
+    await discovering.connect(dtd.uri);
+    expect(apps.sessions.single.uri, first.wsUri);
   });
 }

@@ -147,7 +147,6 @@ function matcherFrom(step: StepT): Matcher {
   if (typeof s['type'] === 'string') m.type = s['type'];
   if (typeof s['x'] === 'number') m.x = s['x'];
   if (typeof s['y'] === 'number') m.y = s['y'];
-  if (s['focused'] === true) m.focused = true;
   return m;
 }
 
@@ -160,7 +159,7 @@ function sleep(ms: number): Promise<void> {
  * matches. Comparison is loose: each provided matcher field must equal the
  * node's value for that field.
  *
- * Supports `key`, `text`, `type`, and `focused`. (`x`/`y` coordinate matching
+ * Supports `key`, `text`, and `type`. (`x`/`y` coordinate matching
  * is a runtime gesture concept and is not part of the static element dump, so
  * it's rejected up front rather than silently returning false.)
  *
@@ -170,18 +169,11 @@ function sleep(ms: number): Promise<void> {
 function elementExists(tree: unknown, m: Matcher): boolean {
   if (m.x !== undefined || m.y !== undefined) {
     throw new Error(
-      'assert-element does not support x/y coordinate matchers — use key, text, type, or focused.',
+      'assert-element does not support x/y coordinate matchers — use key, text, or type.',
     );
   }
-  if (
-    m.key === undefined &&
-    m.text === undefined &&
-    m.type === undefined &&
-    m.focused !== true
-  ) {
-    throw new Error(
-      'assert-element requires at least one of: key, text, type, focused.',
-    );
+  if (m.key === undefined && m.text === undefined && m.type === undefined) {
+    throw new Error('assert-element requires at least one of: key, text, type.');
   }
   const queue: unknown[] = Array.isArray(tree) ? [...tree] : [tree];
   while (queue.length) {
@@ -192,8 +184,7 @@ function elementExists(tree: unknown, m: Matcher): boolean {
     if (
       (m.key === undefined || obj['key'] === m.key) &&
       (m.text === undefined || visibleText === m.text) &&
-      (m.type === undefined || obj['type'] === m.type) &&
-      (m.focused !== true || obj['focused'] === true)
+      (m.type === undefined || obj['type'] === m.type)
     ) {
       return true;
     }

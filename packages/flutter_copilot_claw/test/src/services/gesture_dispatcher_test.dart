@@ -12,13 +12,10 @@ void main() {
   final WidgetFinder finder = WidgetFinder();
 
   group('GestureDispatcher feedback', () {
-    testWidgets('tap reports the widget center and its global bounds', (
-      tester,
-    ) async {
-      final List<(Offset, Rect?)> taps = <(Offset, Rect?)>[];
+    testWidgets('tap marks the center of the widget', (tester) async {
+      final List<Offset> taps = <Offset>[];
       final GestureDispatcher dispatcher = GestureDispatcher(
-        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
-            taps.add((position, bounds)),
+        onTapAt: (Offset position, TapFeedbackKind kind) => taps.add(position),
       );
       await tester.pumpWidget(_targetBox());
       final Rect rect = tester.getRect(
@@ -31,22 +28,18 @@ void main() {
         configuration,
       );
       expect(taps, hasLength(1));
-      expect(taps.single.$1, rect.center);
-      expect(taps.single.$2, rect);
+      expect(taps.single, rect.center);
 
       await tester.pump(const Duration(milliseconds: 400));
       await gesture;
       expect(taps, hasLength(2));
-      expect(taps.last.$2, rect);
+      expect(taps.last, rect.center);
     });
 
-    testWidgets('a coordinate tap has a hit point and no widget bounds', (
-      tester,
-    ) async {
-      final List<(Offset, Rect?)> taps = <(Offset, Rect?)>[];
+    testWidgets('a coordinate tap marks the given point', (tester) async {
+      final List<Offset> taps = <Offset>[];
       final GestureDispatcher dispatcher = GestureDispatcher(
-        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
-            taps.add((position, bounds)),
+        onTapAt: (Offset position, TapFeedbackKind kind) => taps.add(position),
       );
       await tester.pumpWidget(const SizedBox.shrink());
 
@@ -55,8 +48,7 @@ void main() {
         finder,
         configuration,
       );
-      expect(taps.single.$1, const Offset(12, 34));
-      expect(taps.single.$2, isNull);
+      expect(taps.single, const Offset(12, 34));
 
       await tester.pump(const Duration(milliseconds: 400));
       await gesture;
@@ -69,8 +61,7 @@ void main() {
       var epoch = 0;
       final List<Offset> taps = <Offset>[];
       final GestureDispatcher dispatcher = GestureDispatcher(
-        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
-            taps.add(position),
+        onTapAt: (Offset position, TapFeedbackKind kind) => taps.add(position),
         routeEpoch: () => epoch,
       );
       await tester.pumpWidget(const SizedBox.shrink());
@@ -140,11 +131,12 @@ void main() {
       expect(paths, hasLength(2));
     });
 
-    testWidgets('tap bounds skip a container margin', (tester) async {
-      final List<(Offset, Rect?)> taps = <(Offset, Rect?)>[];
+    testWidgets('tap marks the visible box center past a container margin', (
+      tester,
+    ) async {
+      final List<Offset> taps = <Offset>[];
       final GestureDispatcher dispatcher = GestureDispatcher(
-        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
-            taps.add((position, bounds)),
+        onTapAt: (Offset position, TapFeedbackKind kind) => taps.add(position),
       );
       await tester.pumpWidget(
         Directionality(
@@ -167,18 +159,16 @@ void main() {
         finder,
         configuration,
       );
-      expect(taps.single.$1, const Offset(130, 20));
-      expect(taps.single.$2, const Rect.fromLTWH(80, 0, 100, 40));
+      expect(taps.single, const Offset(130, 20));
 
       await tester.pump(const Duration(milliseconds: 400));
       await gesture;
     });
 
-    testWidgets('a keyed padding keeps its own box', (tester) async {
-      final List<(Offset, Rect?)> taps = <(Offset, Rect?)>[];
+    testWidgets('a keyed padding marks its own box center', (tester) async {
+      final List<Offset> taps = <Offset>[];
       final GestureDispatcher dispatcher = GestureDispatcher(
-        onTapAt: (Offset position, Rect? bounds, TapFeedbackKind kind) =>
-            taps.add((position, bounds)),
+        onTapAt: (Offset position, TapFeedbackKind kind) => taps.add(position),
       );
       await tester.pumpWidget(
         const Directionality(
@@ -199,7 +189,7 @@ void main() {
         finder,
         configuration,
       );
-      expect(taps.single.$2, const Rect.fromLTWH(0, 0, 180, 40));
+      expect(taps.single, const Offset(90, 20));
 
       await tester.pump(const Duration(milliseconds: 400));
       await gesture;

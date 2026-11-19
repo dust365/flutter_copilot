@@ -6,7 +6,6 @@ const Matcher = z.object({
   type: z.string().optional(),
   x: z.number().optional(),
   y: z.number().optional(),
-  focused: z.boolean().optional(),
 });
 
 const Retry = z

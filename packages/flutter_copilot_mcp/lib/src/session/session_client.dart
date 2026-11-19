@@ -6,6 +6,21 @@ import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
 import 'package:flutter_copilot_mcp/src/session/session_error.dart';
 import 'package:flutter_copilot_mcp/src/session/session_server.dart';
 import 'package:flutter_copilot_mcp/src/version.g.dart';
+import 'package:path/path.dart' as p;
+
+/// The `.dart_tool/package_config.json` that governs [entry], found by walking
+/// up from the entry script. Null when none exists.
+String? packageConfigFor(String entry) {
+  var dir = Directory(p.dirname(entry));
+  while (true) {
+    final candidate =
+        File(p.join(dir.path, '.dart_tool', 'package_config.json'));
+    if (candidate.existsSync()) return candidate.path;
+    final parent = dir.parent;
+    if (parent.path == dir.path) return null;
+    dir = parent;
+  }
+}
 
 /// A client disconnect never terminates owned Flutter processes.
 class SessionClient {
@@ -49,10 +64,15 @@ class SessionClient {
       final script = Platform.script;
       final interpreted = script.scheme == 'file' &&
           (script.path.endsWith('.dart') || script.path.endsWith('.snapshot'));
+      final entry = interpreted ? script.toFilePath() : null;
+      // Pin the package config that resolves this entry, so the daemon does not
+      // depend on the working directory (the target App's project root).
+      final packages = entry == null ? null : packageConfigFor(entry);
       await Process.start(
           Platform.resolvedExecutable,
           [
-            if (interpreted) script.toFilePath(),
+            if (packages != null) '--packages=$packages',
+            if (entry != null) entry,
             '--session-daemon',
             '--directory',
             root,

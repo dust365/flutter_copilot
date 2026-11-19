@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_copilot_claw/src/services/tap_feedback_controller.dart';
 
@@ -15,21 +14,15 @@ void main() {
       expect(controller.state.value, isNull);
     });
 
-    testWidgets('showTap stores the hit point and widget bounds', (
-      tester,
-    ) async {
+    testWidgets('showTap stores the hit point', (tester) async {
       final TapFeedbackController controller = TapFeedbackController(
         duration: const Duration(seconds: 5),
       );
 
-      controller.showTap(
-        position: const Offset(60, 20),
-        bounds: const Rect.fromLTWH(0, 0, 120, 40),
-      );
+      controller.showTap(position: const Offset(60, 20));
 
       final TapFeedbackState state = controller.state.value!;
       expect(state.position, const Offset(60, 20));
-      expect(state.bounds, const Rect.fromLTWH(0, 0, 120, 40));
       expect(state.path, isEmpty);
       expect(state.isDrag, isFalse);
       controller.dispose();
@@ -43,7 +36,7 @@ void main() {
       controller.showAt(const Offset(3, 4));
 
       expect(controller.state.value!.position, const Offset(3, 4));
-      expect(controller.state.value!.bounds, isNull);
+      expect(controller.state.value!.path, isEmpty);
       controller.dispose();
     });
 

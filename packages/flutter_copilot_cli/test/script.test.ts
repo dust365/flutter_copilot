@@ -177,25 +177,11 @@ describe('runScript', () => {
     expect(r[0]?.ok).toBe(false);
   });
 
-  it('assert-element with focused=true matches a focused node', async () => {
-    // Override: tree has a focused element.
+  it('assert-element rejects a focused-only matcher (focus is not supported)', async () => {
     const fake = new FakeConnector();
-    fake.getInteractiveElements = () =>
-      Promise.resolve({
-        status: 'Success',
-        elements: [{ type: 'TextField', focused: true, children: [] }],
-      }) as ReturnType<FakeConnector['getInteractiveElements']>;
+    // `focused` is not in the schema, so it is stripped and no matcher remains.
     const s = Script.parse({
       steps: [{ action: 'assert-element', focused: true, exists: true }],
-    });
-    const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
-    expect(r[0]?.ok).toBe(true);
-  });
-
-  it('assert-element with only focused=false rejects (no matcher)', async () => {
-    const fake = new FakeConnector();
-    const s = Script.parse({
-      steps: [{ action: 'assert-element', focused: false, exists: true }],
     });
     const r = await runScript(fake as unknown as FlutterCopilotConnector, s);
     expect(r[0]?.ok).toBe(false);

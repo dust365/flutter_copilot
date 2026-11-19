@@ -20,10 +20,7 @@ void main() {
       final _Shot blank = await _capture(tester);
       expect(blank.at(8, 8).a, 0);
 
-      controller.showTap(
-        position: const Offset(100, 80),
-        bounds: const Rect.fromLTWH(30, 40, 140, 80),
-      );
+      controller.showTap(position: const Offset(100, 80));
       await tester.pump();
 
       final _Shot image = await _capture(tester);
@@ -99,10 +96,7 @@ void main() {
         inset: const EdgeInsets.only(left: 24, top: 60),
       );
 
-      controller.showTap(
-        position: const Offset(100, 100),
-        bounds: const Rect.fromLTWH(40, 80, 160, 40),
-      );
+      controller.showTap(position: const Offset(100, 100));
       await tester.pump();
 
       final image = await _capture(tester);

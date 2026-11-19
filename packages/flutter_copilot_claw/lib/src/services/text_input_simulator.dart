@@ -37,6 +37,10 @@ class TextInputSimulator {
         // Move cursor to end
         ..selection = TextSelection.collapsed(offset: text.length);
 
+      // Setting the controller does not call onChanged, which only fires for
+      // user edits. Call it so validation and form state see the new value.
+      editableText.onChanged?.call(text);
+
       // Schedule a frame to ensure the UI updates
       WidgetsBinding.instance.scheduleFrame();
       return;

@@ -9,6 +9,7 @@ import 'package:flutter_copilot_mcp/src/process/machine_output.dart';
 import 'package:flutter_copilot_mcp/src/session/app_directory.dart';
 import 'package:flutter_copilot_mcp/src/session/sdk_tools.dart';
 import 'package:flutter_copilot_mcp/src/session/session_error.dart';
+import 'package:flutter_copilot_mcp/src/session/vm_service_uri.dart';
 import 'package:path/path.dart' as p;
 
 /// One implementation of discovery, selection and launch used by both clients.
@@ -33,7 +34,6 @@ class SessionEngine {
   final Map<String, Map<String, dynamic>> _operations = {};
   final Map<String, String> _pendingEnsures = {};
   final Map<String, Map<String, dynamic>> _bindings = {};
-  final Set<String> _excluded = {};
   final Set<String> _explicit = {};
   DateTime? _lastDiscovery;
   Future<void>? _discovering;
@@ -64,7 +64,7 @@ class SessionEngine {
     // and guessed Android device ids cannot establish continuity.
     for (final session in apps.sessions) {
       final owned = runs.ownedByUri(session.uri);
-      if (owned != null && !_excluded.contains(session.uri)) {
+      if (owned != null && !apps.isSuppressed(session.uri)) {
         await runs.reconnect(owned);
         continue;
       }
@@ -84,9 +84,14 @@ class SessionEngine {
     }
   }
 
+  /// Identifies a session that a disconnect or stop removed, so the client can
+  /// drop its own copy of the connection.
+  static Map<String, dynamic> _ref(AppSession session) =>
+      {'id': session.id, 'uri': session.uri};
+
   List<AppSession> _scoped({bool includeUnknown = false}) => apps.sessions
       .where((session) =>
-          !_excluded.contains(session.uri) &&
+          !apps.isSuppressed(session.uri) &&
           (_explicit.contains(session.uri) ||
               (session.projectRoot != null
                   ? containsProject(root, session.projectRoot!)
@@ -123,7 +128,10 @@ class SessionEngine {
       case 'connect_dtd':
         return {'message': await dtds.connect(args['uri'] as String)};
       case 'disconnect_dtd':
-        return {'message': await dtds.disconnect(args['uri'] as String)};
+        final dtdUri = args['uri'] as String;
+        final removed = apps.sessionsForDtd(canonicalDtdUri(dtdUri));
+        final message = await dtds.disconnect(dtdUri);
+        return {'message': message, 'sessions': removed.map(_ref).toList()};
       case 'list_apps':
         await discover(force: true);
         return {
@@ -139,6 +147,8 @@ class SessionEngine {
         return _select(args['app'] as String?).toJson();
       case 'connect':
         final uri = args['uri'] as String;
+        // An explicit connect lifts an earlier disconnect of this URI.
+        apps.unsuppress(uri);
         final owned = runs.ownedByUri(uri);
         final session = owned != null
             ? await runs.reconnect(owned)
@@ -148,15 +158,18 @@ class SessionEngine {
                 waitForExtension: const Duration(seconds: 5));
         // An explicit URI is authorization to use an otherwise unidentifiable App.
         session.projectRoot ??= root;
-        _excluded.remove(session.uri);
         _explicit.add(session.uri);
         _bindings[session.id] = session.toJson();
         return session.toJson();
       case 'disconnect':
         final session = _select(args['app'] as String?);
-        _excluded.add(session.uri);
+        apps.suppress(session.uri);
         await apps.removeSession(session);
-        return {'disconnected': true, 'id': session.id};
+        return {
+          'disconnected': true,
+          'id': session.id,
+          'sessions': [_ref(session)],
+        };
       case 'list_devices':
         final devices = await runs.listDevices(directory: root);
         return {'devices': devices.map((d) => d.toJson()).toList()};
@@ -176,10 +189,14 @@ class SessionEngine {
       case 'detach_app':
         final detached = runs.ownedById(args['app'] as String?);
         if (detached != null) {
-          return {
-            'message':
-                await runs.stop(detached.id, detach: method == 'detach_app')
-          };
+          final affected = apps.sessions
+              .where((s) => identical(s.process, detached))
+              .toList();
+          final message =
+              await runs.stop(detached.id, detach: method == 'detach_app');
+          // Detached or stopped Apps stay out of discovery until connected again.
+          for (final s in affected) apps.suppress(s.uri);
+          return {'message': message, 'sessions': affected.map(_ref).toList()};
         }
         final session = _select(args['app'] as String?);
         if (!session.launched)
@@ -187,7 +204,11 @@ class SessionEngine {
               'This App belongs to an IDE or another flutter run. Only owned Apps can be stopped or detached.');
         final message = await runs.stop(session.process!.id,
             detach: method == 'detach_app');
-        return {'message': message};
+        apps.suppress(session.uri);
+        return {
+          'message': message,
+          'sessions': [_ref(session)]
+        };
       default:
         throw SessionError(
             'method_not_found', 'Unknown session method: $method');

@@ -11,6 +11,7 @@ import 'package:flutter_copilot_mcp/src/session/session_error.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+import 'mock_dtd.dart';
 import 'mock_vm_server.dart';
 
 class EmptyRegistry extends DtdRegistry {
@@ -248,5 +249,46 @@ void main() {
     final result = await registry.instances();
     expect(result, hasLength(2));
     expect(result[1].roots, ['/cwd', '/one', '/two']);
+  });
+
+  test('a disconnected App stays down across discovery until connected again',
+      () async {
+    final vm = await MockVmServer.start();
+    final dtd = await MockDtd.start();
+    addTearDown(vm.close);
+    addTearDown(dtd.close);
+    dtd.apps.add({'uri': vm.wsUri, 'name': 'Flutter'});
+    final directory = AppDirectory();
+    final discovering = DtdRegistry(directory,
+        run: (_, __) async => ProcessResult(
+            0,
+            0,
+            jsonEncode([
+              {'wsUri': dtd.uri, 'workspaceRoot': project.path}
+            ]),
+            ''));
+    final other = SessionEngine(
+        root: project.path,
+        sdk: SdkTools(flutter: 'flutter', dart: Platform.resolvedExecutable),
+        apps: directory,
+        dtds: discovering);
+    addTearDown(other.close);
+
+    await other.discover(force: true);
+    expect(directory.sessions.single.uri, vm.wsUri);
+    final id = directory.sessions.single.id;
+
+    final removed = await other.call('disconnect', {'app': id}) as Map;
+    expect(removed['sessions'], [
+      {'id': id, 'uri': vm.wsUri}
+    ]);
+    expect(directory.sessions, isEmpty);
+
+    // The DTD still advertises the App, so discovery must not adopt it again.
+    await other.discover(force: true);
+    expect(directory.sessions, isEmpty);
+
+    await other.call('connect', {'uri': vm.wsUri});
+    expect(directory.sessions.single.uri, vm.wsUri);
   });
 }
